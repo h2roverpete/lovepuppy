@@ -53,10 +53,10 @@ class DB {
      */
     async getSiteOutline() {
         try {
-            const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/outline`);
+            const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/pages`);
             return response.data;
         } catch (error) {
-            console.error(`Error fetching site ${this.siteId} outline.`, error);
+            console.error(`Error fetching site ${this.siteId} pages.`, error);
         }
     }
 
@@ -90,32 +90,12 @@ class DB {
     }
 
     /**
-     * Post guest data and feedback data in one shot.
-     *
-     * @param guestBookId {Number}
-     * @param data {GuestData|GuestFeedbackData}
-     * @return {Promise<GuestData|GuestFeedbackData>}
-     */
-    async postGuestBookFeedback(guestBookId, data) {
-        try {
-            const guestResponse = await this.postGuestData(guestBookId, data);
-            const feedbackResponse = await this.postFeedbackData(guestBookId, guestResponse.GuestID, data)
-            return {
-                ...guestResponse,
-                ...feedbackResponse
-            }
-        } catch (error) {
-            console.error(`Error fetching guestbook. guestBookId=${guestBookId}, data=${JSON.stringify(data)}`, error);
-        }
-    }
-
-    /**
      * Retrieve guest data
      *
      * @param guestId {Number}
      * @return {Promise<GuestData>}
      */
-    async getGuestData(guestId) {
+    async getGuest(guestId) {
         try {
             const response = await axios.get(`${this.host}/api/v1/guestbook/guest/${guestId}`);
             return response.data;
@@ -131,7 +111,7 @@ class DB {
      * @param data {GuestData}
      * @return {Promise<GuestData>}
      */
-    async postGuestData(guestBookId, data) {
+    async insertOrUpdateGuest(guestBookId, data) {
         try {
             const response = await axios.post(`${this.host}/api/v1/guestbook/${guestBookId}/guest`, data);
             return response.data;
@@ -146,7 +126,7 @@ class DB {
      * @param guestFeedbackId {Number}
      * @return {Promise<GuestFeedbackData>}
      */
-    async getFeedbackData(guestFeedbackId) {
+    async getGuestFeedback(guestFeedbackId) {
         const response = await axios.get(`${this.host}/api/v1/guestbook/feedback/${guestFeedbackId}`);
         return response.data;
     }
@@ -154,13 +134,12 @@ class DB {
     /**
      * Submit guest feedback
      *
-     * @param guestBookId {Number}
      * @param guestId {Number}
      * @param data {GuestFeedbackData}
      * @return {Promise<GuestFeedbackData>}
      */
-    async postFeedbackData(guestBookId, guestId, data) {
-        const response = await axios.post(`${this.host}/api/v1/guestbook/${guestBookId}/guest/${guestId}/feedback`, data);
+    async insertOrUpdateGuestFeedback(guestId, data) {
+        const response = await axios.post(`${this.host}/api/v1/guestbook/guest/${guestId}/feedback`, data);
         return response.data;
     }
 }

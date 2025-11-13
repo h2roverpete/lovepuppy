@@ -10,6 +10,7 @@ const popupStyles = {
         border: '1px solid #ccc', // Border around the menu
         borderRadius: '4px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+        fontSize: '12pt',
         zIndex: 9999, // Ensure the menu appears above other elements
     }),
     option: (provided, state) => ({
@@ -17,11 +18,16 @@ const popupStyles = {
         backgroundColor: state.isFocused ? '#e6f7ff' : 'white', // Background on hover
         color: state.isSelected ? 'black' : 'black', // Text color for selected/unselected options
         padding: '8px 12px',
+        fontSize: '12pt',
         cursor: 'pointer',
         '&:active': {
             backgroundColor: state.isSelected ? 'blue' : 'blue', // Background on click
         },
     }),
+    control: (provided, state) => ({
+        ...provided,
+        fontSize: '12pt'
+    })
     // You can also style other parts like control, singleValue, multiValue, etc.
     // control: (provided) => ({
     //   ...provided,
@@ -145,7 +151,7 @@ function AddressFields({address, onChange}) {
                                 console.debug(`Country changed: ${JSON.stringify(option)}`);
                                 onChange({name: 'State', value: option.value});
                             }}
-                            defaultValue={stateOption}
+                            value={stateOption}
                             options={stateOptions}
                             styles={popupStyles}
                         />

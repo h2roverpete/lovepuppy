@@ -12,7 +12,7 @@ function ContactMethod({guestBookConfig, guestData, onChange}) {
         <>
             {guestBookConfig?.ShowContactInfo && (
                 <div className="form-group mt-4">
-                    <label className="form-label" style={{marginRight: "20px"}}>Contact Method:</label>
+                    <label className="form-label" style={{marginRight: "20px"}}>Contact By:</label>
                     {guestBookConfig.ShowEmail && (
                         <div className="form-check-inline">
                             <input
