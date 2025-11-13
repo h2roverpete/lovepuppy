@@ -7,23 +7,23 @@ import {useEffect, useState} from "react";
  *
  * A <div> element with class names "content container"
  *
- * @param db{[DB]}                  Content database.
+ * @param api{Api}                  Content database.
  * @param siteData{SiteData}        Site data.
  * @param pageData{PageData}        Page data.
  * @param children{[JSX.Element]}   Elements to add at the end of page content.
  * @constructor
  */
-function Content({db, siteData, pageData, children}) {
+function Content({api, siteData, pageData, children}) {
 
     const [sectionData, setSectionData] = useState(null);
 
     useEffect(() => {
         if (pageData) {
-            db.getPageSections(pageData.PageID).then((data) => {
+            api.getPageSections(pageData.PageID).then((data) => {
                 setSectionData(data);
             })
         }
-    }, [pageData, db]);
+    }, [pageData, api]);
 
     return (
         <div className="content">

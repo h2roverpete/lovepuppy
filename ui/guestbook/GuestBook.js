@@ -1,19 +1,23 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, memo} from "react";
 import GuestFields from "./GuestFields";
 import GuestFeedbackFields from "./GuestFeedbackFields";
 
 /**
- * Guest Book component
+ * @typedef GuestBookProps
  *
- * @param db{DB}
- * @param guestBookId{Number}
- * @param guestId{Number}
- * @param guestFeedbackId{Number}
- * @param [onChange]{DataCallback}    Receives notification that guest ID or guest feedback ID was updated
+ * @property {Api} api                    API to guest book server.
+ * @property {number} guestBookId         Guest book ID.
+ * @property {number} guestId             Guest ID to populate fields with.
+ * @property {number} guestFeedbackId     Guest Feedback ID to populate fields with.
+ * @property {DataCallback} [onChange]    Receives notification that guest ID or guest feedback ID was updated
+ */
+/**
+ * Guest Book component
+ * @param props {GuestBookProps}
  * @returns {JSX.Element}
  * @constructor
  */
-function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
+function GuestBook(props) {
 
   // guest book configuration
   const [guestBookConfig, setGuestBookConfig] = useState(null);
@@ -25,20 +29,22 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
   // has form been submitted?
   const [submitted, setSubmitted] = useState(false);
 
+  console.log(`Rendering guest book. guestData=${JSON.stringify(guestData)}, guestFeedback=${JSON.stringify(guestFeedbackData)}, submitted=${submitted}`);
+
   // load guest book configuration when initialized
   useEffect(() => {
-    if (guestBookId) {
-      db.getGuestBook(guestBookId).then(data => {
+    if (props.guestBookId) {
+      props.api.getGuestBook(props.guestBookId).then(data => {
         setGuestBookConfig(data);
       }).catch(error => {
         console.error(`Error getting guest book: ${error}`);
       })
     }
-  }, [guestBookId, db])
+  }, [props.guestBookId, props.api])
 
   useEffect(() => {
-    if (guestId) {
-      db.getGuest(guestId).then(data => {
+    if (props.guestId) {
+      props.api.getGuest(props.guestId).then(data => {
         setGuestData(prevData => {
           return {
             ...prevData,
@@ -49,11 +55,11 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
         console.error(`Error getting guest data: ${error}`);
       })
     }
-  }, [guestId, db])
+  }, [props.guestId, props.guestBookId, props.api])
 
   useEffect(() => {
-    if (guestFeedbackId) {
-      db.getGuestFeedback(guestFeedbackId).then(data => {
+    if (props.guestFeedbackId) {
+      props.api.getGuestFeedback(props.guestFeedbackId).then(data => {
         setGuestFeedbackData(prevData => {
           return {
             ...prevData,
@@ -64,7 +70,7 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
         console.error(`Error getting feedback data: ${error}`);
       })
     }
-  }, [guestFeedbackId, db])
+  }, [props.guestFeedbackId, props.api])
 
 
   /**
@@ -78,6 +84,10 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
       const newValue = {
         ...prevValue,
         [name]: value
+      }
+      if (typeof value === 'string' && value.trim().length === 0) {
+        // remove empty string properties
+        delete newValue[name];
       }
       console.log(`Guest data updated: ${JSON.stringify(newValue)}`);
       return newValue;
@@ -96,6 +106,10 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
         ...prevValue,
         [name]: value
       }
+      if (typeof value === 'string' && value.trim().length === 0) {
+        // remove empty string properties
+        delete newValue[name];
+      }
       console.log(`Feedback data updated: ${JSON.stringify(newValue)}`);
       return newValue;
     });
@@ -108,11 +122,11 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
   function handleSubmit(e) {
     e.preventDefault();
     console.debug(`Updating guest. data=${JSON.stringify(guestData)}`);
-    db.insertOrUpdateGuest(guestBookId, guestData).then(data => {
+    props.api.insertOrUpdateGuest(props.guestBookId, guestData).then(data => {
       console.debug(`Guest update result: ${JSON.stringify(data)}`);
       setSubmitted(true)
-      onChange?.({name: 'guestId', value: data.GuestID});
-      db.insertOrUpdateGuestFeedback(data.GuestID, guestFeedbackData).then(data => {
+      props.onChange?.({name: 'guestId', value: data.GuestID});
+      props.api.insertOrUpdateGuestFeedback(data.GuestID, guestFeedbackData).then(data => {
         console.debug(`Guest feedback update result: ${JSON.stringify(data)}`);
       })
     })
@@ -127,8 +141,9 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
             <button
               className="btn btn-primary"
               onClick={() => {
+                // clear submit flag and feedback ID to submit again
                 setSubmitted(false);
-                onChange?.({guestFeedbackId: 0});
+                props.onChange?.({guestFeedbackId: 0});
               }}>
               {guestBookConfig.AgainMessage}
             </button>
@@ -167,4 +182,5 @@ function GuestBook({db, guestBookId, guestId, guestFeedbackId, onChange}) {
   )
 }
 
-export default GuestBook;
+// memorize guest book state between content changes
+export default memo(GuestBook);

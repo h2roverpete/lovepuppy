@@ -1,15 +1,15 @@
 import axios from "axios";
 
 /**
- * @class DB
+ * @class RestAPI
  *
- * Class to access the content database.
+ * Class to access the backend server.
  *
  * @property siteId{Number}     Content site ID for resolving
- * @property host{String}       Backend REST API host
+ * @property host{String}       REST API host
  * @property apiKey{String}     API key for backend access
  */
-class DB {
+class RestAPI {
     constructor(siteId, host, apiKey) {
         this.siteId = siteId;
         this.host = host;
@@ -17,12 +17,12 @@ class DB {
     }
 
     /**
-     * Get the page data (joined with site data for convenience)
+     * Get page data.
      *
      * @param pageId{Number}    ID of page to fetch
-     * @returns {Promise<PageData|SiteData>}
+     * @returns {Promise<PageData>}
      */
-    async getPageData(pageId) {
+    async getPage(pageId) {
         try {
             const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}`);
             return response.data;
@@ -49,7 +49,7 @@ class DB {
     /**
      * Get the site navigation outline.
      *
-     * @returns {Promise<[OutlineData]>}
+     * @returns {Promise<[PageData]>}
      */
     async getSiteOutline() {
         try {
@@ -61,7 +61,7 @@ class DB {
     }
 
     /**
-     * Get the site navigation outline.
+     * Get the site configuration information.
      *
      * @returns {Promise<SiteData>}
      */
@@ -144,6 +144,6 @@ class DB {
     }
 }
 
-export default DB;
+export default RestAPI;
 
 

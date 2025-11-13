@@ -16,17 +16,22 @@ import 'react-phone-input-2/lib/style.css'
  * @constructor
  */
 function PhoneNumberField({name, id, value, onChange}) {
-    return (
-        <PhoneInput
-            name={name}
-            id={id}
-            value={value}
-            country={'us'}
-            onChange={(value,country,e,formattedValue) => {onChange(formattedValue)}}
-            dropdownClass={'dropdown'}
-            inputClass={'phone'}
-        />
-    )
+  return (
+    <PhoneInput
+      inputProps={{
+        name: name,
+        required: false,
+        autoFocus: true
+      }}
+      value={value}
+      country={'us'}
+      onChange={(value, country, e, formattedValue) => {
+        onChange(formattedValue)
+      }}
+      dropdownClass={'dropdown'}
+      inputClass={'phone'}
+    />
+  )
 }
 
 export default PhoneNumberField;

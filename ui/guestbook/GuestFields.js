@@ -87,8 +87,8 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
                 <div className="form-group col-5 col-md-4 mt-4">
                     <label className="form-label" htmlFor="dayPhone">Alternate</label>
                     <PhoneNumberField
-                        name="fax"
-                        id="fax"
+                        name="altPhone"
+                        id="altPhone"
                         value={guestData.Fax}
                         onChange={value => onChange({name: 'Fax', value: value})}
                     />
@@ -135,7 +135,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
                         htmlFor="mailinglist"
                         style={{marginLeft: '10px'}}
                     >
-                        Add my email to this site's mailing list
+                        Add my email address to the mailing list
                     </label>
                 </div>
             )}
