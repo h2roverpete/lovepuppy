@@ -22,7 +22,7 @@ const popupStyles = {
             backgroundColor: state.isSelected ? 'blue' : 'blue', // Background on click
         },
     }),
-    control: (provided, state) => ({
+    control: (provided) => ({
         ...provided,
         fontSize: '12pt'
     })
