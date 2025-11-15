@@ -1,43 +1,34 @@
 import Section from './Section';
-import Title from './Title';
-import {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
+import {PageContext} from "./Page";
+import PageTitle from "./PageTitle";
 
 /**
  * Element to show page content
  *
  * A <div> element with class names "content container"
  *
- * @param api{Api}                  Content database.
- * @param siteData{SiteData}        Site data.
- * @param pageData{PageData}        Page data.
  * @param children{[JSX.Element]}   Elements to add at the end of page content.
  * @constructor
  */
-function Content({api, siteData, pageData, children}) {
+export default function Content({children}) {
 
-    const [sectionData, setSectionData] = useState(null);
+  const {pageData, sectionData} = useContext(PageContext);
 
-    useEffect(() => {
-        if (pageData) {
-            api.getPageSections(pageData.PageID).then((data) => {
-                setSectionData(data);
-            })
-        }
-    }, [pageData, api]);
-
-    return (
-        <div className="content">
-            {pageData && sectionData && (
-                <div className="container">
-                    <Title pageData={pageData}/>
-                    <div>{pageData && sectionData && sectionData.map(section => (
-                        <Section sectionData={section} key={section.PageSectionID}/>
-                    ))}</div>
-                    {children}
-                </div>
-            )}
-        </div>
-    )
+  return (
+    <>{pageData && (
+      <div className="content">
+        <PageTitle/>
+        {pageData && sectionData && (
+          <div className="container-fluid" style={{padding: '0'}}>
+            {pageData && sectionData && sectionData.map(section => (
+              <Section sectionData={section} key={section.PageSectionID}/>
+            ))}
+            {children}
+          </div>
+        )}
+      </div>
+    )}
+    </>
+  )
 }
-
-export default Content;

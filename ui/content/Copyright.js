@@ -1,3 +1,6 @@
+import {useContext} from "react";
+import {SiteContext} from "./Site";
+
 /**
  * Insert a copyright element.
  *
@@ -7,12 +10,15 @@
  * @returns {JSX.Element}
  * @constructor
  */
-function Copyright({siteData}) {
+function Copyright() {
+
+    const {siteData} = useContext(SiteContext);
+
     return (
         <>
           {siteData && (
               <div className="copyright">
-                  Copyright {new Date().getFullYear()} {siteData.SiteName}. All rights reserved.
+                  &copy; {new Date().getFullYear()} {siteData.SiteName}. All rights reserved.
               </div>
           )}
         </>
