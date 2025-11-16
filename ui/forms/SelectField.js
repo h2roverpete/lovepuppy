@@ -33,7 +33,7 @@ function SelectField(props) {
         props.onChange?.({name: props.name, value: e.target.value})
       }}
     >
-      <option value="">{prompt && prompt.length ? prompt : `(Select)`}</option>
+      <option key="" value="">{prompt && prompt.length ? prompt : `(Select)`}</option>
       {props.options?.map((option) => (
           <option key={option.value} value={option.value}>{option.label}</option>
         )

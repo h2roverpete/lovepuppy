@@ -20,10 +20,10 @@ import {useContext} from "react";
  * @constructor
  */
 export default function PageTitle(props) {
-  const pageContext = useContext(PageContext);
+  const {pageData} = useContext(PageContext);
   return (
-    <>{(pageContext.ShowTitle || props.showTitle) && (
-      <h1 className="PageTitle">{pageContext.pageData ? pageContext.pageData.PageTitle : (<>&nbsp;</>)}</h1>
+    <>{(pageData?.DisplayTitle || props.showTitle) && (
+      <h1 className="PageTitle">{pageData ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
     )}</>
   )
 }
