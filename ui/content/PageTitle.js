@@ -1,9 +1,29 @@
 import {PageContext} from "./Page";
 import {useContext} from "react";
 
-export default function PageTitle() {
+/**
+ * @typedef PageTitleProps
+ *
+ * @property showTitle {boolean} Always show the title in the tag, regardless of the content settings.
+ */
+
+/**
+ * Display the page title in an <h1> tag.
+ *
+ * If the page title has not loaded yet, still displays the
+ * tag and reserves its space in the layout.
+ *
+ * Must be located within the <Page> tag to receive page context.
+ *
+ * @param props {PageTitleProps}
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function PageTitle(props) {
   const pageContext = useContext(PageContext);
   return (
-    <h1 className="PageTitle">{pageContext.pageData?.PageTitle}</h1>
+    <>{(pageContext.ShowTitle || props.showTitle) && (
+      <h1 className="PageTitle">{pageContext.pageData ? pageContext.pageData.PageTitle : (<>&nbsp;</>)}</h1>
+    )}</>
   )
 }

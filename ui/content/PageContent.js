@@ -19,12 +19,12 @@ export default function PageContent({children}) {
     <div className="PageContent">
       <PageTitle/>
       {pageData && sectionData && (
-        <div style={{padding: '0'}}>
+        <>
           {pageData && sectionData && sectionData.map(section => (
             <PageSection sectionData={section} key={section.PageSectionID}/>
           ))}
           {children}
-        </div>
+        </>
       )}
     </div>
   )
