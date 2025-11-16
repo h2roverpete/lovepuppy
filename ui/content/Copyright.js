@@ -4,7 +4,8 @@ import {SiteContext} from "./Site";
 /**
  * @typedef CopyrightProps
  *
- * @property {string} [startYear]
+ * @property {string} [startYear]   Starting year for copyright.
+ * @property {string} [siteName]    Overrise site name in content configuration.
  */
 
 /**
@@ -22,7 +23,7 @@ function Copyright(props) {
 
   return (
     <div className="Copyright">
-      &copy;{props.startYear ? `${props.startYear}-` : ''}{new Date().getFullYear()} {siteData?.SiteName}.<br/>All
+      &copy;{props.startYear ? `${props.startYear}-` : ''}{new Date().getFullYear()} {props.siteName ? props.siteName : siteData?.SiteName}.<br/>All
       rights
       reserved.
     </div>
