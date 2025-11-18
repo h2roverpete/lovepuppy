@@ -35,7 +35,7 @@ function PageSection({sectionData}) {
       {sectionData.SectionImage && sectionData.ShowImage && (
         <div
           style={imageDivStyle}
-          className={`SectionImage col-12 mb-3 col-sm-auto${sectionData.ImageAlign === 'right' ? ' ms-sm-2' : sectionData.ImageAlign === 'left' ? ' me-sm-2' : ''}`}
+          className={`SectionImage col-12 mb-3 col-sm-auto${sectionData.ImageAlign === 'right' ? ' ms-sm-3' : sectionData.ImageAlign === 'left' ? ' me-sm-4' : ''}`}
         >
           <img
             className="img-fluid"
