@@ -26,6 +26,7 @@
     "react-ga4": "^2.1.0",
     "react-image-gallery": "^1.4.0",
     "react-phone-input-2": "^2.15.1",
+    "react-social-media-embed": "^2.5.18",
     "states-us": "^1.1.1"
   }
 }

@@ -13,6 +13,7 @@ function PageSection({sectionData}) {
     imageDivStyle.float = sectionData.ImageAlign;
     imageStyle[sectionData.ImageAlign === 'left' ? 'marginRight' : 'marginLeft'] = '20px'
     imageDivStyle.marginBottom = '10px';
+    imageDivStyle.textAlign = 'center';
   } else {
     imageDivStyle.display = 'flex';
     imageDivStyle.justifyContent = 'center';
@@ -37,7 +38,7 @@ function PageSection({sectionData}) {
       {sectionData.SectionImage && sectionData.ShowImage && (
         <div
           style={imageDivStyle}
-          className="SectionImage"
+          className="SectionImage col-12 col-sm-auto"
         >
           <img
             className="img-fluid"
