@@ -11,14 +11,11 @@ function PageSection({sectionData}) {
   if (sectionData.ImagePosition === 'beside') {
     imageDivStyle.position = 'relative';
     imageDivStyle.float = sectionData.ImageAlign;
-    imageStyle[sectionData.ImageAlign === 'left' ? 'marginRight' : 'marginLeft'] = '20px'
-    imageDivStyle.marginBottom = '10px';
     imageDivStyle.textAlign = 'center';
   } else {
     imageDivStyle.display = 'flex';
     imageDivStyle.justifyContent = 'center';
     imageDivStyle.alignItems = 'center';
-    imageDivStyle.marginBottom = '10px';
   }
   if (sectionData.HideImageFrame) {
     imageStyle.border='none';
@@ -38,7 +35,7 @@ function PageSection({sectionData}) {
       {sectionData.SectionImage && sectionData.ShowImage && (
         <div
           style={imageDivStyle}
-          className="SectionImage col-12 col-sm-auto"
+          className={`SectionImage col-12 mb-3 col-sm-auto${sectionData.ImageAlign === 'right' ? ' ms-sm-2' : sectionData.ImageAlign === 'left' ? ' me-sm-2' : ''}`}
         >
           <img
             className="img-fluid"

@@ -30,8 +30,6 @@ export default function NavBar(props) {
             <RecursiveDropdown pageData={item}/>
           ) : (
             <NavDropdown.Item
-              data-bs-toggle="collapse"
-              data-bs-target=".navbar-collapse.show"
               key={item.PageID}
               onClick={() => setPageId(item.PageID)}
             >
@@ -43,6 +41,8 @@ export default function NavBar(props) {
     );
   }
 
+  const children = getChildren?.(0);
+  console.debug(`Navbar found ${children.length} items.`);
   return (
     <>
       {outlineData && (
