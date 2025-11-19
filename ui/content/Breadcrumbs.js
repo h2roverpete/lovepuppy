@@ -15,7 +15,7 @@ export default function Breadcrumbs(props) {
       <>&nbsp;&raquo;&nbsp;</>
       {breadcrumbs.map(page => (
         <>
-          {page.NavTitle}
+          {page.PageTitle}
           <>&nbsp;&raquo;&nbsp;</>
         </>
       ))}

@@ -49,12 +49,12 @@ export default function NavBar(props) {
     <>
       {outlineData && (
         <Navbar
-          expand={props.expand ? props.expand : 'md'}
+          expand={props.expand ? props.expand : 'sm'}
           className={`NavBar ${!props.expand ? 'navbar-expand' : ''}`}
           data-bs-theme={props.theme ? props.theme : "light"}
           fixed={props.fixed ? props.fixed : undefined}
         >
-          <div className="NavBarContents container">
+          <div className="NavBarContents container-fluid">
             <>{(props.brand || props.icon) && (
               <Navbar.Brand href={'#'} onClick={() => {
                 setPageId(outlineData?.[0].PageID)

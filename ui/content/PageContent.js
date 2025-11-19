@@ -9,7 +9,7 @@
 export default function PageContent({children}) {
 
   return (
-    <div className="PageContent">
+    <div className="PageContent container-fluid">
       {children}
     </div>
   )
