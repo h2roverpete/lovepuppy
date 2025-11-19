@@ -1,0 +1,43 @@
+import {getData} from 'country-list'
+import SelectField from "./SelectField";
+
+const options = [];
+for (const data of getData()) {
+  options.push({
+    value: data.code,
+    label: data.name.replace(/\([^)]+\)/g, ''),
+  })
+}
+
+/**
+ * @typedef CountryFieldProps
+ *
+ * @property {string} name               Field name, used to label the field and also for onChange events.
+ * @property {string} value              Field current value.
+ * @property {string} className          One or more additional class names for field.
+ * @property {boolean} required          Is required?
+ * @property {string} prompt             Prompt string when nothing is selected.
+ * @property {DataCallback} onChange     Standard data callback receiving {name, value} when field contents change
+ */
+
+/**
+ * Form field with list of countries.
+ *
+ * @param props {CountryFieldProps}
+ * @constructor
+ */
+function CountryField(props) {
+  return (
+    <SelectField
+      name={props.name}
+      value={props.value}
+      className={props.className}
+      required={props.required}
+      prompt={props.prompt}
+      onChange={props.onChange}
+      options={options}
+    />
+  )
+}
+
+export default CountryField;
