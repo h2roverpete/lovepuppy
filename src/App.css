@@ -1,0 +1,139 @@
+/* Outer container and background */
+.Site {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+/* Middle content section, add width constraints here */
+.Page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 768px; /** bootstrap lg boundary */
+}
+
+/* Navigation bar outer container */
+.NavBar.navbar {
+  width: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Navigation bar inner elements, allows for custom alignment/layout */
+.NavBarContents.container-fluid {
+  width: 100%;
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* Navbar branding text */
+.NavBarBrand {
+
+}
+
+/* Navbar dropdown button */
+.navbar .navbar-toggler {
+
+}
+
+/* Navbar dropdown submenus */
+.navbar .dropdown-menu {
+
+}
+
+/* Active page in dropdowns */
+a.dropdown-item.active {
+
+}
+
+/* Navbar dropdown hover */
+.navbar .dropdown-item:hover {
+
+}
+
+/* Navbar navigation links */
+.navbar .navbar-nav .nav-link,
+.navbar .navbar-nav .dropdown-menu .dropdown-item,
+.navbar .navbar-brand {
+
+}
+
+/* Navbar current page in navigation links */
+.navbar .navbar-brand.active,
+.navbar .navbar-nav .nav-link.active,
+.navbar .navbar-nav .nav-link.show {
+
+}
+
+/* Navbar link hover */
+.navbar a:hover {
+
+}
+
+/* Page content container, use flex:1 to fill page height */
+.PageContent {
+  background-color: white;
+  flex: 1;
+}
+
+/* Main title */
+h1.PageTitle {
+}
+
+/* Subheads */
+h2.SectionTitle {
+
+}
+
+/* Uncontained list items need margin correction */
+li {
+  margin-left: 20px;
+}
+
+/* Text content */
+div.SectionText {
+
+}
+
+/* Copyright notice */
+.Copyright {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  text-align: center;
+  color: white;
+}
+
+/* bootstrap xs width */
+@media (max-width: 575px) {
+
+}
+
+/* bootstrap sm width */
+@media (min-width: 576px) {
+
+}
+
+/* bootstrap md width */
+@media (min-width: 768px) {
+
+}
+
+/* bootstrap lg width */
+@media (min-width: 960px) {
+
+}
+
+/* bootstrap xl width */
+@media (min-width: 1140px) {
+
+}
