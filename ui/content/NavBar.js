@@ -48,7 +48,7 @@ export default function NavBar(props) {
       {outlineData && (
         <Navbar
           expand={props.expand ? props.expand : 'md'}
-          className="NavBar"
+          className={`NavBar ${!props.expand ? 'navbar-expand' : ''}`}
           data-bs-theme={props.theme ? props.theme : "light"}
           fixed={props.fixed ? props.fixed : undefined}
         >
@@ -59,13 +59,13 @@ export default function NavBar(props) {
               <>{props.icon && (
                 <img
                   src={props.icon}
-                  alt={props.brand ? props.brand : siteData?.SiteName}
+                  alt={typeof props.brand === 'string' ? props.brand : siteData?.SiteName}
                   height={45}
                   style={{marginRight: '10px'}}
                 />
               )}</>
               <span className={'NavBarBrand'}>
-                  {props.brand ? props.brand : siteData?.SiteName}
+                  {typeof props.brand === 'string' ? props.brand : siteData?.SiteName}
               </span>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
@@ -76,6 +76,7 @@ export default function NavBar(props) {
                     <RecursiveDropdown pageData={item}/>
                   ) : (
                     <Nav.Link
+                      className={"NavItem"}
                       key={item.PageID}
                       onClick={() => setPageId(item.PageID)}
                     >

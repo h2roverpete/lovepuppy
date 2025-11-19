@@ -13,11 +13,11 @@ export default function SimpleNavBar() {
   const {pageData, setPageId} = useContext(PageContext);
 
   return (
-    <div className="SimpleNavBar Navbar">
+    <div className="SimpleNavBar NavBar">
       {outlineData && getChildren(0).map(page => (
         <span
           key={page.PageID}
-          className={'NavItem' + (page.PageID === pageData?.PageID ? ' current' : '')}
+          className={'NavItem nav-link' + (page.PageID === pageData?.PageID ? ' active' : '')}
           onClick={() => setPageId(page.PageID)}
           style={{cursor:'pointer'}}
         >
