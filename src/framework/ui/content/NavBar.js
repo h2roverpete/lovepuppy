@@ -57,7 +57,6 @@ export default function NavBar(props) {
     );
   }
 
-  const children = getChildren?.(0);
   return (
     <Navbar
       expand={props.expand ? props.expand : 'sm'}
