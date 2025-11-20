@@ -6,18 +6,17 @@ export default function Breadcrumbs(props) {
 
   const {outlineData, siteData} = useContext(SiteContext);
   const {pageData} = useContext(PageContext);
-
   const breadcrumbs = buildBreadcrumbs(outlineData, pageData?.ParentID);
 
   return (<>{breadcrumbs.length > 0 && (
     <div className="Breadcrumbs">
-      {siteData.SiteName}
+      {siteData?.SiteName}
       <>&nbsp;&raquo;&nbsp;</>
       {breadcrumbs.map(page => (
-        <>
+        <span key={page.PageID}>
           {page.PageTitle}
           <>&nbsp;&raquo;&nbsp;</>
-        </>
+        </span>
       ))}
     </div>
   )}</>);

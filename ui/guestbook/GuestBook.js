@@ -40,7 +40,6 @@ function GuestBook(props) {
   useEffect(() => {
     if (props.guestBookId) {
       restApi?.getGuestBook(props.guestBookId).then(data => {
-        console.debug(`Loaded guest book ${props.guestBookId}.`);
         setGuestBookConfig(data);
       }).catch(error => {
         console.error(`Error loading guest book: ${error}`);

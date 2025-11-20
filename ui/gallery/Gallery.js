@@ -33,7 +33,7 @@ export default function Gallery(props) {
         console.error(`Error loading gallery ${props.galleryId}: ${error}`);
       })
     }
-  }, [restApi, props.galleryId, props.pageId, pageData.PageID, galleryConfig]);
+  }, [restApi, props.galleryId, props.pageId, pageData?.PageID, galleryConfig]);
 
   useEffect(() => {
     if (restApi && props.galleryId && pageData?.PageID === props.pageId && !galleryPhotos) {
@@ -44,7 +44,7 @@ export default function Gallery(props) {
         console.error(`Error loading photos for gallery ${props.galleryId}: ${error}`);
       })
     }
-  }, [restApi, props.galleryId, props.pageId, pageData.PageID, galleryPhotos]);
+  }, [restApi, props.galleryId, props.pageId, pageData?.PageID, galleryPhotos]);
 
   const images = [];
   if (galleryPhotos) {
