@@ -1,96 +1,174 @@
+@font-face {
+  font-family: 'GoodDog';
+  src: url('./fonts/good-dog.ttf'), /* IE9 Compat Modes */ url('./fonts/good-dog.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'GoodDogCool';
+  src: url('./fonts/good-dog-cool.ttf'), /* IE9 Compat Modes */ url('fonts/good-dog-cool.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'EmmaScript';
+  src: url('./fonts/emma-script.ttf'), /* IE9 Compat Modes */ url('./fonts/emma-script.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
 /* Outer container and background */
 .Site {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   flex: 1;
 }
 
 /* Middle content section, add width constraints here */
 .Page {
-  width: 100%;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
-  max-width: 768px; /** bootstrap lg boundary */
+}
+
+.NavBarWrapper {
+  background-color: #829960;
+  background-image: url('./assets/topimage.jpg');
+  background-repeat: no-repeat;
+  height:199px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: start;
+  width: 100%;
+}
+
+.Logo {
+  align-self: start;
+  justify-self: start;
+  margin-left: 10px;
 }
 
 /* Navigation bar outer container */
 .NavBar.navbar {
-  width: 100%;
+  width: 100vw;
   padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: start;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.5));
+  border-bottom: 1px solid white;
+  min-height:46px;
 }
 
 /* Navigation bar inner elements, allows for custom alignment/layout */
 .NavBarContents.container-fluid {
-  width: 100%;
-  padding-left: 20px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 0;
+  align-self: flex-start;
 }
 
 /* Navbar branding text */
-.NavBarBrand {
-
+.navbar-brand {
+  height:40px;
 }
 
 /* Navbar dropdown button */
 .navbar .navbar-toggler {
-
+  background-color: #829960;
 }
 
 /* Navbar dropdown submenus */
 .navbar .dropdown-menu {
-
+  background-color: #8e9f73;
+  border-color: #e9f7d8;
+  color: #e9f7d8;
+  padding: 10px;
+  font-size: 14pt;
 }
 
 /* Active page in dropdowns */
-a.dropdown-item.active {
-
+.navbar-nav .dropdown-menu a.active.dropdown-item {
+  background-color: #00000016;
 }
 
 /* Navbar dropdown hover */
 .navbar .dropdown-item:hover {
-
+  color: white;
+  background-color: #00000016;
 }
 
 /* Navbar navigation links */
-.navbar .navbar-nav .nav-link,
-.navbar .navbar-nav .dropdown-menu .dropdown-item,
+.navbar .nav-link,
 .navbar .navbar-brand {
+  font-family: "EmmaScript", cursive;
+  font-size: 22pt;
+  color: #e9f7d8;
+  text-shadow: 1px 1px 2px black;
+  line-height: 100%;
+  display: flex;
+  align-items: center;
+  margin-left:10px;
+}
 
+/* Dropdown navigation links */
+.navbar .navbar-nav .dropdown-menu .dropdown-item {
+  color: #e9f7d8;
 }
 
 /* Navbar current page in navigation links */
 .navbar .navbar-brand.active,
 .navbar .navbar-nav .nav-link.active,
 .navbar .navbar-nav .nav-link.show {
-
+  color: white;
 }
 
 /* Navbar link hover */
 .navbar a:hover {
-
+  color: #e9f7d8;
 }
 
-/* Page content container, use flex:1 to fill page height */
-.PageContent {
-  background-color: white;
+/* Page content container, uses flex:1 to fill page height */
+div .PageContent.container-fluid {
+  padding: 20px;
+  color: #5A7335;
+  font-family: Arial, Tahoma, Verdana, sans-serif;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 768px; /** bootstrap lg boundary */
+  margin:0;
+}
+
+.Breadcrumbs {
+  color: #a1b583;
 }
 
 /* Main title */
 h1.PageTitle {
+  font-family: "GoodDog", "Comic Sans MS", sans-serif;
+  font-size: 36pt;
+  font-weight: normal;
+  color: #f26222;
+  text-shadow: 1px 1px 1px #00000066;
+  letter-spacing: 0.03em;
+  line-height: 100%;
+  margin-bottom: 20px;
 }
+
+div.PageSection {
+  margin-bottom: 20px;
+}
+
 
 /* Subheads */
 h2.SectionTitle {
-
+  font-family: "GoodDog", "Comic Sans MS", sans-serif;
+  font-size: 30pt;
+  font-weight: normal;
+  color: #f26222;
+  text-shadow: 1px 1px 1px #00000066;
+  letter-spacing: 0.04em;
 }
 
 /* Uncontained list items need margin correction */
@@ -98,29 +176,92 @@ li {
   margin-left: 20px;
 }
 
+ul {
+  margin-left: -20px;
+}
+
+ol {
+  margin-left: -20px;
+}
+
 /* Text content */
 div.SectionText {
+  line-height: 180%;
+}
 
+div.SectionText a,
+div.SectionText a:active,
+div.SectionText a:visited {
+  color: #f26222;
+  text-decoration: none;
+}
+
+div.SectionText a:hover {
+  text-decoration: underline;
+}
+
+/* Content images */
+div.SectionImage img {
+  border: 1px solid #D1E7B8;
+  box-shadow: 1px 1px 6px #00000066;
 }
 
 /* Copyright notice */
 .Copyright {
-  margin: 10px 0;
+  color: #a1b583;
+  line-height:120%;
+  text-align: right;
+  font-size: 10pt;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: flex-end;
+  flex:1;
+}
+
+.BottomBanner {
+  width: 100%;
+  height: 50px;
+  border-top: 2px solid white;
   display: flex;
   flex-direction: column;
   justify-content: end;
   text-align: center;
-  color: white;
+  color: #e9f7d8;
+  line-height: 120%;
+  background-image: url('./assets/bottombanner.jpg');
+  background-repeat: repeat-x;
+  background-size: cover;
 }
 
 /* bootstrap xs width */
 @media (max-width: 575px) {
-
+  .NavBarWrapper {
+    background-image: none;
+    justify-content: flex-start;
+    height: auto;
+  }
+  .NavBar.navbar {
+    padding: 20px;
+  }
+  .NavBarBrandIcon {
+    height:60px;
+  }
+  div.navbar-nav {
+    margin-top:20px;
+  }
+  a.nav-link {
+    margin: 10px 0;
+    padding: 0;
+  }
 }
 
 /* bootstrap sm width */
 @media (min-width: 576px) {
-
+  .div.NavBarWrapper {
+    height: auto;
+  }
 }
 
 /* bootstrap md width */
