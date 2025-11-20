@@ -141,7 +141,7 @@ function GuestBook(props) {
       <div className="guestbook">
         {submitted ? (
           <>
-            <p>{guestBookConfig.DoneMessage}</p>
+            <p dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage}}/>
             <button
               className="btn btn-primary"
               onClick={() => {
@@ -154,7 +154,7 @@ function GuestBook(props) {
           </>
         ) : (
           <>
-            <p>{guestBookConfig.GuestBookMessage}</p>
+            <p dangerouslySetInnerHTML={{__html: guestBookConfig.GuestBookMessage}}/>
             <form
               encType="multipart/form-data"
               onSubmit={(e) => {
