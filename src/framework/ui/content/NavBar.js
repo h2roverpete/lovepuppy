@@ -23,77 +23,94 @@ export default function NavBar(props) {
   const {setPageId, pageData} = useContext(PageContext);
 
   function RecursiveDropdown(props) {
+    const children = getChildren(props.pageData.PageID);
     return (
-      <NavDropdown title={props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
-                   id="basic-nav-dropdown">
-        <>{getChildren(props.pageData.PageID).map((item) => (
-          <>{item.HasChildren ? (
-            <RecursiveDropdown pageData={item}/>
-          ) : (
-            <NavDropdown.Item
-              className={`${pageData?.PageID === item.PageID ? ' active' : ''}`}
-              key={item.PageID}
-              onClick={() => setPageId(item.PageID)}
-            >
-              {item.NavTitle ? item.NavTitle : item.PageTitle}
-            </NavDropdown.Item>
-          )}</>
-        ))}</>
-      </NavDropdown>
+      <>{children.length === 0 ? (
+        <NavDropdown.Item
+          id="basic-nav-dropdown"
+          onClick={() => {
+            setPageId(props.pageData.PageID)
+          }}
+        >
+          {props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
+        </NavDropdown.Item>
+      ) : (
+        <NavDropdown
+          title={props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
+          id="basic-nav-dropdown"
+        >
+          <>{children.map((item) => (
+            <>{item.HasChildren ? (
+              <RecursiveDropdown pageData={item}/>
+            ) : (
+              <NavDropdown.Item
+                className={`${pageData?.PageID === item.PageID ? ' active' : ''}`}
+                key={item.PageID}
+                onClick={() => setPageId(item.PageID)}
+              >
+                {item.NavTitle ? item.NavTitle : item.PageTitle}
+              </NavDropdown.Item>
+            )}</>
+          ))}</>
+        </NavDropdown>
+      )}</>
     );
   }
 
   const children = getChildren?.(0);
-  console.debug(`Navbar found ${children.length} items.`);
   return (
-    <>
-      {outlineData && (
-        <Navbar
-          expand={props.expand ? props.expand : 'sm'}
-          className={`NavBar ${!props.expand ? 'navbar-expand' : ''}`}
-          data-bs-theme={props.theme ? props.theme : "light"}
-          fixed={props.fixed ? props.fixed : undefined}
-        >
-          <div className="NavBarContents container-fluid">
-            <>{(props.brand || props.icon) && (
-              <Navbar.Brand href={'#'} onClick={() => {
-                setPageId(outlineData?.[0].PageID)
-              }}>
-                <>{props.icon && (
-                  <img
-                    src={props.icon}
-                    alt={typeof props.brand === 'string' ? props.brand : siteData?.SiteName}
-                    height={45}
-                    style={{marginRight: '10px'}}
-                  />
-                )}</>
-                <span className={'NavBarBrand'}>
-                  {typeof props.brand === 'string' ? props.brand : siteData?.SiteName}
-              </span>
-              </Navbar.Brand>
-            )}</>
+    <Navbar
+      expand={props.expand ? props.expand : 'sm'}
+      className={`NavBar ${!props.expand ? 'navbar-expand' : ''}`}
+      data-bs-theme={props.theme ? props.theme : "light"}
+      fixed={props.fixed ? props.fixed : undefined}
+    >
+      <div className="NavBarContents container-fluid">
 
-            <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-            <Navbar.Collapse id="MainNavigation">
-              <Nav>
-                {getChildren(0).map((item) => (
-                  <>{item.HasChildren ? (
-                    <RecursiveDropdown pageData={item}/>
-                  ) : (
-                    <Nav.Link
-                      className={`NavItem${pageData?.PageID === item.PageID ? ' active' : ''}`}
-                      key={item.PageID}
-                      onClick={() => setPageId(item.PageID)}
-                    >
-                      {item.NavTitle ? item.NavTitle : item.PageTitle}
-                    </Nav.Link>
-                  )}</>
-                ))}
-              </Nav>
-            </Navbar.Collapse>
-          </div>
-        </Navbar>
-      )}
-    </>
+        <>{(props.brand || props.icon) && (
+          <Navbar.Brand
+            href={'#'}
+            onClick={() => {
+              setPageId(outlineData?.[0].PageID)
+            }}
+            className={`NavBarBrand ${props.brandClassName}`}
+          >
+            <>{props.icon && (
+              <img
+                className="NavBarBrandIcon"
+                src={props.icon}
+                alt={typeof props.brand === 'string' ? props.brand : siteData?.SiteName}
+                height={45}
+                style={{marginRight: '10px'}}
+              />
+            )}</>
+            <>{props.icon && (
+              <span className={'NavBarBrandText'}>
+                    {typeof props.brand === 'string' ? props.brand : siteData?.SiteName}
+                  </span>
+            )}</>
+          </Navbar.Brand>
+        )}</>
+
+        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+        <Navbar.Collapse id="MainNavigation">
+          <Nav>
+            {getChildren(0).map((item) => (
+              <>{item.HasChildren ? (
+                <RecursiveDropdown pageData={item}/>
+              ) : (
+                <Nav.Link
+                  className={`NavItem${pageData?.PageID === item.PageID ? ' active' : ''}`}
+                  key={item.PageID}
+                  onClick={() => setPageId(item.PageID)}
+                >
+                  {item.NavTitle ? item.NavTitle : item.PageTitle}
+                </Nav.Link>
+              )}</>
+            ))}
+          </Nav>
+        </Navbar.Collapse>
+      </div>
+    </Navbar>
   )
 }
