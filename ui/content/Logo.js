@@ -21,7 +21,7 @@ export default function Logo(props) {
 
   return (
     <Image
-      className='Logo'
+      className={`Logo ${props.className}`}
       src={props.src}
       style={{cursor: 'pointer'}}
       onClick={() => {
