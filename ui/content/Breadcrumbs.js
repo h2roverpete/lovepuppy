@@ -28,7 +28,6 @@ export default function Breadcrumbs(props) {
  * @param parentId {number}
  */
 function buildBreadcrumbs(outlineData, parentId) {
-  console.debug(`Build breadcrumbs for ${parentId} from ${outlineData?.length}`);
   const breadcrumbs = [];
   if (outlineData && parentId) {
     for (let i = outlineData.length - 1; i >= 0; i--) {
