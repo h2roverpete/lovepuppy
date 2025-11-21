@@ -2,8 +2,6 @@ import {createContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// In your main component or at the application entry point
-ReactGA.initialize('YOUR_GA_MEASUREMENT_ID');
 export const SiteContext = createContext({
   restApi: null,
   siteData: null,
@@ -27,6 +25,8 @@ export const SiteContext = createContext({
  * @constructor
  */
 function Site(props) {
+
+  ReactGA.initialize(props.googleId);
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
@@ -72,7 +72,7 @@ function Site(props) {
     if (!outlineData) {
       // load site outline
       props.restApi?.getSiteOutline().then((data) => {
-        console.debug(`Loaded site outline.`);
+        console.debug(`Loaded site ${props.restApi.siteId} outline.`);
         setOutlineData(data);
       })
     }
