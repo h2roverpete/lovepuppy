@@ -1,4 +1,6 @@
 import './App.css';
+import './GuestBook.css'
+
 import Head from './framework/ui/content/Head'
 import Copyright from './framework/ui/content/Copyright'
 import RestAPI from './framework/api/api';
