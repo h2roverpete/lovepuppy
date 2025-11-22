@@ -120,7 +120,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
                 onChange({name: 'ContactMethod', value: value})
             }}/>
             {guestBookConfig?.ShowMailingList && (
-                <div className="form-group align-baseline">
+                <div className="form-group align-baseline d-flex">
                     <input
                         type="checkbox"
                         className="form-check-input"

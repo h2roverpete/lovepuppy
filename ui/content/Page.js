@@ -6,16 +6,30 @@ export const PageContext = createContext(
     pageID: null,
     pageData: null,
     sectionData: null,
+    breadcrumbs: null,
     setPageId: (pageId) => console.warn(`setPageId not defined.`)
   });
 
-export default function Page(props) {
+/**
+ * @typedef PageProps
+ * @property {[JSX.Element]} children
+ */
+/**
+ * Page component, generates a <div> and provides
+ * page related context data to children.
+ *
+ * @param props {PageProps}
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function Page({children}) {
 
   const {outlineData, restApi} = useContext(SiteContext);
 
   const [pageId, setPageId] = useState(null);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
+  const [breadcrumbs, setBreadcrumbs] = useState(null);
 
   if (!pageId) {
     // no explicit page id: check URL params for page id
@@ -50,6 +64,12 @@ export default function Page(props) {
     }
   }, [restApi, pageData, pageId, sectionData]);
 
+  useEffect(() => {
+    if (pageData && outlineData) {
+      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
+    }
+  }, [pageData, outlineData])
+
   /**
    * Setter function for changing page ID.
    *
@@ -65,9 +85,39 @@ export default function Page(props) {
   // provide context to children
   return (
     <div className="Page">
-      <PageContext value={{pageId: pageId, pageData: pageData, sectionData: sectionData, 'setPageId': setter}}>
-        {props.children}
+      <PageContext
+        value={{
+          pageId: pageId,
+          pageData: pageData,
+          sectionData: sectionData,
+          breadcrumbs: breadcrumbs,
+          'setPageId': setter
+        }}
+      >
+        {children}
       </PageContext>
     </div>
   );
+}
+
+/**
+ * Build breadcrumb array.
+ *
+ * @param outlineData {[OutlineData]}
+ * @param parentId {number}
+ */
+function buildBreadcrumbs(outlineData, parentId) {
+  const breadcrumbs = [];
+  console.debug(`buildBreadcrumbs for ${parentId}`);
+  if (outlineData && parentId) {
+    for (let i = outlineData.length - 1; i >= 0; i--) {
+      if (outlineData[i].PageID === parentId) {
+        breadcrumbs.push(outlineData[i]);
+        parentId = outlineData[i].ParentID;
+      }
+    }
+  }
+  return breadcrumbs.sort((a, b) => {
+    return b?.OutlineSeq - a?.OutlineSeq
+  });
 }
