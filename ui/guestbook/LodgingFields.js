@@ -74,7 +74,7 @@ function LodgingFields({lodgingData, onChange}) {
         />
       </div>
       <div className="form-group required">
-        <label htmlFor="departuredate" className="form-label required">Departure Date</label>
+        <label htmlFor="departuredate" className="form-label required mt-2">Departure Date</label>
         <DatePicker
           selected={lodgingData.DepartureDate}
           onChange={(date) => {
@@ -97,7 +97,7 @@ function LodgingFields({lodgingData, onChange}) {
           required={true}
         />
       </div>
-      <div className="form-group col-6">
+      <div className="form-group col-8 mt-2">
         <label className="control-label required" htmlFor="NumberOfGuests">Number of Guests</label>
         <SelectField
           name="NumberOfGuests"
