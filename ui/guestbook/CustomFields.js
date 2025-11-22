@@ -16,7 +16,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
   const customFields = [];
   if (guestBookConfig) {
     for (let i = 0; i <= 8; i++) {
-      if (guestBookConfig[`Custom${i}Label`]) {
+      if (guestBookConfig[`Custom${i}Label`] && guestBookConfig[`Custom${i}Type`]) {
         let options;
         if (guestBookConfig[`Custom${i}Options`]) {
           options = []
