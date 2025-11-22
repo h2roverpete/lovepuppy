@@ -46,7 +46,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
     return (
       <>{children.length === 0 ? (
         <NavDropdown.Item
-          className={`${isInCurrentPath(props.pageData.PageID) ? 'active' : ''}`}
+          className={`text-nowrap${isInCurrentPath(props.pageData.PageID) ? ' active' : ''}`}
           onClick={() => {
             setPageId(props.pageData.PageID)
           }}
@@ -63,7 +63,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
               <RecursiveDropdown pageData={item}/>
             ) : (
               <NavDropdown.Item
-                className={`${pageData?.PageID === item.PageID ? ' active' : ''}`}
+                className={`text-nowrap${pageData?.PageID === item.PageID ? ' active' : ''}`}
                 key={item.PageID}
                 onClick={() => setPageId(item.PageID)}
               >
@@ -103,7 +103,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
               />
             )}</>
             <>{icon && (
-              <span className={'NavBarBrandText'}>
+              <span className={'NavBarBrandText text-nowrap'}>
                     {typeof brand === 'string' ? brand : siteData?.SiteName}
                   </span>
             )}</>
@@ -118,7 +118,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
                 <RecursiveDropdown pageData={item}/>
               ) : (
                 <Nav.Link
-                  className={`NavItem${isInCurrentPath(item.PageID) ? ' active' : ''}`}
+                  className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
                   key={item.PageID}
                   onClick={() => setPageId(item.PageID)}
                 >
