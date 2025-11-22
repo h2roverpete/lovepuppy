@@ -1,7 +1,6 @@
 import PageSection from './PageSection';
 import React, {useContext} from "react";
 import {PageContext} from "./Page";
-import PageTitle from "./PageTitle";
 
 /**
  * Element to show page content
