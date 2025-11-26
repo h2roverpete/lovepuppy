@@ -23,8 +23,8 @@ import {Nav, NavDropdown} from "react-bootstrap";
  */
 export default function NavBar({brand, brandClassName, icon, expand, theme, fixed}) {
 
-  const {siteData, outlineData, getChildren} = useContext(SiteContext);
-  const {setPageId, pageData, breadcrumbs} = useContext(PageContext);
+  const {siteData, getChildren} = useContext(SiteContext);
+  const {pageData, breadcrumbs} = useContext(PageContext);
 
   function isInCurrentPath(pageId) {
     if (!pageData || !breadcrumbs) {

@@ -17,9 +17,6 @@ import {PageContext} from "framework/ui/content/Page";
  * @constructor
  */
 export default function Logo(props) {
-  const {outlineData} = useContext(SiteContext);
-  const {setPageId} = useContext(PageContext);
-
   return (
     <Image
       className={`Logo ${props.className}`}

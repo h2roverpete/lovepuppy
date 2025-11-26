@@ -6,8 +6,7 @@ export const PageContext = createContext(
     pageID: null,
     pageData: null,
     sectionData: null,
-    breadcrumbs: null,
-    setPageId: (pageId) => console.warn(`setPageId not defined.`)
+    breadcrumbs: null
   });
 
 /**
@@ -72,8 +71,9 @@ export default function Page(props) {
 
   /**
    * Setter function for changing page ID.
+   * Clears out page and section data on new Page ID.
    *
-   * @param pageId {number} new pgae ID.
+   * @param pageId {number} new page ID.
    */
   function setter(pageId) {
     console.debug(`Set page ID to ${pageId}.`);
@@ -90,8 +90,7 @@ export default function Page(props) {
           pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
-          breadcrumbs: breadcrumbs,
-          'setPageId': setter
+          breadcrumbs: breadcrumbs
         }}
       >
         {props.children}

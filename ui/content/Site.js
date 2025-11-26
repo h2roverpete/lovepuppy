@@ -28,7 +28,7 @@ export const SiteContext = createContext({
  */
 export default function Site(props) {
 
-  // Google analytics, if provided.
+  // Google Analytics, if provided.
   if (props.googleId) {
     ReactGA.initialize(props.googleId);
   }
@@ -82,7 +82,13 @@ export default function Site(props) {
   return (
     <div className="Site">
       <SiteContext
-        value={{restApi: props.restApi, siteData: siteData, outlineData: outlineData, 'getChildren': getChildren}}>
+        value={{
+          restApi: props.restApi,
+          siteData: siteData,
+          outlineData: outlineData,
+          'getChildren': getChildren
+        }}
+      >
         <BrowserRouter>
           <Routes>
             <Route
