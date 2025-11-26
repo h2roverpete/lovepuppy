@@ -91,8 +91,19 @@ export default function Site(props) {
       >
         <BrowserRouter>
           <Routes>
+            {/* default route for cfm pages */}
+            <Route
+              path=""
+              element={<props.pageElement/>}
+            />
+            {/* root route */}
             <Route
               path="/"
+              element={<props.pageElement/>}
+            />
+            {/* legacy route for cfm pages */}
+            <Route
+              path="/page.cfm"
               element={<props.pageElement/>}
             />
             {outlineData?.map((page) => (
