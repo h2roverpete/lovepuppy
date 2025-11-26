@@ -57,6 +57,7 @@ import axios from "axios";
  * @property {String} PopUpXMLCached
  * @property {Boolean} InheritSecurity
  * @property {String} FacebookPixelID
+ * @property {string} PageRoute
  */
 
 /**
@@ -73,6 +74,7 @@ import axios from "axios";
  * @property {Boolean} HasChildren
  * @property {String} OutlineSort
  * @property {number} OutlineLevel
+ * @property {string} PageRoute
  */
 
 /**

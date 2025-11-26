@@ -22,11 +22,11 @@ export const PageContext = createContext(
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Page({children}) {
+export default function Page(props) {
 
   const {outlineData, restApi} = useContext(SiteContext);
 
-  const [pageId, setPageId] = useState(null);
+  const [pageId, setPageId] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
@@ -94,7 +94,7 @@ export default function Page({children}) {
           'setPageId': setter
         }}
       >
-        {children}
+        {props.children}
       </PageContext>
     </div>
   );

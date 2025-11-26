@@ -1,6 +1,7 @@
 import {createContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {BrowserRouter, Route, Routes} from "react-router";
 
 export const SiteContext = createContext({
   restApi: null,
@@ -12,9 +13,10 @@ export const SiteContext = createContext({
 /**
  * @typedef SiteProps
  *
- * @property {RestAPI} restApi
- * @property {string} googleId          Id for Google tracking tag.
- * @property {[JSX.Element]} children
+ * @property {RestAPI} restApi            Configured REST API.
+ * @property {string} googleId            ID for Google tracking tag.
+ * @property {JSX.Element} pageElement    Element to use for displaying page contents.
+ * @property {[JSX.Element]} children     Child elements.
  */
 
 /**
@@ -24,16 +26,14 @@ export const SiteContext = createContext({
  * @returns {JSX.Element}
  * @constructor
  */
-function Site(props) {
+export default function Site(props) {
 
-  ReactGA.initialize(props.googleId);
-
-  const [siteData, setSiteData] = useState(null);
-  const [outlineData, setOutlineData] = useState(null);
-
+  // Google analytics, if provided.
   if (props.googleId) {
     ReactGA.initialize(props.googleId);
   }
+  const [siteData, setSiteData] = useState(null);
+  const [outlineData, setOutlineData] = useState(null);
 
   /**
    * Use the site outline to get child pages.
@@ -83,10 +83,22 @@ function Site(props) {
     <div className="Site">
       <SiteContext
         value={{restApi: props.restApi, siteData: siteData, outlineData: outlineData, 'getChildren': getChildren}}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={<props.pageElement/>}
+            />
+            {outlineData?.map((page) => (
+              <Route
+                path={page.PageRoute}
+                element={<props.pageElement pageId={page.PageID}/>}
+              />
+            ))}
+          </Routes>
+        </BrowserRouter>
         {props.children}
       </SiteContext>
     </div>
   )
 }
-
-export default Site;
