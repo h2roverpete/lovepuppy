@@ -108,7 +108,6 @@ export default function Page({children}) {
  */
 function buildBreadcrumbs(outlineData, parentId) {
   const breadcrumbs = [];
-  console.debug(`buildBreadcrumbs for ${parentId}`);
   if (outlineData && parentId) {
     for (let i = outlineData.length - 1; i >= 0; i--) {
       if (outlineData[i].PageID === parentId) {
