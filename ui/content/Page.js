@@ -1,5 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
+import {useLocation} from "react-router";
+import ReactGA from "react-ga4";
 
 export const PageContext = createContext(
   {
@@ -30,6 +32,13 @@ export default function Page(props) {
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
 
+  // Google Analytics for page views
+  const location = useLocation();
+  useEffect(() => {
+    console.debug(`Sending GA page view for ${location.pathname + location.search}`);
+    ReactGA.send({hitType: 'pageview', page: location.pathname + location.search});
+  }, [location]);
+
   if (!pageId) {
     // no explicit page id: check URL params for page id
     const params = new URLSearchParams(window.location.search);
@@ -45,9 +54,9 @@ export default function Page(props) {
 
   useEffect(() => {
     if (pageId && !pageData) {
-      // load specific page ID
+      // load page data
       restApi?.getPage(pageId).then((data) => {
-        console.debug(`Loaded page ${pageId}.`);
+        console.debug(`Loaded page ${pageId} data.`);
         setPageData(data);
       })
     }

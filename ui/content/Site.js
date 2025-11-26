@@ -1,7 +1,7 @@
 import {createContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrowserRouter, Route, Routes} from "react-router";
+import {BrowserRouter, Route, Routes, useLocation} from "react-router";
 
 export const SiteContext = createContext({
   restApi: null,
@@ -32,6 +32,7 @@ export default function Site(props) {
   if (props.googleId) {
     ReactGA.initialize(props.googleId);
   }
+
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
 
