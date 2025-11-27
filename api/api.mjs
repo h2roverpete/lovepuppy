@@ -354,6 +354,20 @@ class RestAPI {
   }
 
   /**
+   * Get the sitemap XML.
+   *
+   * @returns {Promise<[OutlineData]>}
+   */
+  async getSitemap() {
+    try {
+      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/sitemap`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching sitemap. siteId=${this.siteId}`, error);
+    }
+  }
+
+  /**
    * Get the guest book configuration.
    *
    * @param guestBookId{Number}

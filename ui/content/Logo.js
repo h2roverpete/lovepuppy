@@ -18,11 +18,9 @@ import {PageContext} from "framework/ui/content/Page";
  */
 export default function Logo(props) {
   return (
-    <Image
+    <a href={props.href ? props.href : '/'}><Image
       className={`Logo ${props.className}`}
       src={props.src}
-      style={{cursor: 'pointer'}}
-      href={props.href ? props.href : '/'}
-    />
+    /></a>
   )
 }
