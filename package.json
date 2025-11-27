@@ -12,19 +12,20 @@
     "@testing-library/user-event": "^13.5.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router": "^7.9.6",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "gulp buildSitemap && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "aws s3 sync ./build s3://www.lovepuppy.net",
-    "deploy-code": "aws s3 sync ./build s3://www.lovepuppy.net --exclude 'images/'",
-    "add-framework": "git subtree add --prefix=src/framework https://github.com/h2roverpete/framework.git main",
-    "push-framework": "git subtree push --prefix=src/framework https://github.com/h2roverpete/framework.git main",
-    "pull-framework": "git subtree pull --prefix=src/framework https://github.com/h2roverpete/framework.git main"
+    "deploy": "aws s3 sync ./build s3://deploymentBucketName",
+    "deploy-code": "aws s3 sync ./build s3://deploymentBucketName --exclude 'images/'",
+    "add-framework": "git subtree add --prefix=src/framework https://github.com/h2roverpete/framework.git 1.1.0",
+    "push-framework": "git subtree push --prefix=src/framework https://github.com/h2roverpete/framework.git 1.1.0",
+    "pull-framework": "git subtree pull --prefix=src/framework https://github.com/h2roverpete/framework.git 1.1.0"
   },
   "eslintConfig": {
     "extends": [
@@ -43,5 +44,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^17.2.3",
+    "gulp": "^5.0.1",
+    "minimist": "^1.2.8"
   }
 }
