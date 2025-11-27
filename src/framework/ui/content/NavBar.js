@@ -23,8 +23,8 @@ import {Nav, NavDropdown} from "react-bootstrap";
  */
 export default function NavBar({brand, brandClassName, icon, expand, theme, fixed}) {
 
-  const {siteData, outlineData, getChildren} = useContext(SiteContext);
-  const {setPageId, pageData, breadcrumbs} = useContext(PageContext);
+  const {siteData, getChildren} = useContext(SiteContext);
+  const {pageData, breadcrumbs} = useContext(PageContext);
 
   function isInCurrentPath(pageId) {
     if (!pageData || !breadcrumbs) {
@@ -47,9 +47,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
       <>{children.length === 0 ? (
         <NavDropdown.Item
           className={`text-nowrap${isInCurrentPath(props.pageData.PageID) ? ' active' : ''}`}
-          onClick={() => {
-            setPageId(props.pageData.PageID)
-          }}
+          href={props.pageData.PageRoute}
         >
           {props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
         </NavDropdown.Item>
@@ -65,7 +63,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
               <NavDropdown.Item
                 className={`text-nowrap${pageData?.PageID === item.PageID ? ' active' : ''}`}
                 key={item.PageID}
-                onClick={() => setPageId(item.PageID)}
+                href={item.PageRoute}
               >
                 {item.NavTitle ? item.NavTitle : item.PageTitle}
               </NavDropdown.Item>
@@ -87,10 +85,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
 
         <>{(brand || icon) && (
           <Navbar.Brand
-            href={'#'}
-            onClick={() => {
-              setPageId(outlineData?.[0].PageID)
-            }}
+            href={'/'}
             className={`NavBarBrand ${brandClassName}`}
           >
             <>{icon && (
@@ -120,7 +115,7 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
                 <Nav.Link
                   className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
                   key={item.PageID}
-                  onClick={() => setPageId(item.PageID)}
+                  href={item.PageRoute}
                 >
                   {item.NavTitle ? item.NavTitle : item.PageTitle}
                 </Nav.Link>

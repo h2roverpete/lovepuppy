@@ -1,6 +1,7 @@
 import {createContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {BrowserRouter, Route, Routes, useLocation} from "react-router";
 
 export const SiteContext = createContext({
   restApi: null,
@@ -12,9 +13,10 @@ export const SiteContext = createContext({
 /**
  * @typedef SiteProps
  *
- * @property {RestAPI} restApi
- * @property {string} googleId          Id for Google tracking tag.
- * @property {[JSX.Element]} children
+ * @property {RestAPI} restApi            Configured REST API.
+ * @property {string} googleId            ID for Google tracking tag.
+ * @property {JSX.Element} pageElement    Element to use for displaying page contents.
+ * @property {[JSX.Element]} children     Child elements.
  */
 
 /**
@@ -24,16 +26,15 @@ export const SiteContext = createContext({
  * @returns {JSX.Element}
  * @constructor
  */
-function Site(props) {
+export default function Site(props) {
 
-  ReactGA.initialize(props.googleId);
-
-  const [siteData, setSiteData] = useState(null);
-  const [outlineData, setOutlineData] = useState(null);
-
+  // Google Analytics, if provided.
   if (props.googleId) {
     ReactGA.initialize(props.googleId);
   }
+
+  const [siteData, setSiteData] = useState(null);
+  const [outlineData, setOutlineData] = useState(null);
 
   /**
    * Use the site outline to get child pages.
@@ -82,11 +83,40 @@ function Site(props) {
   return (
     <div className="Site">
       <SiteContext
-        value={{restApi: props.restApi, siteData: siteData, outlineData: outlineData, 'getChildren': getChildren}}>
+        value={{
+          restApi: props.restApi,
+          siteData: siteData,
+          outlineData: outlineData,
+          'getChildren': getChildren
+        }}
+      >
+        <BrowserRouter>
+          <Routes>
+            {/* default route for cfm pages */}
+            <Route
+              path=""
+              element={<props.pageElement/>}
+            />
+            {/* root route */}
+            <Route
+              path="/"
+              element={<props.pageElement/>}
+            />
+            {/* legacy route for cfm pages */}
+            <Route
+              path="/page.cfm"
+              element={<props.pageElement/>}
+            />
+            {outlineData?.map((page) => (
+              <Route
+                path={page.PageRoute}
+                element={<props.pageElement pageId={page.PageID}/>}
+              />
+            ))}
+          </Routes>
+        </BrowserRouter>
         {props.children}
       </SiteContext>
     </div>
   )
 }
-
-export default Site;

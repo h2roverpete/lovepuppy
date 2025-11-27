@@ -7,6 +7,7 @@ import {PageContext} from "framework/ui/content/Page";
 /**
  * @typedef LogoProps
  * @property {string} src   Logo source file.
+ * @property {string} href  Link to
  */
 /**
  * Display a site logo.
@@ -16,17 +17,10 @@ import {PageContext} from "framework/ui/content/Page";
  * @constructor
  */
 export default function Logo(props) {
-  const {outlineData} = useContext(SiteContext);
-  const {setPageId} = useContext(PageContext);
-
   return (
-    <Image
+    <a href={props.href ? props.href : '/'}><Image
       className={`Logo ${props.className}`}
       src={props.src}
-      style={{cursor: 'pointer'}}
-      onClick={() => {
-        setPageId(outlineData?.[0].PageID)
-      }}
-    />
+    /></a>
   )
 }

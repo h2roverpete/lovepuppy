@@ -1,13 +1,14 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
+import {useLocation} from "react-router";
+import ReactGA from "react-ga4";
 
 export const PageContext = createContext(
   {
     pageID: null,
     pageData: null,
     sectionData: null,
-    breadcrumbs: null,
-    setPageId: (pageId) => console.warn(`setPageId not defined.`)
+    breadcrumbs: null
   });
 
 /**
@@ -22,14 +23,21 @@ export const PageContext = createContext(
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Page({children}) {
+export default function Page(props) {
 
   const {outlineData, restApi} = useContext(SiteContext);
 
-  const [pageId, setPageId] = useState(null);
+  const [pageId, setPageId] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
+
+  // Google Analytics for page views
+  const location = useLocation();
+  useEffect(() => {
+    console.debug(`Sending GA page view for ${location.pathname + location.search}`);
+    ReactGA.send({hitType: 'pageview', page: location.pathname + location.search});
+  }, [location]);
 
   if (!pageId) {
     // no explicit page id: check URL params for page id
@@ -46,9 +54,9 @@ export default function Page({children}) {
 
   useEffect(() => {
     if (pageId && !pageData) {
-      // load specific page ID
+      // load page data
       restApi?.getPage(pageId).then((data) => {
-        console.debug(`Loaded page ${pageId}.`);
+        console.debug(`Loaded page ${pageId} data.`);
         setPageData(data);
       })
     }
@@ -72,8 +80,9 @@ export default function Page({children}) {
 
   /**
    * Setter function for changing page ID.
+   * Clears out page and section data on new Page ID.
    *
-   * @param pageId {number} new pgae ID.
+   * @param pageId {number} new page ID.
    */
   function setter(pageId) {
     console.debug(`Set page ID to ${pageId}.`);
@@ -90,11 +99,10 @@ export default function Page({children}) {
           pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
-          breadcrumbs: breadcrumbs,
-          'setPageId': setter
+          breadcrumbs: breadcrumbs
         }}
       >
-        {children}
+        {props.children}
       </PageContext>
     </div>
   );
@@ -108,7 +116,6 @@ export default function Page({children}) {
  */
 function buildBreadcrumbs(outlineData, parentId) {
   const breadcrumbs = [];
-  console.debug(`buildBreadcrumbs for ${parentId}`);
   if (outlineData && parentId) {
     for (let i = outlineData.length - 1; i >= 0; i--) {
       if (outlineData[i].PageID === parentId) {

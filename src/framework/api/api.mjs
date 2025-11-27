@@ -57,6 +57,7 @@ import axios from "axios";
  * @property {String} PopUpXMLCached
  * @property {Boolean} InheritSecurity
  * @property {String} FacebookPixelID
+ * @property {string} PageRoute
  */
 
 /**
@@ -73,6 +74,7 @@ import axios from "axios";
  * @property {Boolean} HasChildren
  * @property {String} OutlineSort
  * @property {number} OutlineLevel
+ * @property {string} PageRoute
  */
 
 /**
@@ -348,6 +350,20 @@ class RestAPI {
       return response.data;
     } catch (error) {
       console.error(`Error fetching site outline. siteId=${this.siteId}`, error);
+    }
+  }
+
+  /**
+   * Get the sitemap XML.
+   *
+   * @returns {Promise<[OutlineData]>}
+   */
+  async getSitemap() {
+    try {
+      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/sitemap`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching sitemap. siteId=${this.siteId}`, error);
     }
   }
 
