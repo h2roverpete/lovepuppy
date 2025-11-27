@@ -1,7 +1,7 @@
 import {createContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrowserRouter, Route, Routes, useLocation} from "react-router";
+import {BrowserRouter, Route, Routes} from "react-router";
 
 export const SiteContext = createContext({
   restApi: null,
