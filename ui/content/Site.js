@@ -2,6 +2,7 @@ import {createContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter, Route, Routes, useLocation} from "react-router";
+import RestAPI from "../../api/api.mjs";
 
 export const SiteContext = createContext({
   restApi: null,
@@ -33,6 +34,12 @@ export default function Site(props) {
     ReactGA.initialize(props.googleId);
   }
 
+  const restApi = props.restApi ? props.restApi : new RestAPI(
+    parseInt(process.env.REACT_APP_SITE_ID),
+    process.env.REACT_APP_BACKEND_HOST,
+    process.env.REACT_APP_API_KEY
+  );
+
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
 
@@ -60,31 +67,31 @@ export default function Site(props) {
   useEffect(() => {
     if (!siteData) {
       // load site data
-      props.restApi?.getSite().then((data) => {
+      restApi?.getSite().then((data) => {
         console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(error => {
         console.error(`Error loading site: ${error}`);
       })
     }
-  }, [props.restApi, siteData]);
+  }, [restApi, siteData]);
 
   useEffect(() => {
     if (!outlineData) {
       // load site outline
-      props.restApi?.getSiteOutline().then((data) => {
-        console.debug(`Loaded site ${props.restApi.siteId} outline.`);
+      restApi?.getSiteOutline().then((data) => {
+        console.debug(`Loaded site ${restApi.siteId} outline.`);
         setOutlineData(data);
       })
     }
-  }, [props.restApi, outlineData]);
+  }, [restApi, outlineData]);
 
   // provide context to children
   return (
     <div className="Site">
       <SiteContext
         value={{
-          restApi: props.restApi,
+          restApi: restApi,
           siteData: siteData,
           outlineData: outlineData,
           'getChildren': getChildren
