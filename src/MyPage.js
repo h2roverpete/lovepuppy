@@ -1,16 +1,16 @@
 import Page from "framework/ui/content/Page";
 import Head from "framework/ui/content/Head";
 import NavBar from "framework/ui/content/NavBar";
-import icon from "./assets/icon.png";
 import PageContent from "framework/ui/content/PageContent";
 import Breadcrumbs from "framework/ui/content/Breadcrumbs";
 import PageTitle from "framework/ui/content/PageTitle";
 import PageSections from "framework/ui/content/PageSections";
 import GuestBook from "framework/ui/guestbook/GuestBook";
 import Copyright from "framework/ui/content/Copyright";
-import Logo from "./Logo";
-import logo from "./assets/logo-sm.png";
+import logo from "./assets/logo.png";
+import logo_sm from "./assets/logo-sm.png";
 import Gallery from "framework/ui/gallery/Gallery";
+import Logo from "framework/ui/content/Logo";
 
 /**
  * @typedef MyPageProps
@@ -30,11 +30,11 @@ export default function MyPage(props) {
     <Page pageId={props.pageId}>
       <Head/>
       <div className="NavBarWrapper">
-        <Logo />
+        <Logo src={logo} className="d-none d-sm-flex"/>
         <NavBar
           expand={'sm'}
           theme={'dark'}
-          icon={logo}
+          icon={logo_sm}
           brand={''}
           brandClassName="d-flex d-sm-none"
         />
