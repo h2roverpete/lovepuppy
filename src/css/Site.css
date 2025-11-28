@@ -1,16 +1,16 @@
 @font-face {
   font-family: 'GoodDog';
-  src: url('./fonts/good-dog.ttf'), /* IE9 Compat Modes */ url('./fonts/good-dog.ttf') format('truetype'); /* Safari, Android, iOS */
+  src: url('../fonts/good-dog.ttf'), /* IE9 Compat Modes */ url('../fonts/good-dog.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
 @font-face {
   font-family: 'GoodDogCool';
-  src: url('./fonts/good-dog-cool.ttf'), /* IE9 Compat Modes */ url('fonts/good-dog-cool.ttf') format('truetype'); /* Safari, Android, iOS */
+  src: url('../fonts/good-dog-cool.ttf'), /* IE9 Compat Modes */ url('../fonts/good-dog-cool.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
 @font-face {
   font-family: 'EmmaScript';
-  src: url('./fonts/emma-script.ttf'), /* IE9 Compat Modes */ url('./fonts/emma-script.ttf') format('truetype'); /* Safari, Android, iOS */
+  src: url('../fonts/emma-script.ttf'), /* IE9 Compat Modes */ url('../fonts/emma-script.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
 /* Outer container and background */
@@ -33,7 +33,7 @@
 
 .NavBarWrapper {
   background-color: #829960;
-  background-image: url('./assets/topimage.jpg');
+  background-image: url('../assets/topimage.jpg');
   background-repeat: no-repeat;
   height:199px;
   display: flex;
@@ -229,7 +229,7 @@ div.SectionImage img {
   text-align: center;
   color: #e9f7d8;
   line-height: 120%;
-  background-image: url('./assets/bottombanner.jpg');
+  background-image: url('../assets/bottombanner.jpg');
   background-repeat: repeat-x;
 }
 

@@ -1,13 +1,17 @@
+import './css/index.css';
+import './css/Site.css';
+import './css/GuestBook.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Site from "framework/ui/content/Site";
+import MyPage from './MyPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Site pageElement={MyPage} />
   </React.StrictMode>
 );
 
