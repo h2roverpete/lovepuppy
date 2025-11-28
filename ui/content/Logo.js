@@ -1,8 +1,4 @@
 import Image from 'react-bootstrap/Image';
-import {SiteContext} from "framework/ui/content/Site";
-import {useContext} from "react";
-import {PageContext} from "framework/ui/content/Page";
-
 
 /**
  * @typedef LogoProps
