@@ -35,9 +35,14 @@ export default function Page(props) {
   // Google Analytics for page views
   const location = useLocation();
   useEffect(() => {
-    console.debug(`Sending GA page view for ${location.pathname + location.search}`);
-    ReactGA.send({hitType: 'pageview', page: location.pathname + location.search});
-  }, [location]);
+    if (pageData) {
+      ReactGA.send({
+        hitType: 'pageview',
+        page: location.pathname + location.search,
+        title: pageData.PageTitle
+      });
+    }
+  }, [location, pageData]);
 
   if (!pageId) {
     // no explicit page id: check URL params for page id
