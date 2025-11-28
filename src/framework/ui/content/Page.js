@@ -48,8 +48,8 @@ export default function Page(props) {
     }
   }, [props.error, error]);
 
-  if (pageId && props.pageId !== pageId) {
-    // new page ID in props
+  if (pageId && props.pageId && props.pageId !== pageId) {
+    // set new page ID from props
     setter(props.pageId);
   }
 
@@ -65,7 +65,7 @@ export default function Page(props) {
     }
   }, [location, pageData]);
 
-  if (!pageId && !pageError) {
+  if (!pageId && !props.pageId && !pageError) {
     // no explicit page id: check URL params for page id
     const params = new URLSearchParams(window.location.search);
     let id = parseInt(params.get('pageid'));
@@ -118,10 +118,10 @@ export default function Page(props) {
    */
   function setter(pageId) {
     console.debug(`Set page ID to ${pageId}.`);
-    setError(null);
     setPageId(pageId);
     setPageData(null);
     setSectionData(null);
+    setError(null);
   }
 
   // provide context to children
