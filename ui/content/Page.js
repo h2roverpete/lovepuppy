@@ -8,13 +8,17 @@ export const PageContext = createContext(
     pageID: null,
     pageData: null,
     sectionData: null,
-    breadcrumbs: null
+    breadcrumbs: null,
+    error: null,
   });
 
 /**
  * @typedef PageProps
+ *
  * @property {[JSX.Element]} children
+ * @property {ErrorData} error
  */
+
 /**
  * Page component, generates a <div> and provides
  * page related context data to children.
@@ -25,12 +29,29 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, restApi} = useContext(SiteContext);
-
+  const {outlineData, restApi, error} = useContext(SiteContext);
+  const [pageError, setError] = useState(props.error);
   const [pageId, setPageId] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
+
+  useEffect(() => {
+    if (error) {
+      // pass error from site context and clear page data
+      setError(error);
+      setter(0);
+    } else if (props.error) {
+      // pass error from props and clear page data
+      setError(props.error);
+      setter(0);
+    }
+  }, [props.error, error]);
+
+  if (pageId && props.pageId !== pageId) {
+    // new page ID in props
+    setter(props.pageId);
+  }
 
   // Google Analytics for page views
   const location = useLocation();
@@ -44,7 +65,7 @@ export default function Page(props) {
     }
   }, [location, pageData]);
 
-  if (!pageId) {
+  if (!pageId && !pageError) {
     // no explicit page id: check URL params for page id
     const params = new URLSearchParams(window.location.search);
     let id = parseInt(params.get('pageid'));
@@ -63,6 +84,12 @@ export default function Page(props) {
       restApi?.getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
         setPageData(data);
+      }).catch((error) => {
+        setError({
+          title: `${error.status} Server Error`,
+          description: `Page data could not be loaded.<br>Code: ${error.code}`
+        });
+        setPageData(null);
       })
     }
   }, [restApi, pageData, pageId]);
@@ -91,6 +118,7 @@ export default function Page(props) {
    */
   function setter(pageId) {
     console.debug(`Set page ID to ${pageId}.`);
+    setError(null);
     setPageId(pageId);
     setPageData(null);
     setSectionData(null);
@@ -104,7 +132,8 @@ export default function Page(props) {
           pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
-          breadcrumbs: breadcrumbs
+          breadcrumbs: breadcrumbs,
+          error: pageError,
         }}
       >
         {props.children}
