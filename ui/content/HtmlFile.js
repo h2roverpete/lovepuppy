@@ -11,7 +11,7 @@ export default function HtmlFile(props) {
       .then(response => response.text())
       .then(data => setHtmlContent(data))
       .catch(error => console.error(`Error fetching HTML ${props.fileName}:`, error));
-  }, []);
+  }, [props.fileName]);
 
   return (
     <>{pageData?.PageID === props.pageId && (
