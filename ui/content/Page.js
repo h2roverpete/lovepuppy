@@ -36,9 +36,11 @@ export default function Page(props) {
   const location = useLocation();
   useEffect(() => {
     if (pageData) {
+      const path = location.pathname + location.search;
+      console.debug(`Send GA event: ${path} (${pageData.PageTitle})`)
       ReactGA.send({
         hitType: 'pageview',
-        page: location.pathname + location.search,
+        page: path,
         title: pageData.PageTitle
       });
     }
