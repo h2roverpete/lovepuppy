@@ -27,7 +27,7 @@ import Logo from "framework/ui/content/Logo";
  */
 export default function MyPage(props) {
   return (
-    <Page pageId={props.pageId}>
+    <Page {...props}>
       <Head/>
       <div className="NavBarWrapper">
         <Logo src={logo} className="d-none d-sm-flex"/>
