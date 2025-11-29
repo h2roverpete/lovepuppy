@@ -17,6 +17,7 @@ export const SiteContext = createContext({
   siteData: null,
   outlineData: null,
   error: null,
+  setError: () => console.error(`setError function not defined.`),
   getChildren: () => console.error(`Site context function getChildren() is undefined.`)
 });
 
@@ -108,6 +109,17 @@ export default function Site(props) {
     }
   }, [restApi, outlineData]);
 
+  let redirect;
+  if (props.redirects && window.location.pathname === '/') {
+    // search for page redirect matches
+    for (const item of props.redirects) {
+      if (item.hostname === window.location.hostname) {
+        console.debug(`Redirecting ${item.hostname} to page ${item.pageId}.`);
+        redirect = item;
+      }
+    }
+  }
+
   // provide context to children
   return (
     <div className="Site">
@@ -117,53 +129,58 @@ export default function Site(props) {
           siteData: siteData,
           outlineData: outlineData,
           error: error,
-          'getChildren': getChildren
+          setError: setError,
+          getChildren: getChildren
         }}
       >
         {/* only register routes after outline is loaded */}
         <BrowserRouter>
-          <>{outlineData && (
-            <Routes>
-              {/* root route */}
+          <Routes>
+            <>{redirect && (
               <Route
                 path="/"
-                element={<props.pageElement pageId={outlineData[0].PageID}/>}
+                element={<props.pageElement pageId={redirect.pageId}/>}
               />
-              {/* legacy route for cfm pages */}
-              <Route
-                path="/page.cfm"
-                element={<props.pageElement/>}
-              />
-              {outlineData?.map((page) => (
+            )}</>
+            <>{outlineData && (
+              <>
                 <Route
-                  path={page.PageRoute}
-                  element={<props.pageElement pageId={page.PageID}
-                  />}
+                  path="/"
+                  element={<props.pageElement pageId={outlineData[0].PageID}/>}
                 />
-              ))}
-              {/* route to explicit error page */}
-              <Route
-                path="/error"
-                element={<props.pageElement error={{title: "Error", description: "An error occurred."}}/>}
-              />
-              {/* catchall displays 404 errors when route not matched */}
+                <Route
+                  path="/page.cfm"
+                  element={<props.pageElement/>}
+                />
+                {outlineData.map((page) => (
+                  <Route
+                    path={page.PageRoute}
+                    element={<props.pageElement pageId={page.PageID}
+                    />}
+                  />
+                ))}
+                {/* route to explicit error page */}
+                <Route
+                  path="/error"
+                  element={<props.pageElement error={{title: "Error", description: "An error occurred."}}/>}
+                />
+                {/* catchall displays 404 errors when route not matched */}
+                <Route
+                  path="*"
+                  element={<props.pageElement
+                    error={{title: "404 Not Found", description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."}}/>}
+                />
+              </>
+            )}</>
+            <>{error && (
               <Route
                 path="*"
-                element={<props.pageElement
-                  error={{title: "404 Not Found", description: "The content you are looking for was not found."}}/>}
+                element={<props.pageElement error={error}/>
+                }
               />
-            </Routes>
-          )}</>
-          <>{error && (
-            <Routes>
-              {/* pass error state to page module for display */}
-              <Route
-                path="*"
-                element={<props.pageElement error={error}/>}
-              />
-            </Routes>
-          )}</>
-          {props.children}
+            )}</>
+            {props.children}
+          </Routes>
         </BrowserRouter>
       </SiteContext>
     </div>

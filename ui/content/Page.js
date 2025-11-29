@@ -29,26 +29,22 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, restApi, error} = useContext(SiteContext);
-  const [pageError, setError] = useState(props.error);
+  const {outlineData, restApi, error, setError} = useContext(SiteContext);
   const [pageId, setPageId] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
 
-  useEffect(() => {
-    if (error) {
-      // pass error from site context and clear page data
-      setError(error);
-      setter(0);
-    } else if (props.error) {
-      // pass error from props and clear page data
-      setError(props.error);
-      setter(0);
-    }
-  }, [props.error, error]);
+  let errorData;
+  if (error) {
+    // pass error from site context
+    errorData = error;
+  } else if (props.error) {
+    // pass error from props
+    errorData = props.error;
+  }
 
-  if (pageId && props.pageId && props.pageId !== pageId) {
+  if (props.pageId && props.pageId !== pageId) {
     // set new page ID from props
     setter(props.pageId);
   }
@@ -65,7 +61,7 @@ export default function Page(props) {
     }
   }, [location, pageData]);
 
-  if (!pageId && !props.pageId && !pageError) {
+  if (!errorData && !pageId && !props.pageId) {
     // no explicit page id: check URL params for page id
     const params = new URLSearchParams(window.location.search);
     let id = parseInt(params.get('pageid'));
@@ -84,12 +80,6 @@ export default function Page(props) {
       restApi?.getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
         setPageData(data);
-      }).catch((error) => {
-        setError({
-          title: `${error.status} Server Error`,
-          description: `Page data could not be loaded.<br>Code: ${error.code}`
-        });
-        setPageData(null);
       })
     }
   }, [restApi, pageData, pageId]);
@@ -106,6 +96,7 @@ export default function Page(props) {
 
   useEffect(() => {
     if (pageData && outlineData) {
+      // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
     }
   }, [pageData, outlineData])
@@ -133,7 +124,7 @@ export default function Page(props) {
           pageData: pageData,
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
-          error: pageError,
+          error: errorData,
         }}
       >
         {props.children}
