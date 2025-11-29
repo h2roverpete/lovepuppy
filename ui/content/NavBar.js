@@ -3,7 +3,7 @@ import {SiteContext} from "./Site";
 import {PageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
 import {Nav, NavDropdown} from "react-bootstrap";
-import {useNavigate} from "react-router";
+import {NavLink, useNavigate} from "react-router";
 
 /**
  * @typedef NavBarProps
@@ -96,26 +96,27 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
       <div className="NavBarContents container-fluid">
 
         <>{(brand || icon) && (
-          <Navbar.Brand
-            onClick={() => navigateTo('/')}
-            style={{cursor: 'pointer'}}
-            className={`NavBarBrand ${brandClassName}`}
-          >
-            <>{icon && (
-              <img
-                className="NavBarBrandIcon"
-                src={icon}
-                alt={typeof brand === 'string' ? brand : siteData?.SiteName}
-                height={45}
-                style={{marginRight: '10px'}}
-              />
-            )}</>
-            <>{icon && (
-              <span className={'NavBarBrandText text-nowrap'}>
+          <NavLink to={'/'}>
+            <Navbar.Brand
+              style={{cursor: 'pointer'}}
+              className={`NavBarBrand ${brandClassName}`}
+            >
+              <>{icon && (
+                <img
+                  className="NavBarBrandIcon"
+                  src={icon}
+                  alt={typeof brand === 'string' ? brand : siteData?.SiteName}
+                  height={45}
+                  style={{marginRight: '10px'}}
+                />
+              )}</>
+              <>{icon && (
+                <span className={'NavBarBrandText text-nowrap'}>
                 {typeof brand === 'string' ? brand : siteData?.SiteName}
               </span>
-            )}</>
-          </Navbar.Brand>
+              )}</>
+            </Navbar.Brand>
+          </NavLink>
         )}</>
 
         <Navbar.Toggle
