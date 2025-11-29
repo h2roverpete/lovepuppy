@@ -36,19 +36,20 @@ export default function Page(props) {
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
 
+  console.debug(`Render page: props.pageId=${props.pageId}, pageId=${pageId}, site error=${JSON.stringify(error)}, pageError=${JSON.stringify(pageError)}, props.error=${JSON.stringify(props.error)}`);
   useEffect(() => {
     if (error) {
-      // pass error from site context and clear page data
+      // pass error from site context
       setError(error);
-      setter(0);
     } else if (props.error) {
-      // pass error from props and clear page data
+      // pass error from props
       setError(props.error);
-      setter(0);
+    } else {
+      setError(null);
     }
   }, [props.error, error]);
 
-  if (pageId && props.pageId && props.pageId !== pageId) {
+  if (props.pageId && props.pageId !== pageId) {
     // set new page ID from props
     setter(props.pageId);
   }
