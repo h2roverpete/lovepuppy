@@ -96,27 +96,32 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
       <div className="NavBarContents container-fluid">
 
         <>{(brand || icon) && (
-          <NavLink to={'/'}>
-            <Navbar.Brand
-              style={{cursor: 'pointer'}}
-              className={`NavBarBrand ${brandClassName}`}
-            >
-              <>{icon && (
-                <img
-                  className="NavBarBrandIcon"
-                  src={icon}
-                  alt={typeof brand === 'string' ? brand : siteData?.SiteName}
-                  height={45}
-                  style={{marginRight: '10px'}}
-                />
-              )}</>
-              <>{icon && (
-                <span className={'NavBarBrandText text-nowrap'}>
+          <Navbar.Brand
+            style={{cursor: 'pointer'}}
+            className={`NavBarBrand ${brandClassName}`}
+          >
+            <>{icon && (
+              <img
+                className="NavBarBrandIcon"
+                src={icon}
+                alt={typeof brand === 'string' ? brand : siteData?.SiteName}
+                height={45}
+                style={{marginRight: '10px'}}
+                onClick={() => {
+                  navigateTo('/')
+                }}
+              />
+            )}</>
+            <>{icon && (
+              <span
+                className={'NavBarBrandText text-nowrap'}
+                onClick={() => {
+                  navigateTo('/')
+                }}>
                 {typeof brand === 'string' ? brand : siteData?.SiteName}
               </span>
-              )}</>
-            </Navbar.Brand>
-          </NavLink>
+            )}</>
+          </Navbar.Brand>
         )}</>
 
         <Navbar.Toggle
@@ -126,17 +131,21 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
         <Navbar.Collapse id="MainNavigation">
           <Nav>
             {getChildren(0).map((item) => (
-              <>{item.HasChildren ? (
-                <RecursiveDropdown pageData={item}/>
-              ) : (
-                <Nav.Link
-                  onClick={(event) => navigateTo(item.PageRoute)}
-                  className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
-                  key={item.PageID}
-                >
-                  {item.NavTitle ? item.NavTitle : item.PageTitle}
-                </Nav.Link>
-              )}</>
+              <div
+                key={item.PageID}
+              >
+                {item.HasChildren ? (
+                  <RecursiveDropdown pageData={item}/>
+                ) : (
+                  <Nav.Link
+                    onClick={(event) => navigateTo(item.PageRoute)}
+                    className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
+                    key={item.PageID}
+                  >
+                    {item.NavTitle ? item.NavTitle : item.PageTitle}
+                  </Nav.Link>
+                )}
+              </div>
             ))}
           </Nav>
         </Navbar.Collapse>
