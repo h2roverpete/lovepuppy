@@ -1,13 +1,23 @@
-import {createContext, useEffect, useState} from 'react';
+import {createContext, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrowserRouter, Route, Routes, useLocation} from "react-router";
+import 'bootstrap/dist/js/bootstrap.bundle.js';
+import {BrowserRouter, Route, Routes} from "react-router";
 import RestAPI from "../../api/api.mjs";
+
+/**
+ * @typedef ErrorData
+ *
+ * @property {String} title
+ * @property {String} description
+ */
 
 export const SiteContext = createContext({
   restApi: null,
   siteData: null,
   outlineData: null,
+  error: null,
+  setError: () => console.error(`setError function not defined.`),
   getChildren: () => console.error(`Site context function getChildren() is undefined.`)
 });
 
@@ -34,14 +44,17 @@ export default function Site(props) {
     ReactGA.initialize(props.googleId);
   }
 
-  const restApi = props.restApi ? props.restApi : new RestAPI(
-    parseInt(process.env.REACT_APP_SITE_ID),
-    process.env.REACT_APP_BACKEND_HOST,
-    process.env.REACT_APP_API_KEY
-  );
+  const restApi = useMemo(() => {
+    return props.restApi ? props.restApi : new RestAPI(
+      parseInt(process.env.REACT_APP_SITE_ID),
+      process.env.REACT_APP_BACKEND_HOST,
+      process.env.REACT_APP_API_KEY
+    );
+  }, [props.restApi]);
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
+  const [error, setError] = useState(null);
 
   /**
    * Use the site outline to get child pages.
@@ -71,8 +84,12 @@ export default function Site(props) {
         console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(error => {
-        console.error(`Error loading site: ${error}`);
-      })
+        setError({
+          title: `${error.status} Server Error`,
+          description: `Site data could not be loaded.<br>Code: ${error.code}`
+        });
+        setSiteData(null);
+      });
     }
   }, [restApi, siteData]);
 
@@ -82,9 +99,26 @@ export default function Site(props) {
       restApi?.getSiteOutline().then((data) => {
         console.debug(`Loaded site ${restApi.siteId} outline.`);
         setOutlineData(data);
-      })
+      }).catch(error => {
+        setError({
+          title: `${error.status} Server Error`,
+          description: `Site data could not be loaded.<br>Code: ${error.code}`
+        });
+        setOutlineData(null);
+      });
     }
   }, [restApi, outlineData]);
+
+  let redirect;
+  if (props.redirects && window.location.pathname === '/') {
+    // search for page redirect matches
+    for (const item of props.redirects) {
+      if (item.hostname === window.location.hostname) {
+        console.debug(`Redirecting ${item.hostname} to page ${item.pageId}.`);
+        redirect = item;
+      }
+    }
+  }
 
   // provide context to children
   return (
@@ -94,35 +128,60 @@ export default function Site(props) {
           restApi: restApi,
           siteData: siteData,
           outlineData: outlineData,
-          'getChildren': getChildren
+          error: error,
+          setError: setError,
+          getChildren: getChildren
         }}
       >
+        {/* only register routes after outline is loaded */}
         <BrowserRouter>
           <Routes>
-            {/* default route for cfm pages */}
-            <Route
-              path=""
-              element={<props.pageElement/>}
-            />
-            {/* root route */}
-            <Route
-              path="/"
-              element={<props.pageElement/>}
-            />
-            {/* legacy route for cfm pages */}
-            <Route
-              path="/page.cfm"
-              element={<props.pageElement/>}
-            />
-            {outlineData?.map((page) => (
+            <>{redirect && (
               <Route
-                path={page.PageRoute}
-                element={<props.pageElement pageId={page.PageID}/>}
+                path="/"
+                element={<props.pageElement pageId={redirect.pageId}/>}
               />
-            ))}
+            )}</>
+            <>{outlineData && (
+              <>
+                <Route
+                  path="/"
+                  element={<props.pageElement pageId={outlineData[0].PageID}/>}
+                />
+                <Route
+                  path="/page.cfm"
+                  element={<props.pageElement/>}
+                />
+                {outlineData.map((page) => (
+                  <Route
+                    path={page.PageRoute}
+                    element={<props.pageElement pageId={page.PageID}
+                    />}
+                  />
+                ))}
+                {/* route to explicit error page */}
+                <Route
+                  path="/error"
+                  element={<props.pageElement error={{title: "Error", description: "An error occurred."}}/>}
+                />
+                {/* catchall displays 404 errors when route not matched */}
+                <Route
+                  path="*"
+                  element={<props.pageElement
+                    error={{title: "404 Not Found", description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."}}/>}
+                />
+              </>
+            )}</>
+            <>{error && (
+              <Route
+                path="*"
+                element={<props.pageElement error={error}/>
+                }
+              />
+            )}</>
+            {props.children}
           </Routes>
         </BrowserRouter>
-        {props.children}
       </SiteContext>
     </div>
   )

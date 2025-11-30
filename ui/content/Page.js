@@ -8,13 +8,17 @@ export const PageContext = createContext(
     pageID: null,
     pageData: null,
     sectionData: null,
-    breadcrumbs: null
+    breadcrumbs: null,
+    error: null,
   });
 
 /**
  * @typedef PageProps
+ *
  * @property {[JSX.Element]} children
+ * @property {ErrorData} error
  */
+
 /**
  * Page component, generates a <div> and provides
  * page related context data to children.
@@ -25,28 +29,39 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, restApi} = useContext(SiteContext);
-
+  const {outlineData, restApi, error, setError} = useContext(SiteContext);
   const [pageId, setPageId] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
 
+  let errorData;
+  if (error) {
+    // pass error from site context
+    errorData = error;
+  } else if (props.error) {
+    // pass error from props
+    errorData = props.error;
+  }
+
+  if (props.pageId && props.pageId !== pageId) {
+    // set new page ID from props
+    setter(props.pageId);
+  }
+
   // Google Analytics for page views
   const location = useLocation();
   useEffect(() => {
     if (pageData) {
-      const path = location.pathname + location.search;
-      console.debug(`Send GA event: ${path} (${pageData.PageTitle})`)
       ReactGA.send({
         hitType: 'pageview',
-        page: path,
+        page: location.pathname + location.search,
         title: pageData.PageTitle
       });
     }
   }, [location, pageData]);
 
-  if (!pageId) {
+  if (!errorData && !pageId && !props.pageId) {
     // no explicit page id: check URL params for page id
     const params = new URLSearchParams(window.location.search);
     let id = parseInt(params.get('pageid'));
@@ -81,6 +96,7 @@ export default function Page(props) {
 
   useEffect(() => {
     if (pageData && outlineData) {
+      // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
     }
   }, [pageData, outlineData])
@@ -96,6 +112,7 @@ export default function Page(props) {
     setPageId(pageId);
     setPageData(null);
     setSectionData(null);
+    setError(null);
   }
 
   // provide context to children
@@ -106,7 +123,8 @@ export default function Page(props) {
           pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
-          breadcrumbs: breadcrumbs
+          breadcrumbs: breadcrumbs,
+          error: errorData,
         }}
       >
         {props.children}

@@ -1,8 +1,5 @@
 import Image from 'react-bootstrap/Image';
-import {SiteContext} from "framework/ui/content/Site";
-import {useContext} from "react";
-import {PageContext} from "framework/ui/content/Page";
-
+import {useNavigate} from "react-router";
 
 /**
  * @typedef LogoProps
@@ -17,10 +14,13 @@ import {PageContext} from "framework/ui/content/Page";
  * @constructor
  */
 export default function Logo(props) {
+  const navigate = useNavigate();
   return (
-    <a href={props.href ? props.href : '/'}><Image
+    <Image
       className={`Logo ${props.className}`}
+      style={{cursor: 'pointer'}}
       src={props.src}
-    /></a>
+      onClick={() => navigate(props.href ? props.href : '/')}
+    />
   )
 }

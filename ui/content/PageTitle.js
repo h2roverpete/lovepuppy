@@ -4,7 +4,8 @@ import {useContext} from "react";
 /**
  * @typedef PageTitleProps
  *
- * @property showTitle {boolean} Always show the title in the tag, regardless of the content settings.
+ * @property {boolean} showTitle Always show the title in the tag, regardless of the content settings.
+ * @property {ErrorData} error
  */
 
 /**
@@ -20,10 +21,11 @@ import {useContext} from "react";
  * @constructor
  */
 export default function PageTitle(props) {
-  const {pageData} = useContext(PageContext);
+  const {pageData, error} = useContext(PageContext);
   return (
-    <>{(pageData?.DisplayTitle || props.showTitle) && (
-      <h1 className="PageTitle">{pageData ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
+    <>{(pageData?.DisplayTitle || props.showTitle || error?.title) && (
+      <h1
+        className="PageTitle">{error?.title ? error.title : pageData ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
     )}</>
   )
 }

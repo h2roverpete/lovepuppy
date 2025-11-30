@@ -302,12 +302,8 @@ class RestAPI {
    * @returns {Promise<PageData>}
    */
   async getPage(pageId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching page ${pageId}.`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}`);
+    return response.data;
   }
 
   /**
@@ -317,12 +313,8 @@ class RestAPI {
    * @returns {Promise<[PageSectionData]>}
    */
   async getPageSections(pageId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}/sections`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching page ${pageId} sections.`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}/sections`);
+    return response.data;
   }
 
   /**
@@ -331,12 +323,8 @@ class RestAPI {
    * @returns {Promise<SiteData>}
    */
   async getSite() {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching site data. siteId=${this.siteId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}`);
+    return response.data;
   }
 
   /**
@@ -345,12 +333,8 @@ class RestAPI {
    * @returns {Promise<[OutlineData]>}
    */
   async getSiteOutline() {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/outline`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching site outline. siteId=${this.siteId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/outline`);
+    return response.data;
   }
 
   /**
@@ -359,12 +343,8 @@ class RestAPI {
    * @returns {Promise<[OutlineData]>}
    */
   async getSitemap() {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/sitemap`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching sitemap. siteId=${this.siteId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/sitemap`);
+    return response.data;
   }
 
   /**
@@ -374,12 +354,8 @@ class RestAPI {
    * @returns {Promise<GuestBookConfig>}
    */
   async getGuestBook(guestBookId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/guestbook/${guestBookId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching guestbook. guestBookId=${guestBookId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/guestbook/${guestBookId}`);
+    return response.data;
   }
 
   /**
@@ -389,12 +365,8 @@ class RestAPI {
    * @return {Promise<GuestData>}
    */
   async getGuest(guestId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/guestbook/guest/${guestId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching guest data. guestId=${guestId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/guestbook/guest/${guestId}`);
+    return response.data;
   }
 
   /**
@@ -405,12 +377,8 @@ class RestAPI {
    * @return {Promise<GuestData>}
    */
   async insertOrUpdateGuest(guestBookId, data) {
-    try {
-      const response = await axios.post(`${this.host}/api/v1/guestbook/${guestBookId}/guest`, data);
-      return response.data;
-    } catch (error) {
-      console.error(`Error posting guest data. guestBookId=${guestBookId}, data=${JSON.stringify(data)}`, error);
-    }
+    const response = await axios.post(`${this.host}/api/v1/guestbook/${guestBookId}/guest`, data);
+    return response.data;
   }
 
   /**
@@ -457,7 +425,6 @@ class RestAPI {
     const response = await axios.get(`${this.host}/api/v1/gallery/${galleryId}/photos`);
     return response.data;
   }
-
 }
 
 export default RestAPI;
