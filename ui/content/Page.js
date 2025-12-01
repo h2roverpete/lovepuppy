@@ -15,13 +15,15 @@ export const PageContext = createContext(
 /**
  * @typedef PageProps
  *
- * @property {[JSX.Element]} children
- * @property {ErrorData} error
+ * @property {[JSX.Element]} children   Child elements.
+ * @property {number} [pageId]          Specific page ID to display.
+ * @property {ErrorData} [error]        Error information to display.
  */
 
 /**
- * Page component, generates a <div> and provides
- * page related context data to children.
+ * Page component.
+ * Generates a container <div> for styling and display.
+ * Provides page related data in a PageContext to children.
  *
  * @param props {PageProps}
  * @returns {JSX.Element}
@@ -61,19 +63,6 @@ export default function Page(props) {
     }
   }, [location, pageData]);
 
-  if (!errorData && !pageId && !props.pageId) {
-    // no explicit page id: check URL params for page id
-    const params = new URLSearchParams(window.location.search);
-    let id = parseInt(params.get('pageid'));
-    if (id > 0) {
-      setter(id);
-    } else if (outlineData && outlineData.length) {
-      // find the first page in the site outline
-      const defaultPageId = outlineData[0].PageID
-      setter(defaultPageId);
-    }
-  }
-
   useEffect(() => {
     if (pageId && !pageData) {
       // load page data
@@ -95,7 +84,7 @@ export default function Page(props) {
   }, [restApi, pageData, pageId, sectionData]);
 
   useEffect(() => {
-    if (pageData && outlineData) {
+    if (pageData && outlineData && !breadcrumbs) {
       // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
     }
@@ -103,7 +92,7 @@ export default function Page(props) {
 
   /**
    * Setter function for changing page ID.
-   * Clears out page and section data on new Page ID.
+   * Clears out page related data when Page ID is changed.
    *
    * @param pageId {number} new page ID.
    */
@@ -112,6 +101,7 @@ export default function Page(props) {
     setPageId(pageId);
     setPageData(null);
     setSectionData(null);
+    setBreadcrumbs(null);
     setError(null);
   }
 
@@ -134,7 +124,7 @@ export default function Page(props) {
 }
 
 /**
- * Build breadcrumb array.
+ * Build breadcrumb array from site outline.
  *
  * @param outlineData {[OutlineData]}
  * @param parentId {number}
