@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/react';
-import {act, Fragment} from "react";
+import {act, useContext, useEffect} from "react";
 
-import Site from './Site';
+import Site, {SiteContext} from './Site';
 
 import ReactGA from 'react-ga4';
 import RestAPI from "../../api/api.mjs";
@@ -11,8 +11,8 @@ describe('Site component', () => {
 
   const mockSiteData = {SiteID: 10};
   const mockOutlineData = [
-    {PageID: 50, PageTitle: 'First Page', PageRoute: '/firstpage'},
-    {PageID: 51, PageTitle: 'Second Page', PageRoute: '/secondpage'}
+    {PageID: 50, PageTitle: 'First Page', PageRoute: '/firstpage', ParentID: 0},
+    {PageID: 51, PageTitle: 'Second Page', PageRoute: '/secondpage', ParentID: 0}
   ];
   let MockPage;
 
@@ -152,6 +152,26 @@ describe('Site component', () => {
     expect(MockPage).toBeCalledWith({pageId: 51}, undefined);
   });
 
+  it('should initialize Google Analytics', async () => {
+    // given
+    jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue(mockSiteData)
+    jest.spyOn(RestAPI.prototype, 'getSiteOutline').mockResolvedValue(mockOutlineData);
+    jest.spyOn(ReactGA, 'initialize');
+    const gid = 'MyGoogleID'
+
+    // when
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/']}>
+          <Site googleId={gid} pageElement={MockPage}/>
+        </MemoryRouter>
+      );
+    })
+
+    // then
+    expect(ReactGA.initialize).toBeCalledWith(gid);
+  });
+
   it('should send 404 error to Page', async () => {
     // given
     jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue(mockSiteData)
@@ -221,7 +241,8 @@ describe('Site component', () => {
     // then
     const pageElement = screen.getByTestId(/MockPage/i);
     expect(pageElement).toBeInTheDocument();
-    expect(MockPage).toBeCalledTimes(1);
+    expect(MockPage).toBeCalledTimes(2); // one successful load, one error
+    expect(MockPage).toBeCalledWith({pageId:50}, undefined);
     expect(MockPage).toBeCalledWith({
       "error": {
         "description": "Site data could not be loaded.<br>Code: ERRCODE",
@@ -230,24 +251,75 @@ describe('Site component', () => {
     }, undefined);
   });
 
-  it('should initialize Google Analytics', async () => {
+  it('should report errors from Page', async () => {
     // given
-    jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue(mockSiteData)
+    jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue({mockSiteData})
     jest.spyOn(RestAPI.prototype, 'getSiteOutline').mockResolvedValue(mockOutlineData);
-    jest.spyOn(ReactGA, 'initialize');
-    const gid = 'MyGoogleID'
+    MockPage = jest.fn().mockImplementation(() => {
+      const siteContext = useContext(SiteContext);
+      useEffect(() => {
+        console.log('Reporting error.');
+        siteContext.showError({
+          title: `Server Error`,
+          description: `Site data could not be loaded.`
+        })
+      }, [siteContext.showError]);
+      return (<div data-testid="MockPage"></div>)
+    });
+
 
     // when
     await act(async () => {
       render(
         <MemoryRouter initialEntries={['/']}>
-          <Site googleId={gid} pageElement={MockPage}/>
+          <Site pageElement={MockPage}/>
         </MemoryRouter>
       );
     })
 
     // then
-    expect(ReactGA.initialize).toBeCalledWith(gid);
+    const pageElement = screen.getByTestId(/MockPage/i);
+    expect(pageElement).toBeInTheDocument();
+    expect(MockPage).toBeCalledTimes(3); // two successful loads, then error
+    expect(MockPage).toBeCalledWith({pageId:50}, undefined);
+    expect(MockPage).toBeCalledWith({
+      "error": {
+        "description": "Site data could not be loaded.",
+        "title": "Server Error"
+      }
+    }, undefined);
+  });
+
+  it('should provide children to Pages', async () => {
+    // given
+    jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue({mockSiteData})
+    jest.spyOn(RestAPI.prototype, 'getSiteOutline').mockResolvedValue(mockOutlineData);
+    const reportChildren = jest.fn();
+    MockPage = jest.fn().mockImplementation(() => {
+      const siteContext = useContext(SiteContext);
+      useEffect(() => {
+        reportChildren(siteContext.getChildren(0));
+      }, [siteContext.getChildren]);
+      return (<div data-testid="MockPage"></div>)
+    });
+
+
+    // when
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/']}>
+          <Site pageElement={MockPage}/>
+        </MemoryRouter>
+      );
+    })
+
+    // then
+    const pageElement = screen.getByTestId(/MockPage/i);
+    expect(pageElement).toBeInTheDocument();
+    expect(MockPage).toBeCalledTimes(1); // two successful loads, then error
+    expect(MockPage).toBeCalledWith({pageId:50}, undefined);
+    expect(reportChildren).toBeCalledTimes(1);
+    expect(reportChildren).toBeCalledWith(mockOutlineData);
   });
 
 });

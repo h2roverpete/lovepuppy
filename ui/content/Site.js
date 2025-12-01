@@ -2,7 +2,7 @@ import {createContext, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
-import {Route, Routes} from "react-router";
+import {Route, Routes, useNavigate} from "react-router";
 import RestAPI from "../../api/api.mjs";
 
 /**
@@ -17,8 +17,8 @@ export const SiteContext = createContext({
   siteData: null,
   outlineData: null,
   error: null,
-  setError: () => console.error(`setError function not defined.`),
-  getChildren: () => console.error(`Site context function getChildren() is undefined.`)
+  showError: null,
+  getChildren: null
 });
 
 /**
@@ -57,6 +57,23 @@ export default function Site(props) {
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  /**
+   * Display the site in an error state.
+   * @param {string} title
+   * @param {string} description
+   */
+  function showError({title,description}) {
+    if (!error) {
+      // only set error if not already set (prevents looping)
+      setError({
+        title: title,
+        description: description
+      });
+      navigate('/error');
+    }
+  }
 
   /**
    * Use the site outline to get child pages.
@@ -86,7 +103,7 @@ export default function Site(props) {
         console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(error => {
-        setError({
+        showError({
           title: `${error.status} Server Error`,
           description: `Site data could not be loaded.<br>Code: ${error.code}`
         });
@@ -102,7 +119,7 @@ export default function Site(props) {
         console.debug(`Loaded site ${restApi.siteId} outline.`);
         setOutlineData(data);
       }).catch(error => {
-        setError({
+        showError({
           title: `${error.status} Server Error`,
           description: `Site data could not be loaded.<br>Code: ${error.code}`
         });
@@ -134,7 +151,7 @@ export default function Site(props) {
           siteData: siteData,
           outlineData: outlineData,
           error: error,
-          setError: setError,
+          showError: showError,
           getChildren: getChildren
         }}
       >
@@ -142,7 +159,7 @@ export default function Site(props) {
           <>{error && (
             // error page display
             <Route
-              path="*"
+              path="/error"
               element={<props.pageElement error={error}/>
               }
             />
