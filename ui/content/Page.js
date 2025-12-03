@@ -5,7 +5,7 @@ import ReactGA from "react-ga4";
 
 export const PageContext = createContext(
   {
-    pageID: null,
+    pageId: null,
     pageData: null,
     sectionData: null,
     breadcrumbs: null,
@@ -32,7 +32,7 @@ export const PageContext = createContext(
 export default function Page(props) {
 
   const {outlineData, restApi, error, setError} = useContext(SiteContext);
-  const [pageId, setPageId] = useState(props.pageId);
+  const [pageId, __setPageId__] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
@@ -48,16 +48,16 @@ export default function Page(props) {
 
   if (props.pageId && props.pageId !== pageId) {
     // set new page ID from props
-    setter(props.pageId);
+    setPageId(props.pageId);
   }
 
   // Google Analytics for page views
   const location = useLocation();
   useEffect(() => {
     if (pageData) {
-      ReactGA.send({
+      ReactGA.send( {
         hitType: 'pageview',
-        page: location.pathname + location.search,
+        path: location.pathname + location.search,
         title: pageData.PageTitle
       });
     }
@@ -68,7 +68,7 @@ export default function Page(props) {
       // load page data
       restApi?.getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
-        setPageData(data);
+        setPageData(data); // update state
       })
     }
   }, [restApi, pageData, pageId]);
@@ -78,7 +78,7 @@ export default function Page(props) {
       // load page sections
       restApi?.getPageSections(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} sections.`);
-        setSectionData(data);
+        setSectionData(data); // update state
       })
     }
   }, [restApi, pageData, pageId, sectionData]);
@@ -86,19 +86,19 @@ export default function Page(props) {
   useEffect(() => {
     if (pageData && outlineData && !breadcrumbs) {
       // build breadcrumb data
-      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
+      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
   }, [pageData, outlineData])
 
   /**
-   * Setter function for changing page ID.
-   * Clears out page related data when Page ID is changed.
+   * Function for changing page ID.
+   * Clears out extra page related data when Page ID is changed.
    *
    * @param pageId {number} new page ID.
    */
-  function setter(pageId) {
+  function setPageId(pageId) {
     console.debug(`Set page ID to ${pageId}.`);
-    setPageId(pageId);
+    __setPageId__(pageId); // call private state setter
     setPageData(null);
     setSectionData(null);
     setBreadcrumbs(null);
@@ -107,7 +107,7 @@ export default function Page(props) {
 
   // provide context to children
   return (
-    <div className="Page">
+    <div className="Page" data-testid="Page">
       <PageContext
         value={{
           pageId: pageId,

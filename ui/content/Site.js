@@ -1,4 +1,4 @@
-import {createContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useCallback, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
@@ -17,7 +17,7 @@ export const SiteContext = createContext({
   siteData: null,
   outlineData: null,
   error: null,
-  showError: null,
+  setError: null,
   getChildren: null
 });
 
@@ -43,7 +43,14 @@ export default function Site(props) {
 
   // initialize Google Analytics if provided.
   if (props.googleId) {
-    ReactGA.initialize(props.googleId);
+    ReactGA.initialize(props.googleId, {
+      gaOptions: {
+        debug_mode: true,
+      },
+      gtagOptions: {
+        debug_mode: true,
+      },
+    });
   }
 
   const restApi = useMemo(() => {
@@ -56,24 +63,30 @@ export default function Site(props) {
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, __setError__] = useState(null); // use public setter, not __setError__
   const navigate = useNavigate();
 
   /**
    * Display the site in an error state.
-   * @param {string} title
-   * @param {string} description
+   * @param {ErrorData} errorData
    */
-  function showError({title,description}) {
-    if (!error) {
-      // only set error if not already set (prevents looping)
-      setError({
-        title: title,
-        description: description
-      });
-      navigate('/error');
+  const setError = useCallback((errorData) => {
+    // use stringify for deep compare
+    if (JSON.stringify(errorData) !== JSON.stringify(error)) {
+      __setError__(errorData);
+      if (errorData) {
+        // if setting non-null error, then redirect navigation
+        navigate('/error');
+      }
     }
-  }
+  }, [__setError__, error]);
+
+  // set error from props if defined
+  useEffect(() => {
+    if (props.error) {
+      setError(props.error)
+    }
+  }, [props.error, setError]);
 
   /**
    * Use the site outline to get child pages.
@@ -103,14 +116,14 @@ export default function Site(props) {
         console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(error => {
-        showError({
+        setError({
           title: `${error.status} Server Error`,
           description: `Site data could not be loaded.<br>Code: ${error.code}`
         });
         setSiteData(null);
       });
     }
-  }, [restApi, siteData]);
+  }, [restApi, siteData, setError]);
 
   useEffect(() => {
     if (!outlineData) {
@@ -119,14 +132,14 @@ export default function Site(props) {
         console.debug(`Loaded site ${restApi.siteId} outline.`);
         setOutlineData(data);
       }).catch(error => {
-        showError({
+        setError({
           title: `${error.status} Server Error`,
           description: `Site data could not be loaded.<br>Code: ${error.code}`
         });
         setOutlineData(null);
       });
     }
-  }, [restApi, outlineData]);
+  }, [restApi, outlineData, setError]);
 
   let redirect;
   if (props.redirects && window.location.pathname === '/') {
@@ -151,7 +164,7 @@ export default function Site(props) {
           siteData: siteData,
           outlineData: outlineData,
           error: error,
-          showError: showError,
+          setError: setError,
           getChildren: getChildren
         }}
       >

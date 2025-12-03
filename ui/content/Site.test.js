@@ -259,14 +259,13 @@ describe('Site component', () => {
       const siteContext = useContext(SiteContext);
       useEffect(() => {
         console.log('Reporting error.');
-        siteContext.showError({
+        siteContext.setError({
           title: `Server Error`,
           description: `Site data could not be loaded.`
         })
-      }, [siteContext.showError]);
+      }, [siteContext.setError]);
       return (<div data-testid="MockPage"></div>)
     });
-
 
     // when
     await act(async () => {
@@ -290,6 +289,37 @@ describe('Site component', () => {
     }, undefined);
   });
 
+  it('should forward errors from props', async () => {
+    // given
+    jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue({mockSiteData})
+    jest.spyOn(RestAPI.prototype, 'getSiteOutline').mockResolvedValue(mockOutlineData);
+    MockPage = jest.fn().mockImplementation(() => {
+      const {error} = useContext(SiteContext);
+      errorReceiver(error);
+      return (<div data-testid="MockPage"></div>)
+    });
+    const mockError = {
+      title: "Error Title",
+      description: "Error Description",
+    }
+    const errorReceiver=jest.fn();
+
+    // when
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/']}>
+          <Site pageElement={MockPage} error={mockError}/>
+        </MemoryRouter>
+      );
+    })
+
+    // then
+    const pageElement = screen.getByTestId(/MockPage/i);
+    expect(pageElement).toBeInTheDocument();
+    expect(errorReceiver).toBeCalledTimes(2);
+    expect(errorReceiver).toBeCalledWith(mockError);
+  });
+
   it('should provide children to Pages', async () => {
     // given
     jest.spyOn(RestAPI.prototype, 'getSite').mockResolvedValue({mockSiteData})
@@ -302,7 +332,6 @@ describe('Site component', () => {
       }, [siteContext.getChildren]);
       return (<div data-testid="MockPage"></div>)
     });
-
 
     // when
     await act(async () => {
