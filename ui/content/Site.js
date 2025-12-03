@@ -49,13 +49,13 @@ export default function Site(props) {
     );
   }, [props.restApi]);
 
-  const initGA = useMemo(() => {
+  useMemo(() => {
     // Google Analytics, if provided.
     if (props.googleId || process.env.REACT_APP_GOOGLE_CLIENT_ID) {
       ReactGA.initialize(props.googleId ? props.googleId : process.env.REACT_APP_GOOGLE_CLIENT_ID);
     }
     return true;
-  });
+  },[props.googleId]);
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
@@ -75,7 +75,7 @@ export default function Site(props) {
         navigate('/error');
       }
     }
-  }, [__setError__, error]);
+  }, [__setError__, error, navigate]);
 
   // set error from props if defined
   useEffect(() => {

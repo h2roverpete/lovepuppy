@@ -74,7 +74,7 @@ export default function Page(props) {
       // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
-  }, [pageData, outlineData])
+  }, [pageData, outlineData, breadcrumbs])
 
   /**
    * Function for changing page ID.
