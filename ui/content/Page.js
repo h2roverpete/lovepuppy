@@ -1,7 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
-import {useLocation} from "react-router";
-import ReactGA from "react-ga4";
 
 export const PageContext = createContext(
   {
@@ -50,18 +48,6 @@ export default function Page(props) {
     // set new page ID from props
     setPageId(props.pageId);
   }
-
-  // Google Analytics for page views
-  const location = useLocation();
-  useEffect(() => {
-    if (pageData) {
-      ReactGA.send( {
-        hitType: 'pageview',
-        path: location.pathname + location.search,
-        title: pageData.PageTitle
-      });
-    }
-  }, [location, pageData]);
 
   useEffect(() => {
     if (pageId && !pageData) {

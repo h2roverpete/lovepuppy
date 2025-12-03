@@ -164,64 +164,6 @@ describe('Page component', () => {
     expect(mockRestApi.getPageSections).toBeCalledWith(50);
   });
 
-  it('should report page views to Google analytics', async () => {
-    // given
-    mockRestApi.getPage = jest.fn()
-      .mockResolvedValueOnce(mockOutlineData[0])
-      .mockResolvedValueOnce(mockOutlineData[1]);
-    mockRestApi.getPageSections = jest.fn().mockResolvedValue(mockPageSections);
-    jest.spyOn(ReactGA, 'event');
-
-    // when
-    let renderedContent
-    await act(async () => {
-      renderedContent = render(
-        <SiteContext
-          value={{
-            restApi: mockRestApi,
-            siteData: null,
-            outlineData: null,
-            error: null,
-            setError: null,
-            getChildren: null
-          }}
-        >
-          <MemoryRouter initialEntries={['/']}>
-            <Page pageId={50}/>
-          </MemoryRouter>
-        </SiteContext>
-      );
-    })
-    await act(async () => {
-      renderedContent.rerender(
-        <SiteContext
-          value={{
-            restApi: mockRestApi,
-            siteData: null,
-            outlineData: null,
-            error: null,
-            setError: ()=>{},
-            getChildren: null
-          }}
-        >
-          <MemoryRouter initialEntries={['/']}>
-            <Page pageId={51}/>
-          </MemoryRouter>
-        </SiteContext>
-      )
-    })
-
-    // then
-    const pageElement = screen.getByTestId(/Page/i);
-    expect(pageElement).toBeInTheDocument();
-    expect(mockRestApi.getPage).toBeCalledTimes(2);
-    expect(mockRestApi.getPage).toHaveBeenNthCalledWith(1,50);
-    expect(mockRestApi.getPage).toHaveBeenNthCalledWith(2,51);
-    expect(ReactGA.event).toBeCalledTimes(2);
-    expect(ReactGA.event).toHaveBeenNthCalledWith(1, "page_view", {"page_location": "/", "page_title": "First Page"});
-    expect(ReactGA.event).toHaveBeenNthCalledWith(2, "page_view", {"page_location": "/", "page_title": "Second Page"});
-  });
-
   it('should build breadcrumbs for child components', async () => {
     // given
     mockRestApi.getPage = jest.fn().mockResolvedValue(mockOutlineData[3]);

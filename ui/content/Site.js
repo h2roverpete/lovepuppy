@@ -41,18 +41,6 @@ export const SiteContext = createContext({
  */
 export default function Site(props) {
 
-  // initialize Google Analytics if provided.
-  if (props.googleId) {
-    ReactGA.initialize(props.googleId, {
-      gaOptions: {
-        debug_mode: true,
-      },
-      gtagOptions: {
-        debug_mode: true,
-      },
-    });
-  }
-
   const restApi = useMemo(() => {
     return props.restApi ? props.restApi : new RestAPI(
       parseInt(process.env.REACT_APP_SITE_ID),
@@ -60,6 +48,14 @@ export default function Site(props) {
       process.env.REACT_APP_API_KEY
     );
   }, [props.restApi]);
+
+  const initGA = useMemo(() => {
+    // Google Analytics, if provided.
+    if (props.googleId || process.env.REACT_APP_GOOGLE_CLIENT_ID) {
+      ReactGA.initialize(props.googleId ? props.googleId : process.env.REACT_APP_GOOGLE_CLIENT_ID);
+    }
+    return true;
+  });
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
