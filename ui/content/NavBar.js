@@ -127,7 +127,7 @@ export default function NavBar(props) {
                 data-testid="NavBarBrandIcon"
               />
             )}</>
-            <>{props.brand?.length && (
+            <>{props.brand?.length > 0 && (
               <span
                 className={'NavBarBrandText text-nowrap'}
                 onClick={() => {
