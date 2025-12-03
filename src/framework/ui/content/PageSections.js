@@ -23,13 +23,11 @@ export default function PageSections(props) {
       <>{pageData && sectionData && (
         <>
           {pageData && sectionData && sectionData.map(section => (
-            <PageSection sectionData={section} key={section.PageSectionID}/>
+            <PageSection sectionData={section} key={section.PageSectionID} data-testid={`PageSection-section.PageSectionID`} />
           ))}
           {props.children}
         </>
       )}</>
     )}</>
-
-
   )
 }

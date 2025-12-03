@@ -1,4 +1,4 @@
-import {useContext} from "react";
+import {useContext, useRef} from "react";
 import {SiteContext} from "./Site";
 import {PageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,7 +8,7 @@ import {useNavigate} from "react-router";
 /**
  * @typedef NavBarProps
  *
- * @property {String} [brand]           Explicit brand, otherwise the Site name will be used.
+ * @property {String} [brand]           Explicit brand name.
  * @property {String} [brandClassName]  CSS class to apply to brand/logo component
  * @property {string} [icon]            Logo icon for branding. When provided, default brand text is blank.
  * @property {string} [expand]          Bootstrap width boundary to expand/collapse the nav bar, use empty string to prevent collapsing.
@@ -22,17 +22,17 @@ import {useNavigate} from "react-router";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function NavBar({brand, brandClassName, icon, expand, theme, fixed}) {
+export default function NavBar(props) {
 
   const {siteData, getChildren} = useContext(SiteContext);
   const {pageData, breadcrumbs} = useContext(PageContext);
   const navigator = useNavigate();
+  const togglerRef = useRef(null);
 
   function navigateTo(to) {
-    const toggler = document.getElementById("NavbarToggle");
-    if (toggler.checkVisibility() && !toggler.classList.contains("collapsed")) {
+    if ((togglerRef.current.style.visible || togglerRef.current.style.display !== 'none') && !togglerRef.current.classList.contains("collapsed")) {
       // toggle is active, collapse menu on navigation
-      toggler.click();
+      togglerRef.current.click();
     }
     // react-router navigation
     navigator(to);
@@ -57,25 +57,34 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
     const children = getChildren(props.pageData.PageID);
     return (
       <>{children.length === 0 ? (
+        // no children to render
         <NavDropdown.Item
+          key={props.pageData.PageID}
           onClick={() => navigateTo(props.pageData.PageRoute)}
           className={`text-nowrap${isInCurrentPath(props.pageData.PageID) ? ' active' : ''}`}
+          data-testid={`NavItem-${props.pageData.PageID}`}
         >
           {props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
         </NavDropdown.Item>
       ) : (
+        // at least one child, render a dropdown
         <NavDropdown
+          key={props.pageData.PageID}
           title={props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
           id={`nav-dropdown${isInCurrentPath(props.pageData.PageID) ? '-active' : ''}`}
+          data-testid={`NavItem-${props.pageData.PageID}`}
         >
           <>{children.map((item) => (
             <>{item.HasChildren ? (
+              // render further dropdown levels
               <RecursiveDropdown pageData={item}/>
             ) : (
+              // render this dropdown level
               <NavDropdown.Item
                 className={`text-nowrap${pageData?.PageID === item.PageID ? ' active' : ''}`}
                 key={item.PageID}
                 onClick={() => navigateTo(item.PageRoute)}
+                data-testid={`NavItem-${item.PageID}`}
               >
                 {item.NavTitle ? item.NavTitle : item.PageTitle}
               </NavDropdown.Item>
@@ -88,31 +97,45 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
 
   return (
     <Navbar
-      expand={expand ? expand : 'sm'}
-      className={`NavBar ${!expand ? 'navbar-expand' : ''}`}
-      data-bs-theme={theme ? theme : "light"}
-      fixed={fixed ? fixed : undefined}
+      expand={props.expand ? props.expand : 'sm'}
+      className={`NavBar ${!props.expand ? 'navbar-expand' : ''}`}
+      data-bs-theme={props.theme ? props.theme : "light"}
+      fixed={props.fixed ? props.fixed : undefined}
+      data-testid="NavBar"
     >
-      <div className="NavBarContents container-fluid">
-
-        <>{(brand || icon) && (
+      <div
+        className="NavBarContents
+        container-fluid"
+        data-testid="NavBarContents"
+      >
+        <>{(props.brand || props.icon) && (
           <Navbar.Brand
-            onClick={() => navigateTo('/')}
             style={{cursor: 'pointer'}}
-            className={`NavBarBrand ${brandClassName}`}
+            className={`NavBarBrand ${props.brandClassName}`}
+            data-testid="NavBarBrand"
           >
-            <>{icon && (
+            <>{props.icon && (
               <img
                 className="NavBarBrandIcon"
-                src={icon}
-                alt={typeof brand === 'string' ? brand : siteData?.SiteName}
+                src={props.icon}
+                alt={props.brand?.length ? props.brand : siteData?.SiteName}
                 height={45}
                 style={{marginRight: '10px'}}
+                onClick={() => {
+                  navigateTo('/')
+                }}
+                data-testid="NavBarBrandIcon"
               />
             )}</>
-            <>{icon && (
-              <span className={'NavBarBrandText text-nowrap'}>
-                {typeof brand === 'string' ? brand : siteData?.SiteName}
+            <>{props.brand?.length && (
+              <span
+                className={'NavBarBrandText text-nowrap'}
+                onClick={() => {
+                  navigateTo('/')
+                }}
+                data-testid="NavBarBrandText"
+              >
+                {props.brand}
               </span>
             )}</>
           </Navbar.Brand>
@@ -121,21 +144,27 @@ export default function NavBar({brand, brandClassName, icon, expand, theme, fixe
         <Navbar.Toggle
           aria-controls="basic-navbar-nav"
           id="NavbarToggle"
+          ref={togglerRef}
         />
         <Navbar.Collapse id="MainNavigation">
           <Nav>
             {getChildren(0).map((item) => (
-              <>{item.HasChildren ? (
-                <RecursiveDropdown pageData={item}/>
-              ) : (
-                <Nav.Link
-                  onClick={(event) => navigateTo(item.PageRoute)}
-                  className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
-                  key={item.PageID}
-                >
-                  {item.NavTitle ? item.NavTitle : item.PageTitle}
-                </Nav.Link>
-              )}</>
+              <div
+                key={item.PageID}
+              >
+                {item.HasChildren ? (
+                  <RecursiveDropdown pageData={item}/>
+                ) : (
+                  <Nav.Link
+                    onClick={(event) => navigateTo(item.PageRoute)}
+                    className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
+                    key={item.PageID}
+                    data-testid={`NavItem-${item.PageID}`}
+                  >
+                    {item.NavTitle ? item.NavTitle : item.PageTitle}
+                  </Nav.Link>
+                )}
+              </div>
             ))}
           </Nav>
         </Navbar.Collapse>

@@ -1,8 +1,8 @@
-import {createContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useCallback, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
-import {BrowserRouter, Route, Routes} from "react-router";
+import {Route, Routes, useNavigate} from "react-router";
 import RestAPI from "../../api/api.mjs";
 
 /**
@@ -17,7 +17,8 @@ export const SiteContext = createContext({
   siteData: null,
   outlineData: null,
   error: null,
-  getChildren: () => console.error(`Site context function getChildren() is undefined.`)
+  setError: null,
+  getChildren: null
 });
 
 /**
@@ -30,18 +31,15 @@ export const SiteContext = createContext({
  */
 
 /**
- * Element to provide SiteContext to child elements.
+ * Main container element of content framework.
+ * Performs routing for page rendering.
+ * Provides SiteContext to child elements.
  *
  * @param props {SiteProps}
  * @returns {JSX.Element}
  * @constructor
  */
 export default function Site(props) {
-
-  // Google Analytics, if provided.
-  if (props.googleId) {
-    ReactGA.initialize(props.googleId);
-  }
 
   const restApi = useMemo(() => {
     return props.restApi ? props.restApi : new RestAPI(
@@ -51,9 +49,40 @@ export default function Site(props) {
     );
   }, [props.restApi]);
 
+  useMemo(() => {
+    // Google Analytics, if provided.
+    if (props.googleId || process.env.REACT_APP_GOOGLE_CLIENT_ID) {
+      ReactGA.initialize(props.googleId ? props.googleId : process.env.REACT_APP_GOOGLE_CLIENT_ID);
+    }
+    return true;
+  },[props.googleId]);
+
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, __setError__] = useState(null); // use public setter, not __setError__
+  const navigate = useNavigate();
+
+  /**
+   * Display the site in an error state.
+   * @param {ErrorData} errorData
+   */
+  const setError = useCallback((errorData) => {
+    // use stringify for deep compare
+    if (JSON.stringify(errorData) !== JSON.stringify(error)) {
+      __setError__(errorData);
+      if (errorData) {
+        // if setting non-null error, then redirect navigation
+        navigate('/error');
+      }
+    }
+  }, [__setError__, error, navigate]);
+
+  // set error from props if defined
+  useEffect(() => {
+    if (props.error) {
+      setError(props.error)
+    }
+  }, [props.error, setError]);
 
   /**
    * Use the site outline to get child pages.
@@ -90,7 +119,7 @@ export default function Site(props) {
         setSiteData(null);
       });
     }
-  }, [restApi, siteData]);
+  }, [restApi, siteData, setError]);
 
   useEffect(() => {
     if (!outlineData) {
@@ -106,65 +135,87 @@ export default function Site(props) {
         setOutlineData(null);
       });
     }
-  }, [restApi, outlineData]);
+  }, [restApi, outlineData, setError]);
+
+  let redirect;
+  if (props.redirects && window.location.pathname === '/') {
+    // search for page redirect matches
+    for (const item of props.redirects) {
+      if (item.hostname === window.location.hostname) {
+        console.debug(`Redirecting ${item.hostname} to page ${item.pageId}.`);
+        redirect = item;
+      }
+    }
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  let cfmPageId = parseInt(params.get('pageid'));
 
   // provide context to children
   return (
-    <div className="Site">
+    <div className="Site" data-testid="Site">
       <SiteContext
         value={{
           restApi: restApi,
           siteData: siteData,
           outlineData: outlineData,
           error: error,
-          'getChildren': getChildren
+          setError: setError,
+          getChildren: getChildren
         }}
       >
-        {/* only register routes after outline is loaded */}
-        <BrowserRouter>
+        <Routes>
+          <>{error && (
+            // error page display
+            <Route
+              path="/error"
+              element={<props.pageElement error={error}/>
+              }
+            />
+          )}</>
           <>{outlineData && (
-            <Routes>
-              {/* root route */}
-              <Route
-                path="/"
-                element={<props.pageElement pageId={outlineData[0].PageID}/>}
-              />
-              {/* legacy route for cfm pages */}
-              <Route
-                path="/page.cfm"
-                element={<props.pageElement/>}
-              />
-              {outlineData?.map((page) => (
+            <>
+              <>{cfmPageId && (
+                // legacy coldfusion page
+                <Route
+                  path="/page.cfm"
+                  element={<props.pageElement pageId={cfmPageId}/>}
+                />
+              )}</>
+              <>{redirect ? (
+                // redirect root for an alternate domain
+                <Route
+                  path="/"
+                  element={<props.pageElement pageId={redirect.pageId}/>}
+                />
+              ) : (
+                // normal root, first item in outline
+                <Route
+                  path="/"
+                  element={<props.pageElement pageId={outlineData[0].PageID}/>}
+                />
+              )}</>
+              {outlineData.map((page) => (
+                // all pages in site outline
                 <Route
                   path={page.PageRoute}
                   element={<props.pageElement pageId={page.PageID}
                   />}
                 />
               ))}
-              {/* route to explicit error page */}
-              <Route
-                path="/error"
-                element={<props.pageElement error={{title: "Error", description: "An error occurred."}}/>}
-              />
-              {/* catchall displays 404 errors when route not matched */}
+              {/* catchall to display 404 errors when route not matched */}
               <Route
                 path="*"
                 element={<props.pageElement
-                  error={{title: "404 Not Found", description: "The content you are looking for was not found."}}/>}
+                  error={{
+                    title: "404 Not Found",
+                    description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."
+                  }}/>}
               />
-            </Routes>
-          )}</>
-          <>{error && (
-            <Routes>
-              {/* pass error state to page module for display */}
-              <Route
-                path="*"
-                element={<props.pageElement error={error}/>}
-              />
-            </Routes>
+            </>
           )}</>
           {props.children}
-        </BrowserRouter>
+        </Routes>
       </SiteContext>
     </div>
   )

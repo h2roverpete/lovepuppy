@@ -25,7 +25,9 @@ export default function PageTitle(props) {
   return (
     <>{(pageData?.DisplayTitle || props.showTitle || error?.title) && (
       <h1
-        className="PageTitle">{error?.title ? error.title : pageData ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
+        className="PageTitle"
+        data-testid="PageTitle"
+      >{error?.title ? error.title : pageData?.PageTitle ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
     )}</>
   )
 }

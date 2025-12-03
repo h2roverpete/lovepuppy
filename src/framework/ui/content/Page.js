@@ -1,11 +1,9 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
-import {useLocation} from "react-router";
-import ReactGA from "react-ga4";
 
 export const PageContext = createContext(
   {
-    pageID: null,
+    pageId: null,
     pageData: null,
     sectionData: null,
     breadcrumbs: null,
@@ -15,13 +13,15 @@ export const PageContext = createContext(
 /**
  * @typedef PageProps
  *
- * @property {[JSX.Element]} children
- * @property {ErrorData} error
+ * @property {[JSX.Element]} children   Child elements.
+ * @property {number} [pageId]          Specific page ID to display.
+ * @property {ErrorData} [error]        Error information to display.
  */
 
 /**
- * Page component, generates a <div> and provides
- * page related context data to children.
+ * Page component.
+ * Generates a container <div> for styling and display.
+ * Provides page related data in a PageContext to children.
  *
  * @param props {PageProps}
  * @returns {JSX.Element}
@@ -29,54 +29,24 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, restApi, error} = useContext(SiteContext);
-  const [pageError, setError] = useState(props.error);
-  const [pageId, setPageId] = useState(props.pageId);
+  const {outlineData, restApi, error, setError} = useContext(SiteContext);
+  const [pageId, __setPageId__] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
 
-  console.debug(`Render page: props.pageId=${props.pageId}, pageId=${pageId}, site error=${JSON.stringify(error)}, pageError=${JSON.stringify(pageError)}, props.error=${JSON.stringify(props.error)}`);
-  useEffect(() => {
-    if (error) {
-      // pass error from site context
-      setError(error);
-    } else if (props.error) {
-      // pass error from props
-      setError(props.error);
-    } else {
-      setError(null);
-    }
-  }, [props.error, error]);
+  let errorData;
+  if (error) {
+    // pass error from site context
+    errorData = error;
+  } else if (props.error) {
+    // pass error from props
+    errorData = props.error;
+  }
 
   if (props.pageId && props.pageId !== pageId) {
     // set new page ID from props
-    setter(props.pageId);
-  }
-
-  // Google Analytics for page views
-  const location = useLocation();
-  useEffect(() => {
-    if (pageData) {
-      ReactGA.send({
-        hitType: 'pageview',
-        page: location.pathname + location.search,
-        title: pageData.PageTitle
-      });
-    }
-  }, [location, pageData]);
-
-  if (!pageId && !props.pageId && !pageError) {
-    // no explicit page id: check URL params for page id
-    const params = new URLSearchParams(window.location.search);
-    let id = parseInt(params.get('pageid'));
-    if (id > 0) {
-      setter(id);
-    } else if (outlineData && outlineData.length) {
-      // find the first page in the site outline
-      const defaultPageId = outlineData[0].PageID
-      setter(defaultPageId);
-    }
+    setPageId(props.pageId);
   }
 
   useEffect(() => {
@@ -84,13 +54,7 @@ export default function Page(props) {
       // load page data
       restApi?.getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
-        setPageData(data);
-      }).catch((error) => {
-        setError({
-          title: `${error.status} Server Error`,
-          description: `Page data could not be loaded.<br>Code: ${error.code}`
-        });
-        setPageData(null);
+        setPageData(data); // update state
       })
     }
   }, [restApi, pageData, pageId]);
@@ -100,41 +64,43 @@ export default function Page(props) {
       // load page sections
       restApi?.getPageSections(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} sections.`);
-        setSectionData(data);
+        setSectionData(data); // update state
       })
     }
   }, [restApi, pageData, pageId, sectionData]);
 
   useEffect(() => {
-    if (pageData && outlineData) {
-      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
+    if (pageData && outlineData && !breadcrumbs) {
+      // build breadcrumb data
+      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
-  }, [pageData, outlineData])
+  }, [pageData, outlineData, breadcrumbs])
 
   /**
-   * Setter function for changing page ID.
-   * Clears out page and section data on new Page ID.
+   * Function for changing page ID.
+   * Clears out extra page related data when Page ID is changed.
    *
    * @param pageId {number} new page ID.
    */
-  function setter(pageId) {
+  function setPageId(pageId) {
     console.debug(`Set page ID to ${pageId}.`);
-    setPageId(pageId);
+    __setPageId__(pageId); // call private state setter
     setPageData(null);
     setSectionData(null);
+    setBreadcrumbs(null);
     setError(null);
   }
 
   // provide context to children
   return (
-    <div className="Page">
+    <div className="Page" data-testid="Page">
       <PageContext
         value={{
           pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
-          error: pageError,
+          error: errorData,
         }}
       >
         {props.children}
@@ -144,7 +110,7 @@ export default function Page(props) {
 }
 
 /**
- * Build breadcrumb array.
+ * Build breadcrumb array from site outline.
  *
  * @param outlineData {[OutlineData]}
  * @param parentId {number}
