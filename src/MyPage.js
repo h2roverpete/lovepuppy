@@ -11,6 +11,7 @@ import logo from "./assets/logo.png";
 import logo_sm from "./assets/logo-sm.png";
 import Gallery from "framework/ui/gallery/Gallery";
 import Logo from "framework/ui/content/Logo";
+import './css/GuestBook.css'
 
 /**
  * @typedef MyPageProps
@@ -30,13 +31,12 @@ export default function MyPage(props) {
     <Page {...props}>
       <Head/>
       <div className="NavBarWrapper">
-        <Logo src={logo} className="d-none d-sm-flex"/>
+        <Logo src={logo} className="d-none d-md-flex"/>
         <NavBar
-          expand={'sm'}
+          expand={'md'}
           theme={'dark'}
           icon={logo_sm}
-          brand={''}
-          brandClassName="d-flex d-sm-none"
+          brandClassName="d-flex d-md-none"
         />
       </div>
       <PageContent>

@@ -235,8 +235,8 @@ div.SectionImage img {
   background-repeat: repeat-x;
 }
 
-/* bootstrap xs width */
-@media (max-width: 575px) {
+/* bootstrap xs-sm width */
+@media (max-width: 768px) {
   .NavBarWrapper {
     background-image: none;
     justify-content: flex-start;
@@ -257,16 +257,11 @@ div.SectionImage img {
   }
 }
 
-/* bootstrap sm width */
-@media (min-width: 576px) {
+/* bootstrap md width */
+@media (min-width: 768px) {
   .div.NavBarWrapper {
     height: auto;
   }
-}
-
-/* bootstrap md width */
-@media (min-width: 768px) {
-
 }
 
 /* bootstrap lg width */
