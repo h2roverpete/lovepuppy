@@ -1,6 +1,7 @@
 import PageSection from './PageSection';
 import React, {useContext} from "react";
 import {PageContext} from "./Page";
+import Login from "../../auth/Login";
 
 /**
  * @typedef PageSectionProps
@@ -15,18 +16,26 @@ import {PageContext} from "./Page";
  * @constructor
  */
 export default function PageSections(props) {
-  const {pageData, sectionData, error} = useContext(PageContext);
+  const {pageData, sectionData, error, login} = useContext(PageContext);
   return (
-    <>{error?(
-      <div className={'PageSection'} dangerouslySetInnerHTML={{__html:error.description}}></div>
-    ):(
-      <>{pageData && sectionData && (
-        <>
-          {pageData && sectionData && sectionData.map(section => (
-            <PageSection sectionData={section} key={section.PageSectionID} data-testid={`PageSection-section.PageSectionID`} />
-          ))}
-          {props.children}
-        </>
+    <>{error ? (
+      <div className={'PageSection'} dangerouslySetInnerHTML={{__html: error.description}}></div>
+    ) : (
+      <>{login ? (
+        // don't display page sections, display login UI instead
+        <Login/>
+      ) : (
+        <>{pageData && sectionData && (
+          // display page sections
+          <>
+            {sectionData.map(section => (
+              <PageSection
+                sectionData={section} key={section.PageSectionID}
+                data-testid={`PageSection-section.PageSectionID`}/>
+            ))}
+            {props.children}
+          </>
+        )}</>
       )}</>
     )}</>
   )

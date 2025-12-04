@@ -127,7 +127,7 @@ export default function NavBar(props) {
                 data-testid="NavBarBrandIcon"
               />
             )}</>
-            <>{props.brand?.length && (
+            <>{props.brand?.length > 0 && (
               <span
                 className={'NavBarBrandText text-nowrap'}
                 onClick={() => {
@@ -156,7 +156,7 @@ export default function NavBar(props) {
                   <RecursiveDropdown pageData={item}/>
                 ) : (
                   <Nav.Link
-                    onClick={(event) => navigateTo(item.PageRoute)}
+                    onClick={() => navigateTo(item.PageRoute)}
                     className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
                     key={item.PageID}
                     data-testid={`NavItem-${item.PageID}`}

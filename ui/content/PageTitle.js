@@ -21,13 +21,13 @@ import {useContext} from "react";
  * @constructor
  */
 export default function PageTitle(props) {
-  const {pageData, error} = useContext(PageContext);
+  const {pageData, error, login} = useContext(PageContext);
   return (
-    <>{(pageData?.DisplayTitle || props.showTitle || error?.title) && (
+    <>{(pageData?.DisplayTitle || props.showTitle || error?.title || login) && (
       <h1
         className="PageTitle"
         data-testid="PageTitle"
-      >{error?.title ? error.title : pageData?.PageTitle ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
+      >{error?.title ? error.title : login ? `Log In` : pageData?.PageTitle ? pageData.PageTitle : (<>&nbsp;</>)}</h1>
     )}</>
   )
 }

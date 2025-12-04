@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useNavigate} from "react-router";
 import RestAPI from "../../api/api.mjs";
+import AuthProvider from "../../auth/AuthProvider";
 
 /**
  * @typedef ErrorData
@@ -18,6 +19,7 @@ export const SiteContext = createContext({
   outlineData: null,
   error: null,
   setError: null,
+  login: false,
   getChildren: null
 });
 
@@ -49,13 +51,13 @@ export default function Site(props) {
     );
   }, [props.restApi]);
 
-  const initGA = useMemo(() => {
+  useMemo(() => {
     // Google Analytics, if provided.
     if (props.googleId || process.env.REACT_APP_GOOGLE_CLIENT_ID) {
       ReactGA.initialize(props.googleId ? props.googleId : process.env.REACT_APP_GOOGLE_CLIENT_ID);
     }
     return true;
-  });
+  }, [props.googleId]);
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
@@ -75,7 +77,7 @@ export default function Site(props) {
         navigate('/error');
       }
     }
-  }, [__setError__, error]);
+  }, [__setError__, error, navigate]);
 
   // set error from props if defined
   useEffect(() => {
@@ -153,70 +155,77 @@ export default function Site(props) {
 
   // provide context to children
   return (
-    <div className="Site" data-testid="Site">
-      <SiteContext
-        value={{
-          restApi: restApi,
-          siteData: siteData,
-          outlineData: outlineData,
-          error: error,
-          setError: setError,
-          getChildren: getChildren
-        }}
-      >
-        <Routes>
-          <>{error && (
-            // error page display
+    <AuthProvider>
+      <div className="Site" data-testid="Site">
+        <SiteContext
+          value={{
+            restApi: restApi,
+            siteData: siteData,
+            outlineData: outlineData,
+            error: error,
+            setError: setError,
+            getChildren: getChildren
+          }}
+        >
+          <Routes>
             <Route
-              path="/error"
-              element={<props.pageElement error={error}/>
+              path="/login"
+              element={<props.pageElement login={true}/>
               }
             />
-          )}</>
-          <>{outlineData && (
-            <>
-              <>{cfmPageId && (
-                // legacy coldfusion page
-                <Route
-                  path="/page.cfm"
-                  element={<props.pageElement pageId={cfmPageId}/>}
-                />
-              )}</>
-              <>{redirect ? (
-                // redirect root for an alternate domain
-                <Route
-                  path="/"
-                  element={<props.pageElement pageId={redirect.pageId}/>}
-                />
-              ) : (
-                // normal root, first item in outline
-                <Route
-                  path="/"
-                  element={<props.pageElement pageId={outlineData[0].PageID}/>}
-                />
-              )}</>
-              {outlineData.map((page) => (
-                // all pages in site outline
-                <Route
-                  path={page.PageRoute}
-                  element={<props.pageElement pageId={page.PageID}
-                  />}
-                />
-              ))}
-              {/* catchall to display 404 errors when route not matched */}
+            <>{error && (
+              // error page display
               <Route
-                path="*"
-                element={<props.pageElement
-                  error={{
-                    title: "404 Not Found",
-                    description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."
-                  }}/>}
+                path="/error"
+                element={<props.pageElement error={error}/>
+                }
               />
-            </>
-          )}</>
-          {props.children}
-        </Routes>
-      </SiteContext>
-    </div>
+            )}</>
+            <>{outlineData && (
+              <>
+                <>{cfmPageId && (
+                  // legacy coldfusion page
+                  <Route
+                    path="/page.cfm"
+                    element={<props.pageElement pageId={cfmPageId}/>}
+                  />
+                )}</>
+                <>{redirect ? (
+                  // redirect root for an alternate domain
+                  <Route
+                    path="/"
+                    element={<props.pageElement pageId={redirect.pageId}/>}
+                  />
+                ) : (
+                  // normal root, first item in outline
+                  <Route
+                    path="/"
+                    element={<props.pageElement pageId={outlineData[0].PageID}/>}
+                  />
+                )}</>
+                {outlineData.map((page) => (
+                  // all pages in site outline
+                  <Route
+                    path={page.PageRoute}
+                    element={<props.pageElement pageId={page.PageID}
+                    />}
+                  />
+                ))}
+                {/* catchall to display 404 errors when route not matched */}
+                <Route
+                  path="*"
+                  element={<props.pageElement
+                    error={{
+                      title: "404 Not Found",
+                      description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."
+                    }}/>}
+                />
+              </>
+            )}</>
+            {props.children}
+          </Routes>
+        </SiteContext>
+      </div>
+    </AuthProvider>
   )
 }

@@ -3,7 +3,7 @@ import GuestFields from "./GuestFields";
 import GuestFeedbackFields from "./GuestFeedbackFields";
 import {SiteContext} from "../content/Site";
 import {PageContext} from "../content/Page";
-import './GuestBook.css'
+import '../forms/Forms.css'
 
 /**
  * @typedef GuestBookProps

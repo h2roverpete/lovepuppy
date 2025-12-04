@@ -16,6 +16,7 @@ export const PageContext = createContext(
  * @property {[JSX.Element]} children   Child elements.
  * @property {number} [pageId]          Specific page ID to display.
  * @property {ErrorData} [error]        Error information to display.
+ * @property {boolean} [login]          User is logging in.
  */
 
 /**
@@ -74,7 +75,7 @@ export default function Page(props) {
       // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
-  }, [pageData, outlineData])
+  }, [pageData, outlineData, breadcrumbs])
 
   /**
    * Function for changing page ID.
@@ -100,6 +101,7 @@ export default function Page(props) {
           pageData: pageData,
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
+          login: props.login === true,
           error: errorData,
         }}
       >
