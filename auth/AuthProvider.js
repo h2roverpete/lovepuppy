@@ -1,15 +1,23 @@
 import {useContext, createContext} from "react";
+import {useCookies} from 'react-cookie';
 
-const AuthContext = createContext({});
+export const AuthContext = createContext({
+  token: null,
+  setToken: (value) => console.error(`setToken() is not defined.`)
+});
 
-export default function (props) {
-  return <AuthContext
-    value={{
-      user: null,
-      token: null
-    }}>
-    {props.children}
-  </AuthContext>;
+export default function AuthProvider(props) {
+  const [cookies, setCookie] = useCookies();
+
+  return (
+    <AuthContext
+      value={{
+        token: cookies.token,
+        setToken: (token) => setCookie('token', token)
+      }}>
+      {props.children}
+    </AuthContext>
+  );
 };
 
 export const useAuth = () => {

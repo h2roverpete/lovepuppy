@@ -10,7 +10,7 @@
  * @property {DataCallback} onChange     Standard data callback receiving {name, value} when field contents change
  */
 
-export default function EmailField(props){
+export default function EmailField(props) {
   return (
     <div className="form-group col-xs-8 col-md-6 mt-4">
       <label className="form-label" htmlFor="email">{props.label}</label>
@@ -26,7 +26,7 @@ export default function EmailField(props){
           value: e.target.value !== null ? e.target.value : ""
         })}
         onBlur={e => props.onChange({
-          name:  props.name,
+          name: props.name,
           value: e.target.value !== null ? e.target.value : ""
         })}
         required={props.required === true}

@@ -425,6 +425,11 @@ class RestAPI {
     const response = await axios.get(`${this.host}/api/v1/gallery/${galleryId}/photos`);
     return response.data;
   }
+
+  async getAuthToken(clientId,redirectUrl,authCode) {
+    const response = await axios.post(`${this.host}/oauth/token?client_id=${clientId}&redirect_uri=${redirectUrl}&code=${authCode}&grant_type=authorization_code`);
+    return response.data;
+  }
 }
 
 export default RestAPI;

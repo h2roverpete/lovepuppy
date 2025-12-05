@@ -1,5 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
+import {useRestApi} from "../../api/RestApi";
 
 export const PageContext = createContext(
   {
@@ -8,6 +9,8 @@ export const PageContext = createContext(
     sectionData: null,
     breadcrumbs: null,
     error: null,
+    login: false,
+    logout: false,
   });
 
 /**
@@ -16,7 +19,8 @@ export const PageContext = createContext(
  * @property {[JSX.Element]} children   Child elements.
  * @property {number} [pageId]          Specific page ID to display.
  * @property {ErrorData} [error]        Error information to display.
- * @property {boolean} [login]          User is logging in.
+ * @property {boolean} [login]          User is logging in or out.
+ * @property {boolean} [logout]         User log out flag.
  */
 
 /**
@@ -30,11 +34,12 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, restApi, error, setError} = useContext(SiteContext);
+  const {outlineData, error, setError} = useContext(SiteContext);
   const [pageId, __setPageId__] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
+  const {getPage, getPageSections} = useRestApi();
 
   let errorData;
   if (error) {
@@ -53,22 +58,22 @@ export default function Page(props) {
   useEffect(() => {
     if (pageId && !pageData) {
       // load page data
-      restApi?.getPage(pageId).then((data) => {
+      getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
         setPageData(data); // update state
       })
     }
-  }, [restApi, pageData, pageId]);
+  }, [getPage, pageData, pageId]);
 
   useEffect(() => {
     if (pageId && !sectionData) {
       // load page sections
-      restApi?.getPageSections(pageId).then((data) => {
+      getPageSections(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} sections.`);
         setSectionData(data); // update state
       })
     }
-  }, [restApi, pageData, pageId, sectionData]);
+  }, [getPageSections, pageId, sectionData]);
 
   useEffect(() => {
     if (pageData && outlineData && !breadcrumbs) {
@@ -102,6 +107,7 @@ export default function Page(props) {
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
           login: props.login === true,
+          logout: props.logout === true,
           error: errorData,
         }}
       >
