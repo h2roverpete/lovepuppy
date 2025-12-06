@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useNavigate} from "react-router";
 import {useRestApi} from "../../api/RestApi";
+import Logout from '../../auth/Logout';
 
 /**
  * @typedef ErrorData
@@ -163,8 +164,7 @@ export default function Site(props) {
           />
           <Route
             path="/logout"
-            element={<props.pageElement login={true} logout={true}/>
-            }
+            element={<Logout/>}
           />
           <>{error && (
             // error page display

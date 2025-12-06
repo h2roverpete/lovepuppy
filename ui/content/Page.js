@@ -10,7 +10,6 @@ export const PageContext = createContext(
     breadcrumbs: null,
     error: null,
     login: false,
-    logout: false,
   });
 
 /**
@@ -20,7 +19,6 @@ export const PageContext = createContext(
  * @property {number} [pageId]          Specific page ID to display.
  * @property {ErrorData} [error]        Error information to display.
  * @property {boolean} [login]          User is logging in or out.
- * @property {boolean} [logout]         User log out flag.
  */
 
 /**
@@ -53,6 +51,12 @@ export default function Page(props) {
   if (props.pageId && props.pageId !== pageId) {
     // set new page ID from props
     setPageId(props.pageId);
+  }
+
+  if (props.login && pageId !== 0) {
+
+    // clear page contents if login is true
+    setPageId(0);
   }
 
   useEffect(() => {
@@ -107,7 +111,6 @@ export default function Page(props) {
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
           login: props.login === true,
-          logout: props.logout === true,
           error: errorData,
         }}
       >

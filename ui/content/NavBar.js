@@ -4,6 +4,7 @@ import {PageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
 import {Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
+import {useAuth} from "../../auth/AuthProvider";
 
 /**
  * @typedef NavBarProps
@@ -13,6 +14,7 @@ import {useNavigate} from "react-router";
  * @property {string} [icon]            Logo icon for branding. When provided, default brand text is blank.
  * @property {string} [expand]          Bootstrap width boundary to expand/collapse the nav bar, use empty string to prevent collapsing.
  * @property {string} [fixed]           Fix the navbar to a viewport location, i.e. 'top', 'bottom'
+ * @property {boolean} [showLogin]      Show a top level element for logging in?
  */
 
 /**
@@ -28,6 +30,7 @@ export default function NavBar(props) {
   const {pageData, breadcrumbs} = useContext(PageContext);
   const navigator = useNavigate();
   const togglerRef = useRef(null);
+  const {token} = useAuth();
 
   function navigateTo(to) {
     if ((togglerRef.current.style.visible || togglerRef.current.style.display !== 'none') && !togglerRef.current.classList.contains("collapsed")) {
@@ -166,6 +169,27 @@ export default function NavBar(props) {
                 )}
               </div>
             ))}
+            <>{props.showLogin === true && (
+              <>{token ? (
+                <Nav.Link
+                  onClick={() => navigateTo('/logout')}
+                  className={`NavItem text-nowrap`}
+                  key={`Logout`}
+                  data-testid={`NavItem-Logout`}
+                >
+                  Log Out
+                </Nav.Link>
+              ) : (
+                <Nav.Link
+                  onClick={() => navigateTo('/login')}
+                  className={`NavItem text-nowrap`}
+                  key={`Login`}
+                  data-testid={`NavItem-Login`}
+                >
+                  Log In
+                </Nav.Link>
+              )}</>
+            )}</>
           </Nav>
         </Navbar.Collapse>
       </div>

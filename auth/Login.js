@@ -4,44 +4,57 @@ import EmailField from "../ui/forms/EmailField";
 import PasswordField from "../ui/forms/PasswordField";
 import {useSearchParams} from 'react-router';
 import {SiteContext} from "../ui/content/Site";
-import {PageContext} from "../ui/content/Page";
 import {useNavigate} from "react-router";
-import {useAuth} from "./AuthProvider";
+import {Permission, useAuth} from "./AuthProvider";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
 
 /**
+ * @typedef LoginProps
+ * @property {Permission | [Permission]} [permission]   Permissions to request
+ */
+
+/**
  * Login UI component.
  *
+ * @param {LoginProps} props
  * @returns {JSX.Element}
  * @constructor
  */
-const Login = () => {
+const Login = (props) => {
+
+  const permissions = [];
+  if (!props.permission) {
+    // default permission to request is admin
+    permissions.push(Permission.ADMIN);
+  } else if (typeof props.permission === "string") {
+    // one permission provided
+    permissions.push(props.permission);
+  } else if (Array.isArray(props.permission)) {
+    // multiple permissions provided
+    for (const permission of props.permission) {
+      permissions.push(permission);
+    }
+  }
+  // prefix all permissions with host name
+  for (let i = 0; i < permissions.length; i++) {
+    permissions[i] = window.location.host + ":" + permissions[i];
+  }
+  const scope = permissions.join(",")
 
   const {getAuthToken} = useRestApi();
   const {setError} = useContext(SiteContext);
-  let [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const {token, setToken} = useAuth();
   const navigate = useNavigate();
-  const {logout} = useContext(PageContext);
-  const [cookies, setCookie] = useCookies();
+  const [cookies] = useCookies();
 
   useEffect(() => {
     if (token) {
       // token already set
-      console.debug(`Token already set: ${JSON.stringify(token)}`);
       navigate('/');
     }
   }, [token, navigate])
-
-  useEffect(() => {
-    if (logout && token) {
-      // clear token and return
-      console.debug(`Log out.`);
-      setToken(null);
-      navigate('/');
-    }
-  }, [token, navigate, logout, setToken]);
 
   const loginResponse = searchParams.get('state') && searchParams.get('code');
   const fetchingToken = useRef(false); // prevent double fetch of token
@@ -62,8 +75,7 @@ const Login = () => {
           searchParams.get('code')
         ).then((token) => {
             // successful token retrieval
-            console.debug(`Received token: ${JSON.stringify(token)}`);
-            setCookie('token', token);
+            setToken(token);
             navigate('/');
           }
         ).catch((error) => {
@@ -95,9 +107,21 @@ const Login = () => {
           <input type="hidden" name="redirect_uri"
                  value={`${window.location.protocol}//${window.location.host}/login`}/>
           <input type="hidden" name="state" value={`${cookies.loginState}`}/>
-          <input type="hidden" name="scope" value={`admin`}/>
-          <EmailField onChange={onChange} name={"username"} label="Email" required={true} defaultValue={"me@me.com"}/>
-          <PasswordField onChange={onChange} name={"password"} label="Password" value={""} required={true}/>
+          <input type="hidden" name="scope" value={scope}/>
+          <EmailField
+            onChange={onChange}
+            name={"username"}
+            label="Email"
+            required={true}
+            defaultValue={"me@me.com"}
+          />
+          <PasswordField
+            onChange={onChange}
+            name={"password"}
+            label="Password"
+            value={""}
+            required={true}
+          />
           <div className="form-group mt-4">
             <button className="btn btn-primary">Log In</button>
           </div>

@@ -7,15 +7,14 @@ export const RestApiContext = React.createContext({});
 
 export default function RestApi(props) {
 
-  const [cookies] = useCookies();
   const siteId = useMemo(() => parseInt(process.env.REACT_APP_SITE_ID), []);
-  const host = useMemo(() => process.env.REACT_APP_BACKEND_HOST, [])
-  const apiKey = useMemo(() => process.env.REACT_APP_API_KEY, [])
-  const token = useMemo(() => cookies.token, [cookies.token])
+  const host = useMemo(() => process.env.REACT_APP_BACKEND_HOST, []);
+  const apiKey = useMemo(() => process.env.REACT_APP_API_KEY, []);
+  const [cookies] = useCookies(); // can't use auth context, access directly
 
   axios.defaults.headers.common["x-api-key"] = apiKey;
-  if (token) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token.access_token}`;
+  if (cookies.token) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${cookies.token.access_token}`;
   }
 
   async function getPage(pageId) {
@@ -25,6 +24,11 @@ export default function RestApi(props) {
 
   async function getPageSections(pageId) {
     const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/sections`);
+    return response.data;
+  }
+
+  async function insertOrUpdatePage(data) {
+    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}`,data);
     return response.data;
   }
 
@@ -83,8 +87,13 @@ export default function RestApi(props) {
     return response.data;
   }
 
-  async function refreshToken(refreshToken) {
-    const response = await axios.post(`${host}/oauth/token?grant_type=refresh_token&refresh_token=${refreshToken}`);
+  async function refreshToken(refreshToken, clientId) {
+    const response = await axios.post(`${host}/oauth/token?client_id=${clientId}&grant_type=refresh_token&refresh_token=${refreshToken}`);
+    return response.data;
+  }
+
+  async function checkToken() {
+    const response = await axios.get(`${host}/oauth/check`);
     return response.data;
   }
 
@@ -92,6 +101,7 @@ export default function RestApi(props) {
     <RestApiContext value={{
       getPage: getPage,
       getPageSections: getPageSections,
+      insertOrUpdatePage: insertOrUpdatePage,
       getSite: getSite,
       getSiteOutline: getSiteOutline,
       getSitemap: getSitemap,
@@ -104,6 +114,7 @@ export default function RestApi(props) {
       getPhotos: getPhotos,
       getAuthToken: getAuthToken,
       refreshToken: refreshToken,
+      checkToken: checkToken,
     }}>
       {props.children}
     </RestApiContext>
