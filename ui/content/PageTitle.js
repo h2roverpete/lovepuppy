@@ -1,7 +1,8 @@
 import {PageContext} from "./Page";
 import {useCallback, useContext, useRef} from "react";
 import {useRestApi} from "../../api/RestApi";
-import EditableField from "./EditableField";
+import EditableField from "../editor/EditableField";
+import {useEdit} from "../editor/EditProvider";
 
 /**
  * @typedef PageTitleProps
@@ -27,6 +28,7 @@ export default function PageTitle(props) {
 
   const {pageData, error, login} = useContext(PageContext);
   const {insertOrUpdatePage} = useRestApi();
+  const {canEdit} = useEdit();
 
   const onTitleChanged = useCallback(({textContent, textAlign}) => {
     if (pageData) {
@@ -59,7 +61,7 @@ export default function PageTitle(props) {
   )
 
   return (
-    <>{(pageData?.DisplayTitle || props.showTitle || error?.title || login) && (
+    <>{(pageData?.PageTitle || error?.title || login || canEdit) && (
       <EditableField
         field={title}
         fieldRef={titleRef}

@@ -1,8 +1,8 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
-import EditButtons, {EditAction} from "../editor/EditButtons";
-import {useEdit} from "../editor/EditProvider";
+import {useCallback, useEffect, useState} from "react";
+import EditButtons, {EditAction} from "./EditButtons";
+import {useEdit} from "./EditProvider";
 import {Button, Modal, ModalBody, ModalFooter} from "react-bootstrap";
-import AlignButtons, {AlignAction} from "../editor/AlignButtons";
+import AlignButtons, {AlignAction} from "./AlignButtons";
 
 /**
  * @typedef EditCallbackData
@@ -38,8 +38,6 @@ export default function EditableField(props) {
   const {canEdit} = useEdit();
   const [editing, setEditing] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [savedMinHeight, setSavedMinHeight] = useState(null);
-  const [savedRightPadding, setSavedRightPadding] = useState(null);
 
   const editCallback = useCallback((action) => {
     switch (action) {
@@ -143,14 +141,19 @@ export default function EditableField(props) {
       props.fieldRef.current.classList.remove('border-secondary');
       props.fieldRef.current.classList.remove('rounded-2');
       props.fieldRef.current.onkeydown = undefined;
-      delete props.fieldRef.current.style.minHeight;
+      if (!props.fieldRef.current.textContent) {
+        props.fieldRef.current.style.minHeight = '39px';
+      } else {
+        delete props.fieldRef.current.style.minHeight;
+      }
     } else {
       // show border around editable item while editing
       props.fieldRef.current.classList.add('border');
       props.fieldRef.current.classList.add('border-secondary');
       props.fieldRef.current.classList.add('rounded-2');
       props.fieldRef.current.onkeydown = (evt) => onKeyDown(evt);
-      props.fieldRef.current.style.minHeight = '36px';
+      props.fieldRef.current.style.minHeight = '39px';
+      props.fieldRef.current.style.verticalAlign = 'middle';
     }
   }
 
@@ -166,7 +169,7 @@ export default function EditableField(props) {
         </Modal>
       )}</>
 
-      <div style={{display: 'flex', justifyContent: 'space-between', position: 'relative', border: '0px red solid'}}>
+      <div style={{position: 'relative'}}>
         {props.field}
         <AlignButtons
           callback={editCallback}

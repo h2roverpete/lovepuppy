@@ -1,6 +1,7 @@
-import EditableField from "./EditableField";
+import EditableField from "../editor/EditableField";
 import {useCallback, useRef} from "react";
 import {useRestApi} from "../../api/RestApi";
+import {useEdit} from "../editor/EditProvider";
 
 /**
  * Generate a page section
@@ -11,6 +12,7 @@ import {useRestApi} from "../../api/RestApi";
 function PageSection({sectionData}) {
 
   const {insertOrUpdatePageSection} = useRestApi();
+  const {canEdit} = useEdit();
 
   const imageDivStyle = {};
   const imageStyle = {};
@@ -73,7 +75,7 @@ function PageSection({sectionData}) {
       className={`PageSection`}
       data-testid={`PageSection-${sectionData.PageSectionID}`}
     >
-      {sectionData.SectionTitle && sectionData.ShowTitle && (
+      {((sectionData.SectionTitle && sectionData.ShowTitle) || canEdit) && (
         <EditableField
           field={sectionTitle}
           fieldRef={sectionTitleRef}
@@ -97,7 +99,7 @@ function PageSection({sectionData}) {
           />
         </div>
       )}
-      {sectionData.SectionText && sectionData.SectionText.length && sectionData.ShowText && (
+      {((sectionData.SectionText && sectionData.SectionText.length && sectionData.ShowText) || canEdit) && (
         <EditableField
           field={sectionText}
           fieldRef={sectionTextRef}
