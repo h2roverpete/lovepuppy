@@ -1,3 +1,7 @@
+import EditableField from "./EditableField";
+import {useCallback, useRef} from "react";
+import {useRestApi} from "../../api/RestApi";
+
 /**
  * Generate a page section
  * @param sectionData{PageSectionData}
@@ -5,6 +9,8 @@
  * @constructor
  */
 function PageSection({sectionData}) {
+
+  const {insertOrUpdatePageSection} = useRestApi();
 
   const imageDivStyle = {};
   const imageStyle = {};
@@ -25,16 +31,55 @@ function PageSection({sectionData}) {
     imageStyle.boxShadow = 'none';
   }
 
+  const sectionTitleRef = useRef(null);
+  const sectionTitle = (
+    <h2
+      ref={sectionTitleRef}
+      className={'SectionTitle'}
+      dangerouslySetInnerHTML={{__html: sectionData.SectionTitle}}
+      data-testid={`SectionTitle-${sectionData.PageSectionID}`}
+      style={{textAlign: sectionData.TitleAlign, width: '100%'}}
+    />
+  );
+  const onTitleChanged = useCallback(({textContent, textAlign}) => {
+    console.debug(`Update section title...`);
+    sectionData.SectionTitle = textContent;
+    sectionData.TitleAlign = textAlign;
+    insertOrUpdatePageSection(sectionData)
+      .then(result => console.log(`Updated section title.`))
+      .catch(error => console.error(`Error updating section title.`));
+  }, []);
+
+  const sectionTextRef = useRef(null);
+  const sectionText = (
+    <div
+      className={`SectionText`}
+      style={{textAlign: sectionData.TextAlign}}
+      dangerouslySetInnerHTML={{__html: sectionData.SectionText}}
+      ref={sectionTextRef}
+    />
+  );
+  const onTextChanged = useCallback(({textContent, textAlign}) => {
+    console.debug(`Update section text...`);
+    sectionData.SectionText = textContent;
+    sectionData.TextAlign = textAlign;
+    insertOrUpdatePageSection(sectionData)
+      .then(result => console.log(`Updated section text.`))
+      .catch(error => console.error(`Error updating section text.`));
+  }, []);
+
   return (
     <div
       className={`PageSection`}
       data-testid={`PageSection-${sectionData.PageSectionID}`}
     >
       {sectionData.SectionTitle && sectionData.ShowTitle && (
-        <h2
-          className={'SectionTitle text-' + sectionData.TitleAlign}
-          dangerouslySetInnerHTML={{__html: sectionData.SectionTitle}}
-          data-testid={`SectionTitle-${sectionData.PageSectionID}`}
+        <EditableField
+          field={sectionTitle}
+          fieldRef={sectionTitleRef}
+          textContent={sectionData.SectionTitle}
+          textAlign={sectionData.TitleAlign}
+          callback={onTitleChanged}
         />
       )}
       {sectionData.SectionImage && sectionData.ShowImage && (
@@ -53,9 +98,13 @@ function PageSection({sectionData}) {
         </div>
       )}
       {sectionData.SectionText && sectionData.SectionText.length && sectionData.ShowText && (
-        <div
-          className={`SectionText text-${sectionData.TextAlign}`}
-          dangerouslySetInnerHTML={{__html: sectionData.SectionText}}
+        <EditableField
+          field={sectionText}
+          fieldRef={sectionTextRef}
+          textContent={sectionData.SectionText}
+          textAlign={sectionData.TextAlign}
+          callback={onTextChanged}
+          allowEnterKey={true}
         />
       )}
     </div>

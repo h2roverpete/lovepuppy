@@ -1,14 +1,12 @@
 import {PageContext} from "./Page";
-import {useContext, useEffect, useRef, useState} from "react";
-import {Permission, useAuth} from "../../auth/AuthProvider";
-import EditButton from "../editor/EditButton";
+import {useCallback, useContext, useRef} from "react";
 import {useRestApi} from "../../api/RestApi";
+import EditableField from "./EditableField";
 
 /**
  * @typedef PageTitleProps
  *
  * @property {boolean} showTitle Always show the title in the tag, regardless of the content settings.
- * @property {ErrorData} error
  */
 
 /**
@@ -16,6 +14,8 @@ import {useRestApi} from "../../api/RestApi";
  *
  * If the page title has not loaded yet, still displays the
  * tag and reserves its space in the layout.
+ *
+ * If the site is in a login state, displays "Log In" as the title.
  *
  * Must be located within the <Page> tag to receive page context.
  *
@@ -26,72 +26,47 @@ import {useRestApi} from "../../api/RestApi";
 export default function PageTitle(props) {
 
   const {pageData, error, login} = useContext(PageContext);
-
-  const {hasPermission, isAuthenticated} = useAuth();
-  const [admin, setAdmin] = useState(false);
   const {insertOrUpdatePage} = useRestApi();
 
-  useEffect(() => {
-    // check admin permissions
-    hasPermission(Permission.ADMIN).then((res) => {
-      setAdmin(res);
-    });
-  }, [isAuthenticated, hasPermission, setAdmin]);
-
-  const titleElement = useRef(null);
-  const [editing, setEditing] = useState(false);
-
-  function toggleEditing() {
-    setEditing(!editing);
-  }
-
-  useEffect(() => {
-    if (editing) {
-      // focus when editing
-      titleElement.current?.focus();
+  const onTitleChanged = useCallback(({textContent, textAlign}) => {
+    if (pageData) {
+      console.debug(`Updating page title: textContent=${textContent}, textAlign=${textAlign}`);
+      pageData.PageTitle = textContent;
+      pageData.PageTitleAlign = textAlign;
+      insertOrUpdatePage(pageData)
+        .then((res) => {
+          console.debug(`Page title updated: ${JSON.stringify(res)}`);
+        })
+        .catch((err) => {
+          console.error(`Error updating page title: ${err.message}`);
+        })
     }
-  }, [editing]);
+  }, [pageData, insertOrUpdatePage]);
 
-  function onKeyDown(evt) {
-    // end editing and update on enter
-    console.debug(`onKeyDown: ${evt.key}`);
-    if (evt.key === 'Enter') {
-      evt.preventDefault();
-      if (titleElement.current?.textContent !== pageData.PageTitle) {
-        console.debug(`Updating page...`);
-        pageData.PageTitle = titleElement.current?.textContent;
-        insertOrUpdatePage(pageData)
-          .then((res) => {
-            console.debug(`Page updated: ${JSON.stringify(res)}`);
-          })
-          .catch((err) => {
-            console.error(`Error updating page: ${err.message}`);
-          })
-      }
-      toggleEditing();
-    }
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      titleElement.current.textContent = pageData.PageTitle;
-      toggleEditing();
-    }
-  }
+  const titleRef = useRef(null);
+  const title = (
+    <h1
+      className={`PageTitle`}
+      style={{
+        width: '100%',
+        textAlign: pageData?.PageTitleAlign,
+      }}
+      data-testid="PageTitle"
+      ref={titleRef}
+    >
+      {error?.title ? error.title : login ? `Log In` : pageData?.PageTitle ? pageData.PageTitle : (<>&nbsp;</>)}
+    </h1>
+  )
 
   return (
     <>{(pageData?.DisplayTitle || props.showTitle || error?.title || login) && (
-      <div style={{position: 'relative'}}>
-        <h1
-          className="PageTitle"
-          data-testid="PageTitle"
-          ref={titleElement}
-          contentEditable={editing}
-          style={{position: 'relative'}}
-          onKeyDown={onKeyDown}
-        >
-          {error?.title ? error.title : login ? `Log In` : pageData?.PageTitle ? pageData.PageTitle : (<>&nbsp;</>)}
-        </h1>
-        <EditButton onClick={toggleEditing} editable={admin} editing={editing}/>
-      </div>
+      <EditableField
+        field={title}
+        fieldRef={titleRef}
+        callback={onTitleChanged}
+        textContent={pageData?.PageTitle}
+        textAlign={pageData?.PageTitleAlign}
+      />
     )}</>
   )
 }

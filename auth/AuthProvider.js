@@ -1,6 +1,7 @@
 import {useContext, createContext, useState, useEffect} from "react";
 import {useCookies} from 'react-cookie';
 import {useRestApi} from "../api/RestApi";
+import EditProvider from "../ui/editor/EditProvider";
 
 export const AuthContext = createContext({
   token: null,
@@ -92,11 +93,12 @@ export default function AuthProvider(props) {
         hasPermission: hasPermission,
         isAuthenticated: isAuthenticated,
       }}>
-      {props.children}
+      <EditProvider>
+        {props.children}
+      </EditProvider>
     </AuthContext>
   );
 };
-
 
 
 export const useAuth = () => {
