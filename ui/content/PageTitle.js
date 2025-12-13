@@ -8,7 +8,7 @@ import {useSiteContext} from "./Site";
 /**
  * @typedef PageTitleProps
  *
- * @property {boolean} showTitle Always show the title in the tag, regardless of the content settings.
+ * @property {boolean} alwaysShow Always show the title in the tag, regardless of the content settings.
  */
 
 /**
@@ -62,12 +62,12 @@ export default function PageTitle(props) {
       data-testid="PageTitle"
       ref={titleRef}
     >
-      {error?.title ? error.title : login ? `Log In` : pageData?.PageTitle ? pageData.PageTitle : (<>&nbsp;</>)}
+      {error?.title ? error.title : login ? `Log In` : pageData?.PageTitle.length > 0 ? pageData.PageTitle : (<>&nbsp;</>)}
     </h1>
   )
 
   return (
-    <>{(pageData?.PageTitle || error?.title || login || canEdit) && (
+    <>{(pageData?.PageTitle || error?.title || login || canEdit || props.alwaysShow) && (
       <EditableField
         field={title}
         fieldRef={titleRef}
@@ -76,6 +76,7 @@ export default function PageTitle(props) {
         textAlign={pageData?.PageTitleAlign}
         showEditButton={true}
         editing={editingTitle}
+        alwaysShow={props.alwaysShow === true}
       />
     )}</>
   )

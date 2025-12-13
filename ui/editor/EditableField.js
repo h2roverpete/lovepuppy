@@ -26,6 +26,7 @@ import AlignButtons, {AlignAction} from "./AlignButtons";
  * @property {boolean} [allowEnterKey]    Allow enter key in data entry (instead of committing changes)
  * @property {boolean} [showEditButton]   Show edit button?
  * @property {boolean} [editing]          Is the field currently being edited?
+ * @property {boolean} [alwaysShow]       Always show the field, even if empty (reserves layout space)
  */
 
 /**
@@ -182,8 +183,8 @@ export default function EditableField(props) {
           </ModalFooter>
         </Modal>
 
-        <div style={{position: 'relative'}}>
-          <div className={isEditing || props.textContent?.length > 0 ? 'd-inline': 'd-none'}>{props.field}</div>
+        <div style={{position: 'relative', width: '100%'}}>
+          <div className={isEditing || props.textContent?.length > 0 || props.alwaysShow ? 'd-block': 'd-none'} style={{width:'100%'}}>{props.field}</div>
           <AlignButtons
             callback={editCallback}
             editable={canEdit}
@@ -201,7 +202,7 @@ export default function EditableField(props) {
         </div>
       </>
     ) : (
-      <>{props.textContent?.length > 0 && (
+      <>{(props.textContent?.length > 0 || props.alwaysShow) && (
         <>{props.field}</>
       )}</>
     )}
