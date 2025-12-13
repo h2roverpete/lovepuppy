@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from "react";
 import EditButtons, {EditAction} from "./EditButtons";
 import {useEdit} from "./EditProvider";
-import {Button, Modal, ModalBody, ModalFooter} from "react-bootstrap";
+import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
 import AlignButtons, {AlignAction} from "./AlignButtons";
 
 /**
@@ -12,7 +12,7 @@ import AlignButtons, {AlignAction} from "./AlignButtons";
 
 /**
  * @callback EditCallback
- * @param {EditCallbackData}
+ * @param {EditCallbackData|undefined}
  */
 
 /**
@@ -23,7 +23,9 @@ import AlignButtons, {AlignAction} from "./AlignButtons";
  * @property {EditCallback} callback      Called when edits need to be committed.
  * @property {string} textContent         Initial text content (used for canceling/reverting)
  * @property {string} textAlign           Initial text alignment (used for canceling/reverting)
- * @property {boolean} [allowEnterKey]   Allow enter key in data entry (instead of committing changes)
+ * @property {boolean} [allowEnterKey]    Allow enter key in data entry (instead of committing changes)
+ * @property {boolean} [showEditButton]   Show edit button?
+ * @property {boolean} [editing]          Is the field currently being edited?
  */
 
 /**
@@ -36,38 +38,16 @@ import AlignButtons, {AlignAction} from "./AlignButtons";
 export default function EditableField(props) {
 
   const {canEdit} = useEdit();
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setEditing] = useState(props.editing);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const editCallback = useCallback((action) => {
-    switch (action) {
-      case EditAction.EDIT:
-        startEditing(true);
-        break;
-      case EditAction.CONFIRM:
-        commitEdits();
-        break;
-      case EditAction.CANCEL:
-        cancelEditing();
-        break;
-      case AlignAction.ALIGN_LEFT:
-        props.fieldRef.current.style.textAlign = 'left';
-        break;
-      case AlignAction.ALIGN_CENTER:
-        props.fieldRef.current.style.textAlign = 'center';
-        break;
-      case AlignAction.ALIGN_RIGHT:
-        props.fieldRef.current.style.textAlign = 'right';
-        break;
-    }
-  }, []);
 
   useEffect(() => {
-    if (editing) {
+    if (isEditing) {
       // focus when editing
       props.fieldRef.current.focus();
     }
-  }, [editing]);
+  }, [props.fieldRef, isEditing]);
 
   function onKeyDown(evt) {
     // end editing and update on enter
@@ -95,47 +75,81 @@ export default function EditableField(props) {
     }
   }
 
-  function startEditing() {
+  const startEditing = useCallback(() => {
     // set editing flag
     setEditing(true);
     // transform text from display HTML to source
     props.fieldRef.current.textContent = props.fieldRef.current.innerHTML
-  }
+  }, [props.fieldRef]);
 
-  function cancelEditing() {
+  const cancelEditing = useCallback(() => {
     // revert title value and alignment
-    props.fieldRef.current.innerHTML = props.textContent;
-    props.fieldRef.current.style.textAlign = props.textAlign;
+    //props.fieldRef.current.innerHTML = props.textContent;
+    //props.fieldRef.current.style.textAlign = props.textAlign;
     // hide confirmation
     if (showConfirmation) {
       setShowConfirmation(false);
     }
     // clear editing flag
     setEditing(false);
-  }
+    // notify caller we canceled
+    props.callback({textContent: null, textAlign: null});
+  }, [setShowConfirmation, props, showConfirmation]);
 
-  function commitEdits() {
+  const commitEdits = useCallback(() => {
     console.debug(`Committing edits...`);
     props.callback({
       textContent: props.fieldRef.current.textContent,
       textAlign: props.fieldRef.current.style.textAlign,
-    })
+    });
+
     // transform text from HTML source to display HTML
     props.fieldRef.current.innerHTML = props.fieldRef.current.textContent;
     setShowConfirmation(false);
     setEditing(false);
-  }
+  }, [props, setShowConfirmation, setEditing,]);
 
-  function onHideConfirmation() {
+  useEffect(() => {
+    if (props.editing && !isEditing) {
+      startEditing();
+    }
+  }, [props.editing, isEditing, startEditing]);
+
+  const editCallback = useCallback((action) => {
+    switch (action) {
+      case EditAction.EDIT:
+        startEditing();
+        break;
+      case EditAction.CONFIRM:
+        commitEdits();
+        break;
+      case EditAction.CANCEL:
+        cancelEditing();
+        break;
+      case AlignAction.ALIGN_LEFT:
+        props.fieldRef.current.style.textAlign = 'left';
+        break;
+      case AlignAction.ALIGN_CENTER:
+        props.fieldRef.current.style.textAlign = 'center';
+        break;
+      case AlignAction.ALIGN_RIGHT:
+        props.fieldRef.current.style.textAlign = 'right';
+        break;
+      default:
+        break;
+    }
+  }, [cancelEditing, commitEdits, props.fieldRef, startEditing]);
+
+  const onHideConfirmation = useCallback(() => {
     // canceled by clicking outside
     cancelEditing();
-  }
+  }, [cancelEditing]);
 
   // update field properties
   if (props.fieldRef.current) {
-    props.fieldRef.current.style.paddingRight = `${editing ? '65px' : '0'}`
-    props.fieldRef.current.contentEditable = editing;
-    if (!editing) {
+    props.fieldRef.current.style.paddingRight = `${isEditing ? '65px' : '0'}`
+    props.fieldRef.current.contentEditable = isEditing === true;
+    if (!isEditing) {
       // undo edit modifications to field
       props.fieldRef.current.classList.remove('border');
       props.fieldRef.current.classList.remove('border-secondary');
@@ -158,33 +172,39 @@ export default function EditableField(props) {
   }
 
   return (
-    <>
-      <>{canEdit && (
+    <>{canEdit ? (
+      <>
         <Modal show={showConfirmation} onHide={onHideConfirmation}>
           <ModalBody>Do you want to save your changes?</ModalBody>
           <ModalFooter>
-            <Button className={'btn-default'} onClick={() => commitEdits()}>Save</Button>
-            <Button className={'btn-secondary'} onClick={() => cancelEditing()}>Cancel</Button>
+            <button className={'btn btn-sm btn-primary'} onClick={() => commitEdits()}>Save</button>
+            <button className={'btn btn-sm btn-secondary'} onClick={() => cancelEditing()}>Cancel</button>
           </ModalFooter>
         </Modal>
-      )}</>
 
-      <div style={{position: 'relative'}}>
-        {props.field}
-        <AlignButtons
-          callback={editCallback}
-          editable={canEdit}
-          editing={editing}
-          align={props.fieldRef.current?.style.textAlign}
-          style={{position: 'absolute', top: '-20px', left: '40%'}}
-        />
-        <EditButtons
-          callback={editCallback}
-          editable={canEdit}
-          editing={editing}
-          style={{position: 'absolute', right: '2px', top: '2px'}}
-        />
-      </div>
+        <div style={{position: 'relative'}}>
+          <div className={isEditing || props.textContent?.length > 0 ? 'd-inline': 'd-none'}>{props.field}</div>
+          <AlignButtons
+            callback={editCallback}
+            editable={canEdit}
+            editing={isEditing}
+            align={props.fieldRef.current?.style.textAlign}
+            style={{position: 'absolute', top: '-20px', left: '40%'}}
+          />
+          <EditButtons
+            callback={editCallback}
+            editable={canEdit}
+            editing={isEditing}
+            showEditButton={props.showEditButton}
+            style={{position: 'absolute', right: '2px', top: '2px'}}
+          />
+        </div>
+      </>
+    ) : (
+      <>{props.textContent?.length > 0 && (
+        <>{props.field}</>
+      )}</>
+    )}
     </>
-  )
+  );
 }

@@ -1,10 +1,11 @@
-import {createContext, useCallback, useEffect, useMemo, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useNavigate} from "react-router";
 import {useRestApi} from "../../api/RestApi";
 import Logout from '../../auth/Logout';
+import {PageContext} from "./Page";
 
 /**
  * @typedef ErrorData
@@ -19,7 +20,8 @@ export const SiteContext = createContext({
   error: null,
   setError: null,
   login: false,
-  getChildren: null
+  getChildren: null,
+  updateOutlineData: (data)=>console.error(`updateOutlineData() not defined.`),
 });
 
 /**
@@ -144,6 +146,26 @@ export default function Site(props) {
   const params = new URLSearchParams(window.location.search);
   let cfmPageId = parseInt(params.get('pageid'));
 
+  /**
+   * Refresh a page in the site outline.
+   * @param {PageData} pageData
+   */
+  function updateOutlineData(pageData) {
+    console.debug(`Update outline data for page ${pageData.PageID}`)
+    if (outlineData) {
+      const newOutlineData = [];
+      outlineData.map((item) => {
+        newOutlineData.push(item);
+        if (item.PageID === pageData.PageID) {
+          item.PageTitle = pageData.PageTitle;
+          item.NavTitle = pageData.NavTitle;
+          item.PageHidden = pageData.PageHidden;
+        }
+      })
+      setOutlineData(newOutlineData);
+    }
+  }
+
   // provide context to children
   return (
     <div className="Site" data-testid="Site">
@@ -153,7 +175,8 @@ export default function Site(props) {
           outlineData: outlineData,
           error: error,
           setError: setError,
-          getChildren: getChildren
+          getChildren: getChildren,
+          updateOutlineData: updateOutlineData,
         }}
       >
         <Routes>
@@ -221,3 +244,5 @@ export default function Site(props) {
     </div>
   )
 }
+
+export function useSiteContext() {return useContext(SiteContext)}

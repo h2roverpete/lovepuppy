@@ -32,6 +32,11 @@ export default function RestApi(props) {
     return response.data;
   }
 
+  async function deletePageSection(pageId,pageSectionId) {
+    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}`);
+    return response.data;
+  }
+
   async function insertOrUpdatePage(data) {
     const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}`,data);
     return response.data;
@@ -107,6 +112,7 @@ export default function RestApi(props) {
       getPage: getPage,
       getPageSections: getPageSections,
       insertOrUpdatePageSection: insertOrUpdatePageSection,
+      deletePageSection: deletePageSection,
       insertOrUpdatePage: insertOrUpdatePage,
       getSite: getSite,
       getSiteOutline: getSiteOutline,

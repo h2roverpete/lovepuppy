@@ -30,7 +30,7 @@ export default function PageSections(props) {
           <>
             {sectionData.map(section => (
               <PageSection
-                sectionData={section} key={section.PageSectionID}
+                pageSectionData={section} key={section.PageSectionID}
                 data-testid={`PageSection-section.PageSectionID`}/>
             ))}
             {props.children}

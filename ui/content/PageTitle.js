@@ -1,8 +1,9 @@
 import {PageContext} from "./Page";
-import {useCallback, useContext, useRef} from "react";
+import {useCallback, useContext, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import EditableField from "../editor/EditableField";
 import {useEdit} from "../editor/EditProvider";
+import {useSiteContext} from "./Site";
 
 /**
  * @typedef PageTitleProps
@@ -27,22 +28,27 @@ import {useEdit} from "../editor/EditProvider";
 export default function PageTitle(props) {
 
   const {pageData, error, login} = useContext(PageContext);
+  const {updateOutlineData} = useSiteContext();
   const {insertOrUpdatePage} = useRestApi();
   const {canEdit} = useEdit();
+  const [editingTitle, setEditingTitle] = useState(false);
 
   const onTitleChanged = useCallback(({textContent, textAlign}) => {
-    if (pageData) {
+    if (pageData && textContent?.length > 0) {
       console.debug(`Updating page title: textContent=${textContent}, textAlign=${textAlign}`);
       pageData.PageTitle = textContent;
       pageData.PageTitleAlign = textAlign;
       insertOrUpdatePage(pageData)
         .then((res) => {
-          console.debug(`Page title updated: ${JSON.stringify(res)}`);
+          console.debug(`Page title updated.`);
+          // refresh outline with new title
+          updateOutlineData(pageData);
         })
         .catch((err) => {
           console.error(`Error updating page title: ${err.message}`);
         })
     }
+    setEditingTitle(false);
   }, [pageData, insertOrUpdatePage]);
 
   const titleRef = useRef(null);
@@ -68,6 +74,8 @@ export default function PageTitle(props) {
         callback={onTitleChanged}
         textContent={pageData?.PageTitle}
         textAlign={pageData?.PageTitleAlign}
+        showEditButton={true}
+        editing={editingTitle}
       />
     )}</>
   )

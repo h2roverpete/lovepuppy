@@ -10,6 +10,8 @@ export const PageContext = createContext(
     breadcrumbs: null,
     error: null,
     login: false,
+    setPageData: (data) => console.error(`setPageData() not defined.`),
+    setSectionData: (data) => console.error(`setSectionData() not defined.`),
   });
 
 /**
@@ -54,7 +56,6 @@ export default function Page(props) {
   }
 
   if (props.login && pageId !== 0) {
-
     // clear page contents if login is true
     setPageId(0);
   }
@@ -112,6 +113,8 @@ export default function Page(props) {
           breadcrumbs: breadcrumbs,
           login: props.login === true,
           error: errorData,
+          setPageData: setPageData,
+          setSectionData: setSectionData,
         }}
       >
         {props.children}
@@ -140,3 +143,7 @@ function buildBreadcrumbs(outlineData, parentId) {
     return b?.OutlineSeq - a?.OutlineSeq
   });
 }
+
+export function usePageContext() {
+  return useContext(PageContext)
+};
