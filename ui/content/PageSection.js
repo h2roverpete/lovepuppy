@@ -1,10 +1,13 @@
 import EditableField from "../editor/EditableField";
-import {useCallback, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useEdit} from "../editor/EditProvider";
-import {BsArrowsMove, BsPencil} from "react-icons/bs";
-import {Button, Modal, ModalBody, ModalFooter} from "react-bootstrap";
+import {BsPencil} from "react-icons/bs";
+import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
 import {usePageContext} from "./Page";
+import PageSectionImage from "./PageSectionImage";
+import './PageSection.css';
+import {FileDropTarget, DropState} from "./FileDropTarget";
 
 /**
  * Generate a page section
@@ -13,31 +16,13 @@ import {usePageContext} from "./Page";
  */
 function PageSection({pageSectionData}) {
 
-  const {insertOrUpdatePageSection, deletePageSection} = useRestApi();
+  const {insertOrUpdatePageSection, deletePageSection, uploadSectionImage} = useRestApi();
   const {canEdit} = useEdit();
-  const {sectionData, setSectionData} = usePageContext();
+  const {sectionData, setSectionData, updatePageSection} = usePageContext();
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingText, setEditingText] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-
-  const imageDivStyle = {};
-  const imageStyle = {};
-  if (pageSectionData.ImagePosition === 'beside') {
-    // align image left or right beside text
-    imageDivStyle.position = 'relative';
-    imageDivStyle.float = pageSectionData.ImageAlign;
-    imageDivStyle.textAlign = 'center';
-  } else {
-    // center image above text
-    imageDivStyle.display = 'flex';
-    imageDivStyle.justifyContent = 'center';
-    imageDivStyle.alignItems = 'center';
-  }
-  if (pageSectionData.HideImageFrame) {
-    // hide frame for this instance of the image
-    imageStyle.border = 'none';
-    imageStyle.boxShadow = 'none';
-  }
+  const [uploadPrompt, setUploadPrompt] = useState(pageSectionData.SectionImage ? DropState.REPLACE : DropState.INSERT);
 
   const sectionTitleRef = useRef(null);
   const sectionTitle = (
@@ -172,22 +157,64 @@ function PageSection({pageSectionData}) {
     }
   }
 
-  function setImageAlign(align) {
-    pageSectionData.ImageAlign = align;
-    console.debug(`Updating image alignment...`);
-    insertOrUpdatePageSection(pageSectionData)
-      .then(() => console.debug(`Updated image alignment.`))
-      .catch(error => console.error(`Error updating image alignment.`, error));
-    setSectionData([...sectionData]);
+  const dropContainerRef = useRef(null);
+  const dropFileRef = useRef(null);
+  useEffect(() => {
+    if (dropContainerRef.current && canEdit) {
+      dropContainerRef.current.addEventListener('dragenter', dragEnterHandler);
+    }
+    if (dropFileRef.current && canEdit) {
+      dropFileRef.current.addEventListener('dragover', dragOverHandler);
+      dropFileRef.current.addEventListener('drop', dropHandler);
+      dropFileRef.current.addEventListener('dragleave', dragLeaveHandler);
+    }
+  }, [dropContainerRef, canEdit]);
+
+  function dragEnterHandler(e) {
+    console.log(`Image drag enter...`);
+    dropFileRef.current.hidden = false;
+    e.preventDefault();
   }
 
-  function setImagePosition(position) {
-    pageSectionData.ImagePosition = position;
-    console.debug(`Updating image position...`);
-    insertOrUpdatePageSection(pageSectionData)
-      .then(() => console.debug(`Updated image position.`))
-      .catch(error => console.error(`Error updating image position.`, error));
-    setSectionData([...sectionData]);
+  function dragOverHandler(e) {
+    console.log(`Image drag over...`);
+    const fileItems = [...e.dataTransfer.items].filter(
+      (item) => item.kind === "file",
+    );
+    if (fileItems.length > 0) {
+      e.preventDefault();
+      if (fileItems.some((item) => item.type.startsWith("image/"))) {
+        e.dataTransfer.dropEffect = "copy";
+      } else {
+        e.dataTransfer.dropEffect = "none";
+      }
+    }
+  }
+
+  function dropHandler(e) {
+    const files = [...e.dataTransfer.items]
+      .map((item) => item.getAsFile())
+      .filter((file) => file);
+    console.log(`${files.length} file(s) dropped.`);
+    if (files.length === 1) {
+      setUploadPrompt(DropState.UPLOADING);
+      uploadSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID, files[0])
+        .then((result) => {
+          console.log(`Image uploaded successfully.`);
+          dropFileRef.current.hidden = true;
+          setUploadPrompt(pageSectionData.SectionImage ? DropState.REPLACE : DropState.INSERT);
+          updatePageSection(result);
+        }).catch(e => {
+        console.error(`Error uploading image.`, e);
+      });
+    }
+    e.preventDefault();
+  }
+
+  function dragLeaveHandler(e) {
+    console.log(`Image drag leave...`);
+    dropFileRef.current.hidden = true;
+    e.preventDefault();
   }
 
   return (
@@ -208,6 +235,7 @@ function PageSection({pageSectionData}) {
         className={`PageSection`}
         style={{position: 'relative'}}
         data-testid={`PageSection-${pageSectionData.PageSectionID}`}
+        ref={dropContainerRef}
       >
         <EditableField
           field={sectionTitle}
@@ -217,47 +245,9 @@ function PageSection({pageSectionData}) {
           callback={onTitleChanged}
           editing={editingTitle}
         />
-        {pageSectionData.SectionImage && (
-          <div
-            style={{...imageDivStyle, position: 'relative'}}
-            className={`SectionImage col-12 mb-3 col-sm-auto${pageSectionData.ImageAlign === 'right' ? ' ms-sm-3' : pageSectionData.ImageAlign === 'left' ? ' me-sm-4' : ''}`}
-            data-testid={`SectionImageDiv-${pageSectionData.PageSectionID}`}
-          >
-            <img
-              className="img-fluid"
-              style={imageStyle}
-              src={'images/' + pageSectionData.SectionImage}
-              alt={pageSectionData.SectionTitle}
-              data-testid={`SectionImage-${pageSectionData.PageSectionID}`}
-            />
-            {canEdit && (
-              <div
-                className="dropdown"
-                style={{position: 'absolute', bottom: '0', right: '2px', zIndex: 100}}
-              >
-                <button
-                  style={{zIndex: 200, border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-                  className={`btn btn-sm border border-secondary text-dark bg-white`}
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                ><BsArrowsMove/></button>
-                <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
-                  {pageSectionData.ImageAlign !== 'left' && (
-                    <span className="dropdown-item" onClick={() => setImageAlign('left')}>Align Left</span>)}
-                  {pageSectionData.ImageAlign !== 'center' && pageSectionData.ImageAlign === 'above' && (
-                    <span className="dropdown-item" onClick={() => setImageAlign('center')}>Align Center</span>)}
-                  {pageSectionData.ImageAlign !== 'right' && (
-                    <span className="dropdown-item" onClick={() => setImageAlign('right')}>Align Right</span>)}
-                  {pageSectionData.ImagePosition !== 'above' && (
-                    <span className="dropdown-item" onClick={() => setImagePosition('above')}>Above Text</span>)}
-                  {pageSectionData.ImagePosition !== 'beside' && (
-                    <span className="dropdown-item" onClick={() => setImagePosition('beside')}>Beside Text</span>)}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        <PageSectionImage
+          pageSectionData={pageSectionData}
+        />
         <EditableField
           field={sectionText}
           fieldRef={sectionTextRef}
@@ -267,6 +257,12 @@ function PageSection({pageSectionData}) {
           allowEnterKey={true}
           editing={editingText}
         />
+        {canEdit && (
+          <FileDropTarget
+            ref={dropFileRef}
+            state={uploadPrompt}
+          />
+        )}
         {(canEdit && !editingText && !editingTitle) && (
           <div
             className="dropdown"

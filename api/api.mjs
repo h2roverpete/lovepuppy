@@ -8,6 +8,7 @@ import axios from "axios";
  * @property {String} SiteName
  * @property {String} SiteRootUrl
  * @property {String} SiteRootDir
+ * @property {String} SiteBucketName
  * @property {String} PageDisplayURL
  * @property {Number} ColorSchemeID
  * @property {Number} FrameID

@@ -12,6 +12,7 @@ export const PageContext = createContext(
     login: false,
     setPageData: (data) => console.error(`setPageData() not defined.`),
     setSectionData: (data) => console.error(`setSectionData() not defined.`),
+    updatePageSection: (data) => console.error(`updatePageSection() not defined.`),
   });
 
 /**
@@ -88,6 +89,23 @@ export default function Page(props) {
   }, [pageData, outlineData, breadcrumbs])
 
   /**
+   * Update a page section that has been edited.
+   * @param newData {PageSectionData} Data for section that was updated.
+   */
+  function updatePageSection(newData) {
+    for (let i = 0; i < sectionData.length; i++) {
+      if (sectionData[i].PageSectionID === newData.PageSectionID) {
+        console.debug(`Updating data for page section ${newData.PageSectionID}.`);
+        // need new array to trigger updates
+        const newSectionData = [...sectionData];
+        newSectionData[i] = newData;
+        setSectionData(newSectionData);
+        break;
+      }
+    }
+  }
+
+  /**
    * Function for changing page ID.
    * Clears out extra page related data when Page ID is changed.
    *
@@ -115,6 +133,7 @@ export default function Page(props) {
           error: errorData,
           setPageData: setPageData,
           setSectionData: setSectionData,
+          updatePageSection: updatePageSection
         }}
       >
         {props.children}
