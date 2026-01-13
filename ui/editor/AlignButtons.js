@@ -1,6 +1,6 @@
 import {Button} from "react-bootstrap";
 import {BsTextCenter, BsTextLeft, BsTextRight} from "react-icons/bs";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 /**
  * @typedef AlignButtonProps
@@ -19,7 +19,12 @@ import {useState} from "react";
  * @constructor
  */
 export default function AlignButtons(props) {
-  const [align, setAlign] = useState(props.align);
+  const [align, setAlign] = useState(null);
+  useEffect(() => {
+    if (align === null && props.align) {
+      setAlign(props.align);
+    }
+  }, [align, props.align]);
   return (
     <>
       {props.editing && (
@@ -31,8 +36,9 @@ export default function AlignButtons(props) {
             }}
             name={'align'}
             type="radio"
-            style={{border: 'none', boxShadow: 'none', margin: '2px 1px 2px 2px', padding:'0 5px'}}
-            className={`btn btn-sm border border-secondary ${align === 'left' ? 'text-light active' : ' text-dark bg-white'}`}
+            checked={align==='left'}
+            style={{border: 'none', boxShadow: 'none', margin: '2px 1px 2px 2px', padding: '0 5px'}}
+            className={`btn btn-sm border border-secondary ${align === 'left' ? 'text-light' : ' text-dark bg-white'}`}
           ><BsTextLeft/></Button>
           <Button
             onClick={() => {
@@ -41,8 +47,9 @@ export default function AlignButtons(props) {
             }}
             type="radio"
             name={'align'}
-            style={{border: 'none', boxShadow: 'none', margin: '2px -2px 2px -2px', padding:'0 5px'}}
-            className={`btn btn-sm border border-secondary ${align === 'center' ? ' text-light active' : ' text-dark bg-white'}`}
+            checked={align==='center'}
+            style={{border: 'none', boxShadow: 'none', margin: '2px -2px 2px -2px', padding: '0 5px'}}
+            className={`btn btn-sm border border-secondary ${align === 'center' ? ' text-light' : ' text-dark bg-white'}`}
           ><BsTextCenter/></Button>
           <Button
             onClick={() => {
@@ -51,8 +58,9 @@ export default function AlignButtons(props) {
             }}
             type="radio"
             name={'align'}
-            style={{border: 'none', boxShadow: 'none', margin: '2px 2px 2px 1px', padding:'0 5px'}}
-            className={`btn btn-sm border border-secondary  ${align === 'right' ? ' text-light active' : ' text-dark bg-white'}`}
+            checked={align==='right'}
+            style={{border: 'none', boxShadow: 'none', margin: '2px 2px 2px 1px', padding: '0 5px'}}
+            className={`btn btn-sm border border-secondary  ${align === 'right' ? ' text-light' : ' text-dark bg-white'}`}
           ><BsTextRight/></Button>
         </div>
       )}

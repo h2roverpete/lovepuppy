@@ -28,12 +28,29 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdatePageSection(data) {
-    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}/sections`,data);
+    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}/sections`, data);
+    return response.data;
+  }
+
+  async function uploadSectionImage(pageId, pageSectionId, file) {
+    const formData = new FormData();
+    formData.append('SectionImage', file);
+    const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`, formData);
+    return response.data;
+  }
+
+  async function deleteSectionImage(pageId, pageSectionId) {
+    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`);
+    return response.data;
+  }
+
+  async function deletePageSection(pageId, pageSectionId) {
+    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}`);
     return response.data;
   }
 
   async function insertOrUpdatePage(data) {
-    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}`,data);
+    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}`, data);
     return response.data;
   }
 
@@ -107,6 +124,9 @@ export default function RestApi(props) {
       getPage: getPage,
       getPageSections: getPageSections,
       insertOrUpdatePageSection: insertOrUpdatePageSection,
+      uploadSectionImage: uploadSectionImage,
+      deleteSectionImage: deleteSectionImage,
+      deletePageSection: deletePageSection,
       insertOrUpdatePage: insertOrUpdatePage,
       getSite: getSite,
       getSiteOutline: getSiteOutline,

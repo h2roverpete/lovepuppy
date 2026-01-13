@@ -7,6 +7,7 @@ import {BsCheck, BsPencil, BsX} from "react-icons/bs";
  * @property {boolean} editing
  * @property {callback} callback
  * @property {string} align
+ * @property {boolean} showEditButton
  */
 
 /**
@@ -20,13 +21,7 @@ export default function EditButtons(props) {
   return (
     <>
       {props.editable && (
-        <div style={{whiteSpace: "nowrap", ...props.style}}>
-          <Button
-            onClick={() => props.callback(EditAction.EDIT)}
-            type="radio"
-            style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-            className={`btn btn-sm border border-secondary text-dark bg-white ${props.editing ? ' d-none' : ''}`}
-          ><BsPencil/></Button>
+        <div style={{whiteSpace: "nowrap", position: 'absolute', top: '2px', right: '2px'}}>
           <Button
             onClick={() => props.callback(EditAction.CONFIRM)}
             type="button"
@@ -39,6 +34,14 @@ export default function EditButtons(props) {
             style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
             className={`btn btn-sm border border-secondary text-dark bg-white ${!props.editing ? ' d-none' : ''}`}
           ><BsX/></Button>
+          {props.showEditButton && !props.editing && (
+            <Button
+              onClick={() => props.callback(EditAction.EDIT)}
+              type="button"
+              style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
+              className={`btn btn-sm border border-secondary text-dark bg-white`}
+            ><BsPencil/></Button>
+          )}
         </div>
       )}
     </>

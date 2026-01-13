@@ -47,7 +47,11 @@ const Login = (props) => {
   const [searchParams] = useSearchParams();
   const {token, setToken} = useAuth();
   const navigate = useNavigate();
-  const [cookies] = useCookies();
+  const [cookies, setCookie] = useCookies();
+
+  if (!cookies.loginState) {
+    setCookie("loginState", generateState());
+  }
 
   useEffect(() => {
     if (token) {
@@ -106,7 +110,7 @@ const Login = (props) => {
           <input type="hidden" name="client_id" value={window.location.host}/>
           <input type="hidden" name="redirect_uri"
                  value={`${window.location.protocol}//${window.location.host}/login`}/>
-          <input type="hidden" name="state" value={`${cookies.loginState}`}/>
+          <input type="hidden" name="state" value={cookies.loginState}/>
           <input type="hidden" name="scope" value={scope}/>
           <EmailField
             onChange={onChange}
@@ -132,3 +136,20 @@ const Login = (props) => {
 }
 
 export default Login;
+
+/**
+ * Generate a random state string.
+ * @returns {string}
+ */
+function generateState() {
+  const randomBytes = new Uint8Array(128); // 32 bytes for a strong verifier
+  crypto.getRandomValues(randomBytes);
+  return base64UrlEncode(randomBytes);
+}
+
+function base64UrlEncode(buffer) {
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}

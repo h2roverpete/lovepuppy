@@ -143,7 +143,7 @@ function GuestBook(props) {
           <>
             <p dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage}}/>
             <button
-              className="btn btn-primary"
+              className="btn btn-lg btn-primary"
               onClick={() => {
                 // clear submit flag and feedback ID to submit again
                 setSubmitted(false);
@@ -176,7 +176,7 @@ function GuestBook(props) {
               <div className="form-errors" id="FormErrors"></div>
               <div className="form-group mt-4">
                 <input type="submit" value={guestBookConfig.SubmitButtonName}
-                       className="btn btn-primary"/>
+                       className="btn btn-lg btn-primary"/>
               </div>
             </form>
           </>
