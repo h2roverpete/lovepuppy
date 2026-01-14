@@ -42,7 +42,6 @@ export default function EditableField(props) {
   const [isEditing, setEditing] = useState(props.editing);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-
   useEffect(() => {
     if (isEditing) {
       // focus when editing
@@ -183,7 +182,7 @@ export default function EditableField(props) {
           </ModalFooter>
         </Modal>
 
-        <div style={{position: 'relative', width: '100%'}}>
+        <div style={{position: 'relative', width: '100%', pointerEvents: isEditing ? 'auto' : 'none'}}>
           <div className={isEditing || props.textContent?.length > 0 || props.alwaysShow ? 'd-block': 'd-none'} style={{width:'100%'}}>{props.field}</div>
           <AlignButtons
             callback={editCallback}

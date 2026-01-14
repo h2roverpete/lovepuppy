@@ -1,5 +1,5 @@
-import {useState} from "react";
 import {Spinner} from "react-bootstrap";
+import './FileDropTarget.css';
 
 /**
  * Insert a div as a file drop target.
@@ -23,6 +23,7 @@ export function FileDropTarget({ref, state}) {
           <Spinner animation="border" role="status"/>
             </span>
         );
+      case DropState.UNDEFINED:
       default:
         return (<></>);
     }
@@ -33,6 +34,7 @@ export function FileDropTarget({ref, state}) {
       className="DropFile"
       ref={ref}
       hidden={true}
+      style={{pointerEvents: 'none'}}
     >
       {renderContent()}
     </div>

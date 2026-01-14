@@ -6,8 +6,7 @@ import {BsPencil} from "react-icons/bs";
 import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
-import './PageSection.css';
-import {FileDropTarget, DropState} from "./FileDropTarget";
+import {DropState} from "./FileDropTarget";
 
 /**
  * Generate a page section
@@ -157,27 +156,53 @@ function PageSection({pageSectionData}) {
     }
   }
 
-  const dropContainerRef = useRef(null);
   const dropFileRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const sectionImageRef = useRef(null);
+
   useEffect(() => {
-    if (dropContainerRef.current && canEdit) {
-      dropContainerRef.current.addEventListener('dragenter', dragEnterHandler);
+    if (sectionImageRef.current && canEdit) {
+      sectionImageRef.current.addEventListener('dragenter', dragEnterHandler);
+      sectionImageRef.current.addEventListener('dragleave', dragLeaveHandler);
+      sectionImageRef.current.addEventListener('dragover', dragOverHandler);
+      sectionImageRef.current.addEventListener('drop', dropHandler);
     }
-    if (dropFileRef.current && canEdit) {
-      dropFileRef.current.addEventListener('dragover', dragOverHandler);
-      dropFileRef.current.addEventListener('drop', dropHandler);
-      dropFileRef.current.addEventListener('dragleave', dragLeaveHandler);
+  }, [sectionImageRef, dropFileRef, canEdit, pageSectionData]);
+
+  useEffect(() => {
+    if (sectionImageRef.current && canEdit) {
+      sectionImageRef.current.addEventListener('click', selectImageFile);
+      sectionImageRef.current.style.cursor = 'pointer';
     }
-  }, [dropContainerRef, canEdit]);
+  }, [sectionImageRef, canEdit, pageSectionData]);
+
+  useEffect(() => {
+    if (fileInputRef.current && canEdit) {
+      fileInputRef.current.addEventListener('change', fileSelectedHandler);
+    }
+  }, [fileInputRef, canEdit]);
+
+  function selectImageFile() {
+    fileInputRef.current.click();
+  }
+
+  function fileSelectedHandler(e) {
+    const files = [...e.target.files];
+    console.log(`${files.length} file(s) selected.`);
+    if (files.length === 1) {
+      uploadFile(files[0]);
+    }
+    e.preventDefault();
+  }
 
   function dragEnterHandler(e) {
-    console.log(`Image drag enter...`);
-    dropFileRef.current.hidden = false;
+    if (dropFileRef.current) {
+      dropFileRef.current.hidden = false;
+    }
     e.preventDefault();
   }
 
   function dragOverHandler(e) {
-    console.log(`Image drag over...`);
     const fileItems = [...e.dataTransfer.items].filter(
       (item) => item.kind === "file",
     );
@@ -197,23 +222,35 @@ function PageSection({pageSectionData}) {
       .filter((file) => file);
     console.log(`${files.length} file(s) dropped.`);
     if (files.length === 1) {
-      setUploadPrompt(DropState.UPLOADING);
-      uploadSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID, files[0])
-        .then((result) => {
-          console.log(`Image uploaded successfully.`);
-          dropFileRef.current.hidden = true;
-          setUploadPrompt(pageSectionData.SectionImage ? DropState.REPLACE : DropState.INSERT);
-          updatePageSection(result);
-        }).catch(e => {
-        console.error(`Error uploading image.`, e);
-      });
+      uploadFile(files[0]);
     }
     e.preventDefault();
   }
 
+  function uploadFile(file) {
+    if (dropFileRef.current) {
+      dropFileRef.current.hidden = false;
+    }
+    setUploadPrompt(DropState.UPLOADING);
+    uploadSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID, file)
+      .then((result) => {
+        console.log(`Image uploaded successfully.`);
+        if (dropFileRef.current) {
+          dropFileRef.current.hidden = true;
+        }
+        setUploadPrompt(pageSectionData.SectionImage ? DropState.REPLACE : DropState.INSERT);
+        updatePageSection(result);
+      })
+      .catch(e => {
+        console.error(`Error uploading image.`, e);
+      });
+  }
+
   function dragLeaveHandler(e) {
     console.log(`Image drag leave...`);
-    dropFileRef.current.hidden = true;
+    if (dropFileRef.current) {
+      dropFileRef.current.hidden = true;
+    }
     e.preventDefault();
   }
 
@@ -235,7 +272,6 @@ function PageSection({pageSectionData}) {
         className={`PageSection`}
         style={{position: 'relative'}}
         data-testid={`PageSection-${pageSectionData.PageSectionID}`}
-        ref={dropContainerRef}
       >
         <EditableField
           field={sectionTitle}
@@ -247,6 +283,9 @@ function PageSection({pageSectionData}) {
         />
         <PageSectionImage
           pageSectionData={pageSectionData}
+          imageRef={sectionImageRef}
+          dropTargetRef={dropFileRef}
+          dropTargetState={uploadPrompt}
         />
         <EditableField
           field={sectionText}
@@ -258,10 +297,9 @@ function PageSection({pageSectionData}) {
           editing={editingText}
         />
         {canEdit && (
-          <FileDropTarget
-            ref={dropFileRef}
-            state={uploadPrompt}
-          />
+          <>
+            <input type="file" ref={fileInputRef} hidden={true}/>
+          </>
         )}
         {(canEdit && !editingText && !editingTitle) && (
           <div
@@ -285,6 +323,7 @@ function PageSection({pageSectionData}) {
                 <span className="dropdown-item" style={{marginLeft: '0'}} onClick={onMoveDown}>Move
                   Down</span>
               )}
+              <span className="dropdown-item" onClick={selectImageFile}>Upload Image</span>
               <span className="dropdown-item" onClick={() => setShowDeleteConfirmation(true)}> Delete Section</span>
             </div>
           </div>
