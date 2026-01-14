@@ -127,7 +127,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
         <img
           className={imageClassName}
           style={imageStyle}
-          src={`${siteData.SiteRootUrl}/images/` + pageSectionData.SectionImage}
+          src={`${siteData?.SiteRootUrl}/images/` + pageSectionData.SectionImage}
           alt={pageSectionData.SectionTitle}
           data-testid={`SectionImage-${pageSectionData.PageSectionID}`}
           ref={imageRef}
