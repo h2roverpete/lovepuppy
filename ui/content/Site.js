@@ -5,7 +5,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useNavigate} from "react-router";
 import {useRestApi} from "../../api/RestApi";
 import Logout from '../../auth/Logout';
-import {PageContext} from "./Page";
 
 /**
  * @typedef ErrorData
@@ -161,6 +160,7 @@ export default function Site(props) {
           item.NavTitle = pageData.NavTitle;
           item.PageHidden = pageData.PageHidden;
         }
+        return item;
       })
       setOutlineData(newOutlineData);
     }

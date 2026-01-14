@@ -49,7 +49,7 @@ export default function PageTitle(props) {
         })
     }
     setEditingTitle(false);
-  }, [pageData, insertOrUpdatePage]);
+  }, [pageData, insertOrUpdatePage, updateOutlineData]);
 
   const titleRef = useRef(null);
   const title = (

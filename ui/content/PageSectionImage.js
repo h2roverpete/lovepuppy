@@ -3,6 +3,7 @@ import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "./Page";
 import {useEdit} from "../editor/EditProvider";
 import {useSiteContext} from "./Site";
+import FileDropTarget from "./FileDropTarget";
 
 /**
  * Insert an editable page section image.
@@ -10,10 +11,13 @@ import {useSiteContext} from "./Site";
  * otherwise it should be inserted after the section text.
  *
  * @param pageSectionData {PageSectionData} Database record for page section.
+ * @param imageRef {RefObject} Receives a reference to the section image
+ * @param dropTargetRef {RefObject} Receives a reference to the drop target <div>
+ * @param dropTargetState {DropState} State to display the drop target.
  * @returns {JSX.Element}
  * @constructor
  */
-export default function PageSectionImage({pageSectionData}) {
+export default function PageSectionImage({pageSectionData, imageRef, dropTargetRef, dropTargetState}) {
 
   const {insertOrUpdatePageSection, deleteSectionImage} = useRestApi();
   const {sectionData, setSectionData} = usePageContext();
@@ -31,6 +35,10 @@ export default function PageSectionImage({pageSectionData}) {
 
   function setImagePosition(position) {
     pageSectionData.ImagePosition = position;
+    if (position === 'beside' && pageSectionData.ImageAlign !== 'left' && pageSectionData.ImageAlign !== 'right') {
+      // fix alignment to be side by side
+      pageSectionData.ImageAlign = 'right';
+    }
     console.debug(`Updating image position...`);
     insertOrUpdatePageSection(pageSectionData)
       .then(() => console.debug(`Updated image position.`))
@@ -58,18 +66,50 @@ export default function PageSectionImage({pageSectionData}) {
       .catch(error => console.error(`Error deleting section image.`, error));
   }
 
-  const imageDivStyle = {};
+  function setImageWidth(width) {
+    console.debug(`Setting image width to ${width}...`);
+    pageSectionData.ImageWidth = width;
+    insertOrUpdatePageSection(pageSectionData)
+      .then(() => console.debug(`Updated image width.`))
+      .catch(error => console.error(`Error updating image width.`, error));
+    setSectionData([...sectionData]);
+  }
+
+  /**
+   * Get image display width.
+   *
+   * @returns {number|Number|number} Image width in Bootstrap columns, or 0 if data is undefined.
+   */
+  function getImageWidth() {
+    if (pageSectionData) {
+      return pageSectionData.ImageWidth > 0 ? pageSectionData.ImageWidth : pageSectionData.ImagePosition === 'above' ? 12 : 7;
+    } else {
+      return 0;
+    }
+  }
+
+  const imageDivStyle = {position: 'relative'};
+  let imageDivClassName = 'SectionImage mb-3 col-12';
   const imageStyle = {};
+  let imageClassName = 'img-fluid';
   if (pageSectionData.ImagePosition === 'beside') {
     // align image left or right beside text
+    imageDivClassName += ` col-sm-${getImageWidth()}`;
     imageDivStyle.position = 'relative';
     imageDivStyle.float = pageSectionData.ImageAlign;
     imageDivStyle.textAlign = 'center';
+    if (pageSectionData.ImageAlign === 'right') {
+      imageDivClassName += ' ms-sm-3';
+    } else if (pageSectionData.ImageAlign === 'left') {
+      imageDivClassName += ' me-sm-4';
+    }
   } else {
     // center image
-    imageDivStyle.display = 'flex';
-    imageDivStyle.justifyContent = 'center';
-    imageDivStyle.alignItems = 'center';
+    imageDivClassName += ` col-sm-12`;
+    imageDivStyle.display = 'flex'
+    imageDivStyle.flexDirection = 'column'
+    imageDivStyle.alignItems = pageSectionData.ImageAlign === 'right' ? 'flex-end' : pageSectionData.ImageAlign === 'left' ? 'flex-start' : 'center';
+    imageClassName += ` col-sm-${getImageWidth()}`;
   }
   if (pageSectionData.HideImageFrame) {
     // hide frame for this instance of the image
@@ -80,19 +120,21 @@ export default function PageSectionImage({pageSectionData}) {
   return (
     <>{pageSectionData?.SectionImage && (
       <div
-        style={{...imageDivStyle, position: 'relative'}}
-        className={`SectionImage col-12 mb-3 col-sm-auto${pageSectionData.ImageAlign === 'right' ? ' ms-sm-3' : pageSectionData.ImageAlign === 'left' ? ' me-sm-4' : ''}`}
+        style={imageDivStyle}
+        className={imageDivClassName}
         data-testid={`SectionImageDiv-${pageSectionData.PageSectionID}`}
       >
         <img
-          className="img-fluid"
+          className={imageClassName}
           style={imageStyle}
           src={`${siteData.SiteRootUrl}/images/` + pageSectionData.SectionImage}
           alt={pageSectionData.SectionTitle}
           data-testid={`SectionImage-${pageSectionData.PageSectionID}`}
+          ref={imageRef}
         />
         {canEdit && (
           <>
+            <FileDropTarget ref={dropTargetRef} state={dropTargetState}/>
             <div
               className="dropdown"
               style={{position: 'absolute', bottom: '0', right: '2px', zIndex: 100}}
@@ -107,7 +149,7 @@ export default function PageSectionImage({pageSectionData}) {
               <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
                 {pageSectionData.ImageAlign !== 'left' && (
                   <span className="dropdown-item" onClick={() => setImageAlign('left')}>Align Left</span>)}
-                {pageSectionData.ImageAlign !== 'center' && pageSectionData.ImageAlign === 'above' && (
+                {pageSectionData.ImageAlign !== 'center' && pageSectionData.ImagePosition === 'above' && (
                   <span className="dropdown-item" onClick={() => setImageAlign('center')}>Align Center</span>)}
                 {pageSectionData.ImageAlign !== 'right' && (
                   <span className="dropdown-item" onClick={() => setImageAlign('right')}>Align Right</span>)}
@@ -115,6 +157,12 @@ export default function PageSectionImage({pageSectionData}) {
                   <span className="dropdown-item" onClick={() => setImagePosition('above')}>Above Text</span>)}
                 {pageSectionData.ImagePosition !== 'beside' && (
                   <span className="dropdown-item" onClick={() => setImagePosition('beside')}>Beside Text</span>)}
+                {getImageWidth() > 1 && (
+                  <span className="dropdown-item"
+                        onClick={() => setImageWidth(getImageWidth() - 1)}>Make Smaller</span>)}
+                {getImageWidth() < 12 && (
+                  <span className="dropdown-item"
+                        onClick={() => setImageWidth(getImageWidth() + 1)}>Make Larger</span>)}
                 {pageSectionData.HideImageFrame ?
                   (<span className="dropdown-item" onClick={() => hideImageFrame(false)}>Show Image Frame</span>) :
                   (<span className="dropdown-item" onClick={() => hideImageFrame(true)}>Hide Image Frame</span>)
