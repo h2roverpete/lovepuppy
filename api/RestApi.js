@@ -50,8 +50,16 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdatePage(data) {
-    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}`, data);
-    return response.data;
+    try {
+      const response = await axios.post(`${host}/api/v1/content/pages`, data);
+      return response.data;
+    } catch (error) {
+      console.error(`Error inserting page.`, error);
+    }
+  }
+
+  async function deletePage(pageId) {
+    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}`);
   }
 
   async function getSite() {
@@ -122,6 +130,7 @@ export default function RestApi(props) {
   return (
     <RestApiContext value={{
       getPage: getPage,
+      deletePage: deletePage,
       getPageSections: getPageSections,
       insertOrUpdatePageSection: insertOrUpdatePageSection,
       uploadSectionImage: uploadSectionImage,

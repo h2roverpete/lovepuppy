@@ -82,7 +82,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
    */
   function getImageWidth() {
     if (pageSectionData) {
-      return pageSectionData.ImageWidth > 0 ? pageSectionData.ImageWidth : pageSectionData.ImagePosition === 'above' ? 12 : 7;
+      return pageSectionData.ImageWidth > 0 ? pageSectionData.ImageWidth : pageSectionData.ImagePosition === 'beside' ? 7 : 12;
     } else {
       return 0;
     }
