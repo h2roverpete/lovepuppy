@@ -2,6 +2,7 @@ import React from 'react';
 import {useCookies} from "react-cookie";
 import {useContext, useMemo} from "react";
 import axios from "axios";
+import {AuthContext, useAuth} from "../auth/AuthProvider";
 
 export const RestApiContext = React.createContext({});
 
@@ -11,6 +12,7 @@ export default function RestApi(props) {
   const host = useMemo(() => process.env.REACT_APP_BACKEND_HOST, []);
   const apiKey = useMemo(() => process.env.REACT_APP_API_KEY, []);
   const [cookies] = useCookies(); // can't use auth context, access directly
+  const {refreshAuthToken} = useAuth();
 
   axios.defaults.headers.common["x-api-key"] = apiKey;
   if (cookies.token) {
@@ -50,16 +52,22 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdatePage(data) {
-    try {
-      const response = await axios.post(`${host}/api/v1/content/pages`, data);
-      return response.data;
-    } catch (error) {
-      console.error(`Error inserting page.`, error);
-    }
+    return await restApiCall(() => {
+      return async () => {
+        console.debug("InsertOrUpdatePage");
+        const response = await axios.post(`${host}/api/v1/content/pages`, data);
+        return response.data;
+      }
+    });
   }
 
   async function deletePage(pageId) {
-    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}`);
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}`);
+        return response.data;
+      }
+    });
   }
 
   async function getSite() {
@@ -125,6 +133,47 @@ export default function RestApi(props) {
   async function checkToken() {
     const response = await axios.get(`${host}/oauth/check`);
     return response.data;
+  }
+
+  /**
+   * @callback RestApiCall
+   * @return {Promise<any>}
+   */
+
+  /**
+   * @callback RestApiCallFactory
+   * @return {RestApiCall}
+   */
+
+  /**
+   * Execute a "protected" REST API call.
+   * Protected calls modify site content and require a valid OAuth token
+   * in addition to an API key.
+   *
+   * If the original call throws an Auth error, attempts to refresh the auth token
+   * and executes the call again.
+   *
+   * @param callFactory {RestApiCallFactory} Factory function returning a Promise which runs the API call and returns a result.
+   * @returns {any} Response from Rest API call
+   */
+  async function restApiCall(callFactory) {
+    try {
+      console.log(`Calling REST API...`);
+      const result = await (callFactory())();
+      console.log(`REST API result: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      console.error(`REST API error.`, error);
+      if (error.code === 401) {
+        try {
+          await refreshAuthToken();
+          return await (callFactory())();
+        } catch (err2) {
+          console.error(`REST API error refreshing auth token.`, err2);
+          throw error;
+        }
+      }
+    }
   }
 
   return (

@@ -38,8 +38,8 @@ export default function NavBar(props) {
   const {insertOrUpdatePage} = useRestApi();
 
   const [showNewPage, setShowNewPage] = useState(false);
-  const [newPageTitle, setNewPageTitle] = useState(false);
-  const [newPageRoute, setNewPageRoute] = useState(false);
+  const [newPageTitle, setNewPageTitle] = useState(null);
+  const [newPageRoute, setNewPageRoute] = useState(null);
 
   function navigateTo(to) {
     if ((togglerRef.current.style.visible || togglerRef.current.style.display !== 'none') && !togglerRef.current.classList.contains("collapsed")) {
@@ -112,7 +112,7 @@ export default function NavBar(props) {
   }
 
   function isValidRoute(route) {
-    return route && route.match(/^\/[a-z]+$/) !== null;
+    return route && route.match(/^\/[a-z0-9]+$/) !== null;
   }
 
   const newTitleRef = useRef(null);
@@ -274,7 +274,6 @@ export default function NavBar(props) {
                         name={'PageRoute'}
                         placeholder={'/mypage'}
                         required={true}
-                        pattern={'\/[a-z]+'}
                         type="text"
                         style={{fontSize: '12pt'}}
                         onChange={(e) => {
