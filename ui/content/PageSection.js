@@ -243,6 +243,7 @@ function PageSection({pageSectionData}) {
       })
       .catch(e => {
         console.error(`Error uploading image.`, e);
+        dropFileRef.current.hidden = true;
       });
   }
 
