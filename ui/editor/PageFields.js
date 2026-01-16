@@ -16,7 +16,7 @@ export default function PageFields() {
   const {insertOrUpdatePage, insertOrUpdatePageSection, deletePage} = useRestApi();
   const {canEdit} = useEdit();
   const {pageData, setPageData, setSectionData} = usePageContext();
-  const {updateOutlineData, deletePageFromOutline} = useSiteContext()
+  const {outline} = useSiteContext()
   const [edits, setEdits] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ export default function PageFields() {
       console.debug(`Updated page.`);
       setEdits({})
       setPageData(data);
-      updateOutlineData(data);
+      outline.updatePage(data);
     }).catch((error) => {
       console.error(`Error updating page.`, error);
     });
@@ -91,7 +91,7 @@ export default function PageFields() {
       .then(() => {
         console.debug(`Deleted page.`);
         navigate('/');
-        deletePageFromOutline(pageData.PageID);
+        outline.deletePage(pageData.PageID);
         setCollapsed(true);
       })
       .catch(e => console.error(`Error deleting page.`, e));

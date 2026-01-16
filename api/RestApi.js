@@ -70,6 +70,33 @@ export default function RestApi(props) {
     });
   }
 
+  async function movePageBefore(pageId, beforePageId) {
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/before/${beforePageId}`);
+        return response.data;
+      }
+    });
+  }
+
+  async function movePageAfter(pageId, afterPageId) {
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/after/${afterPageId}`);
+        return response.data;
+      }
+    });
+  }
+
+  async function makePageChildOf(pageId, parentId) {
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/childof/${parentId}`);
+        return response.data;
+      }
+    });
+  }
+
   async function getSite() {
     const response = await axios.get(`${host}/api/v1/content/sites/${siteId}`);
     return response.data;
@@ -158,18 +185,13 @@ export default function RestApi(props) {
    */
   async function restApiCall(callFactory) {
     try {
-      console.log(`Calling REST API...`);
-      const result = await (callFactory())();
-      console.log(`REST API result: ${JSON.stringify(result)}`);
-      return result;
+      return await (callFactory())();
     } catch (error) {
-      console.error(`REST API error.`, error);
       if (error.code === 401) {
         try {
           await refreshAuthToken();
           return await (callFactory())();
         } catch (err2) {
-          console.error(`REST API error refreshing auth token.`, err2);
           throw error;
         }
       }
@@ -180,6 +202,9 @@ export default function RestApi(props) {
     <RestApiContext value={{
       getPage: getPage,
       deletePage: deletePage,
+      movePageAfter: movePageAfter,
+      movePageBefore: movePageBefore,
+      makePageChildOf: makePageChildOf,
       getPageSections: getPageSections,
       insertOrUpdatePageSection: insertOrUpdatePageSection,
       uploadSectionImage: uploadSectionImage,
