@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import {usePageContext} from "../content/Page";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
+import {useNavigate} from "react-router";
 
 /**
  * Edit page metadata fields.
@@ -12,11 +13,13 @@ import {useSiteContext} from "../content/Site";
  */
 export default function PageFields() {
 
-  const {insertOrUpdatePage, insertOrUpdatePageSection} = useRestApi();
+  const {insertOrUpdatePage, insertOrUpdatePageSection, deletePage} = useRestApi();
   const {canEdit} = useEdit();
   const {pageData, setPageData, setSectionData} = usePageContext();
-  const {updateOutlineData} = useSiteContext()
+  const {updateOutlineData, deletePageFromOutline} = useSiteContext()
   const [edits, setEdits] = useState(null);
+  const [collapsed, setCollapsed] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (pageData) {
@@ -56,6 +59,7 @@ export default function PageFields() {
     });
     submitButton.current.classList.add('disabled');
     revertButton.current.classList.add('disabled');
+    setCollapsed(true);
   }
 
   function onRevert() {
@@ -74,10 +78,23 @@ export default function PageFields() {
       insertOrUpdatePageSection(data)
         .then(() => {
           setSectionData(null)
+          setCollapsed(true);
         }).catch((error) => {
         console.error(`Error adding page section.`, error);
       })
     }
+  }
+
+  function onDeletePage() {
+    console.debug(`Deleting page...`);
+    deletePage(pageData.PageID)
+      .then(() => {
+        console.debug(`Deleted page.`);
+        navigate('/');
+        deletePageFromOutline(pageData.PageID);
+        setCollapsed(true);
+      })
+      .catch(e => console.error(`Error deleting page.`, e));
   }
 
   const submitButton = useRef(null);
@@ -91,9 +108,10 @@ export default function PageFields() {
           data-bs-toggle="collapse"
           data-bs-target="#PageFields"
           style={{padding: '8px', position: 'absolute', top: -25, right: 0}}
+          onClick={()=>setCollapsed(!collapsed)}
         />
         <div
-          className={"accordion-collapse collapse"}
+          className={`accordion-collapse${collapsed?' collapse':''}`}
           id={"PageFields"}
           style={{background: '#00000011', marginBottom: '20px'}}
         >
@@ -216,6 +234,12 @@ export default function PageFields() {
                   onClick={onAddSection}
                 >
                   Add Section
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm me-2"
+                  onClick={onDeletePage}
+                >
+                  Delete Page
                 </button>
               </div>
             </div>

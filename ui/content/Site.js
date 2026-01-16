@@ -20,7 +20,7 @@ export const SiteContext = createContext({
   setError: null,
   login: false,
   getChildren: null,
-  updateOutlineData: (data)=>console.error(`updateOutlineData() not defined.`),
+  updateOutlineData: (data) => console.error(`updateOutlineData() not defined.`),
 });
 
 /**
@@ -166,6 +166,28 @@ export default function Site(props) {
     }
   }
 
+  function deletePageFromOutline(pageId) {
+    console.debug(`Delete page ${pageId} from outline.`)
+    if (outlineData) {
+      const newOutlineData = [];
+      outlineData.map((item) => {
+        if (item.PageID !== pageId) {
+          newOutlineData.push(item);
+        }
+        return item;
+      })
+      setOutlineData(newOutlineData);
+    }
+  }
+
+  function addPageToOutline(pageData) {
+    console.debug(`Add page ${pageData.PageID} to outline.`)
+    if (outlineData) {
+      const newOutlineData = [...outlineData, pageData];
+      setOutlineData(newOutlineData);
+    }
+  }
+
   // provide context to children
   return (
     <div className="Site" data-testid="Site">
@@ -177,6 +199,8 @@ export default function Site(props) {
           setError: setError,
           getChildren: getChildren,
           updateOutlineData: updateOutlineData,
+          deletePageFromOutline: deletePageFromOutline,
+          addPageToOutline: addPageToOutline,
         }}
       >
         <Routes>
@@ -245,4 +269,6 @@ export default function Site(props) {
   )
 }
 
-export function useSiteContext() {return useContext(SiteContext)}
+export function useSiteContext() {
+  return useContext(SiteContext)
+}

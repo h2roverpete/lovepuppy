@@ -73,9 +73,7 @@ export default function AuthProvider(props) {
       if (error.status === 401) {
         try {
           // token refused, try refreshing
-          console.debug(`Refreshing token...`);
-          const newToken = await refreshToken(cookies.token.refresh_token, window.location.host);
-          setToken(newToken);
+          await refreshAuthToken()
         } catch (error) {
           console.error(`Error refreshing token: ${JSON.stringify(error)}`);
         }
@@ -85,6 +83,13 @@ export default function AuthProvider(props) {
     }
   }
 
+  async function refreshAuthToken() {
+    console.debug(`Refreshing token...`);
+    const newToken = await refreshToken(cookies.token.refresh_token, window.location.host);
+    setToken(newToken);
+    return true;
+  }
+
   return (
     <AuthContext
       value={{
@@ -92,6 +97,7 @@ export default function AuthProvider(props) {
         setToken: setToken,
         hasPermission: hasPermission,
         isAuthenticated: isAuthenticated,
+        refreshToken: refreshToken,
       }}>
       <EditProvider>
         {props.children}

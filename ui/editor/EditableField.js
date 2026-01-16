@@ -182,7 +182,7 @@ export default function EditableField(props) {
           </ModalFooter>
         </Modal>
 
-        <div style={{position: 'relative', width: '100%', pointerEvents: isEditing ? 'auto' : 'none'}}>
+        <div style={{position: 'relative', width: '100%', pointerEvents: isEditing || props.showEditButton ? 'auto' : 'none'}}>
           <div className={isEditing || props.textContent?.length > 0 || props.alwaysShow ? 'd-block': 'd-none'} style={{width:'100%'}}>{props.field}</div>
           <AlignButtons
             callback={editCallback}

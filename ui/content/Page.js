@@ -165,4 +165,4 @@ function buildBreadcrumbs(outlineData, parentId) {
 
 export function usePageContext() {
   return useContext(PageContext)
-};
+}

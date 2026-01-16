@@ -82,7 +82,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
    */
   function getImageWidth() {
     if (pageSectionData) {
-      return pageSectionData.ImageWidth > 0 ? pageSectionData.ImageWidth : pageSectionData.ImagePosition === 'above' ? 12 : 7;
+      return pageSectionData.ImageWidth > 0 ? pageSectionData.ImageWidth : pageSectionData.ImagePosition === 'beside' ? 7 : 12;
     } else {
       return 0;
     }
@@ -127,7 +127,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
         <img
           className={imageClassName}
           style={imageStyle}
-          src={`${siteData.SiteRootUrl}/images/` + pageSectionData.SectionImage}
+          src={`${siteData?.SiteRootUrl}/images/` + pageSectionData.SectionImage}
           alt={pageSectionData.SectionTitle}
           data-testid={`SectionImage-${pageSectionData.PageSectionID}`}
           ref={imageRef}
