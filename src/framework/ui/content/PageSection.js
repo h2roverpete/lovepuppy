@@ -3,10 +3,10 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useEdit} from "../editor/EditProvider";
 import {BsPencil} from "react-icons/bs";
-import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
+import {Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
-import {DropState} from "./FileDropTarget";
+import {DropState} from "../editor/FileDropTarget";
 
 /**
  * Generate a page section
@@ -170,13 +170,6 @@ function PageSection({pageSectionData}) {
   }, [sectionImageRef, dropFileRef, canEdit, pageSectionData]);
 
   useEffect(() => {
-    if (sectionImageRef.current && canEdit) {
-      sectionImageRef.current.addEventListener('click', selectImageFile);
-      sectionImageRef.current.style.cursor = 'pointer';
-    }
-  }, [sectionImageRef, canEdit, pageSectionData]);
-
-  useEffect(() => {
     if (fileInputRef.current && canEdit) {
       fileInputRef.current.addEventListener('change', fileSelectedHandler);
     }
@@ -258,6 +251,7 @@ function PageSection({pageSectionData}) {
   return (
     <>
       <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+        <ModalHeader><h5>Delete Section</h5></ModalHeader>
         <ModalBody>Are you sure you want to delete this section? This action cannot be undone.</ModalBody>
         <ModalFooter>
           <button className={'btn btn-sm btn-primary'} onClick={() => {
@@ -309,14 +303,14 @@ function PageSection({pageSectionData}) {
           >
             <button
               style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
-              className={`btn btn-sm border border-secondary text-dark bg-white`}
+              className={`btn btn-sm border btn-light`}
               type="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             ><BsPencil/></button>
             <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
-              <span className="dropdown-item" onClick={() => setEditingTitle(true)}>Edit Section Title</span>
-              <span className="dropdown-item" onClick={() => setEditingText(true)}>Edit Section Text</span>
+              <span className="dropdown-item" onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
+              <span className="dropdown-item" onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Section Text`}</span>
               {pageSectionData.PageSectionSeq > 1 && (
                 <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
               )}

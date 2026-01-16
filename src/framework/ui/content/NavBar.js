@@ -2,7 +2,7 @@ import {useRef, useState} from "react";
 import {useSiteContext} from "./Site";
 import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavDropdown} from "react-bootstrap";
+import {Button, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
@@ -29,13 +29,13 @@ import {useRestApi} from "../../api/RestApi";
  */
 export default function NavBar(props) {
 
-  const {siteData, getChildren, addPageToOutline} = useSiteContext();
+  const {siteData, getChildren, outline} = useSiteContext();
   const {pageData, breadcrumbs} = usePageContext();
   const navigate = useNavigate();
   const togglerRef = useRef(null);
   const {token} = useAuth();
   const {canEdit} = useEdit();
-  const {insertOrUpdatePage} = useRestApi();
+  const {insertOrUpdatePage, movePageAfter, movePageBefore, makePageChildOf} = useRestApi();
 
   const [showNewPage, setShowNewPage] = useState(false);
   const [newPageTitle, setNewPageTitle] = useState(null);
@@ -71,6 +71,10 @@ export default function NavBar(props) {
       <>{children.length === 0 ? (
         // no children to render
         <NavDropdown.Item
+          draggable={canEdit}
+          onDragStart={(e) => dragStartHandler(e, props.pageData)}
+          onDragOver={(e) => dragOverHandler(e)}
+          onDrop={(e) => dropHandler(e, props.pageData, 'vertical')}
           key={props.pageData.PageID}
           onClick={() => navigateTo(props.pageData.PageRoute)}
           className={`text-nowrap${isInCurrentPath(props.pageData.PageID) ? ' active' : ''}`}
@@ -81,18 +85,26 @@ export default function NavBar(props) {
       ) : (
         // at least one child, render a dropdown
         <NavDropdown
+          draggable={canEdit}
+          onDragStart={(e) => dragStartHandler(e, props.pageData)}
+          onDragOver={(e) => dragOverHandler(e)}
+          onDrop={(e) => dropHandler(e, props.pageData, 'horizontal')}
           key={props.pageData.PageID}
           title={props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
           id={`nav-dropdown${isInCurrentPath(props.pageData.PageID) ? '-active' : ''}`}
           data-testid={`NavItem-${props.pageData.PageID}`}
         >
           <>{children.map((item) => (
-            <>{item.HasChildren ? (
+            <>{getChildren(item.PageID).length > 0 ? (
               // render further dropdown levels
               <RecursiveDropdown pageData={item}/>
             ) : (
               // render this dropdown level
               <NavDropdown.Item
+                draggable={canEdit}
+                onDragStart={(e) => dragStartHandler(e, item)}
+                onDragOver={(e) => dragOverHandler(e)}
+                onDrop={(e) => dropHandler(e, item, 'vertical')}
                 className={`text-nowrap${pageData?.PageID === item.PageID ? ' active' : ''}`}
                 key={item.PageID}
                 onClick={() => navigateTo(item.PageRoute)}
@@ -131,12 +143,80 @@ export default function NavBar(props) {
     insertOrUpdatePage(data)
       .then((result) => {
         console.debug(`Page inserted.`);
-        addPageToOutline(result);
+        outline.addPage(result);
         navigate(result.PageRoute)
       })
       .catch((e) => {
         console.error(`Error inserting new page.`, e);
       });
+  }
+
+  function dragStartHandler(e, data) {
+    if (canEdit) {
+      console.debug(`Drag start. data = ${JSON.stringify(data)}`);
+      if (!e.dataTransfer.getData('application/json')) {
+        e.dataTransfer.setData('application/json', JSON.stringify(data));
+        e.stopPropagation()
+      }
+    }
+  }
+
+  function dragOverHandler(e) {
+    e.preventDefault();
+  }
+
+  /**
+   * Process a drop event to reorder navigation.
+   *
+   * @param e                   Drag Event
+   * @param dropData {PageData} Data about the page being dropped on.
+   * @param direction {String}  Direction of elements: 'vertical' or 'horizontal'
+   */
+  function dropHandler(e, dropData, direction) {
+    if (canEdit) {
+      const x = e.nativeEvent.offsetX;
+      const y = e.nativeEvent.offsetY;
+      const width = e.nativeEvent.target.offsetWidth;
+      const height = e.nativeEvent.target.offsetHeight;
+      const percent = direction === 'vertical' ? y / height : x / width;
+      const dragData = JSON.parse(e.dataTransfer.getData('application/json'));
+      if (percent < 0.33) {
+        console.debug(`Move page '${dragData.PageTitle}' before page '${dropData.PageTitle}'`);
+        // move outline first for UI responsiveness
+        outline.movePageBefore(dragData, dropData);
+        movePageBefore(dragData.PageID, dropData.PageID)
+          .then((result) => {
+            console.debug(`Page moved.`);
+          })
+          .catch((err) => {
+            console.error(`Error moving page.`, err);
+          });
+      } else if (percent < 0.66) {
+        console.debug(`Make page '${dragData.PageTitle}' child of page '${dropData.PageTitle}'`);
+        // move outline first for UI responsiveness
+        outline.makeChildOf(dragData, dropData);
+        makePageChildOf(dragData.PageID, dropData.PageID)
+          .then((result) => {
+            console.debug(`Page moved.`);
+          })
+          .catch((err) => {
+            console.error(`Error moving page.`, err);
+          });
+      } else {
+        console.debug(`Move page '${dragData.PageTitle}' after page '${dropData.PageTitle}'`);
+        // move outline first for UI responsiveness
+        outline.movePageAfter(dragData, dropData);
+        movePageAfter(dragData.PageID, dropData.PageID)
+          .then(() => {
+            console.debug(`Page moved.`);
+          })
+          .catch((err) => {
+            console.error(`Error moving page.`, err);
+          });
+      }
+      e.stopPropagation();
+      e.preventDefault();
+    }
   }
 
   return (
@@ -196,10 +276,14 @@ export default function NavBar(props) {
               <div
                 key={item.PageID}
               >
-                {item.HasChildren ? (
+                {getChildren(item.PageID).length > 0 ? (
                   <RecursiveDropdown pageData={item}/>
                 ) : (
                   <Nav.Link
+                    draggable={canEdit}
+                    onDragStart={(e) => dragStartHandler(e, item)}
+                    onDragOver={(e) => dragOverHandler(e)}
+                    onDrop={(e) => dropHandler(e, item, 'horizontal')}
                     onClick={() => navigateTo(item.PageRoute)}
                     className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
                     key={item.PageID}
@@ -247,9 +331,10 @@ export default function NavBar(props) {
                       </label>
                       <input
                         ref={newTitleRef}
-                        className={'form-control' + (newPageTitle ? isValidTitle(newPageTitle) ? ' is-valid' : ' is-invalid' : '')}
+                        className={'form-control' + (newPageTitle?.length > 0 ? isValidTitle(newPageTitle) ? ' is-valid' : ' is-invalid' : '')}
                         id={'PageTitle'}
                         name={'PageTitle'}
+                        value={newPageTitle}
                         required={true}
                         placeholder={'My Page'}
                         type="text"
@@ -269,12 +354,13 @@ export default function NavBar(props) {
                       </label>
                       <input
                         ref={newRouteRef}
-                        className={'form-control' + (newPageRoute ? isValidRoute(newPageRoute) ? ' is-valid' : ' is-invalid' : '')}
+                        className={'form-control' + (newPageRoute?.length > 0 ? isValidRoute(newPageRoute) ? ' is-valid' : ' is-invalid' : '')}
                         id={'PageRoute'}
                         name={'PageRoute'}
                         placeholder={'/mypage'}
                         required={true}
                         type="text"
+                        value={newPageRoute}
                         style={{fontSize: '12pt'}}
                         onChange={(e) => {
                           setNewPageRoute(e.target.value)
@@ -308,15 +394,19 @@ export default function NavBar(props) {
                   </button>
                 </ModalFooter>
               </Modal>
-              <button
-                style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
-                className={`btn btn-sm border border-light text-light`}
+              <Button
+                style={{border: 'none', boxShadow: 'none', margin: '0 0 0 10px', padding: '0 3px', zIndex: 200}}
+                className={`border border-secondary btn-light`}
                 type="button"
+                variant={'secondary'}
+                size={'sm'}
                 aria-expanded="false"
                 onClick={() => {
+                  setNewPageTitle(null);
+                  setNewPageRoute(null);
                   setShowNewPage(true);
                 }}
-              ><BsPlus/></button>
+              ><BsPlus/></Button>
             </>
           )}
         </Navbar.Collapse>

@@ -16,7 +16,7 @@ export default function PageFields() {
   const {insertOrUpdatePage, insertOrUpdatePageSection, deletePage} = useRestApi();
   const {canEdit} = useEdit();
   const {pageData, setPageData, setSectionData} = usePageContext();
-  const {updateOutlineData, deletePageFromOutline} = useSiteContext()
+  const {outline} = useSiteContext()
   const [edits, setEdits] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ export default function PageFields() {
       console.debug(`Updated page.`);
       setEdits({})
       setPageData(data);
-      updateOutlineData(data);
+      outline.updatePage(data);
     }).catch((error) => {
       console.error(`Error updating page.`, error);
     });
@@ -91,7 +91,7 @@ export default function PageFields() {
       .then(() => {
         console.debug(`Deleted page.`);
         navigate('/');
-        deletePageFromOutline(pageData.PageID);
+        outline.deletePage(pageData.PageID);
         setCollapsed(true);
       })
       .catch(e => console.error(`Error deleting page.`, e));
@@ -104,10 +104,10 @@ export default function PageFields() {
     <>{canEdit && (
       <div className="accordion" style={{width: "100%", position: "relative", minHeight: '20px'}}>
         <Button
-          className="accordion-button collapsed bg-transparent border-0 shadow-none"
+          className="accordion-button collapsed bg-transparent border-none shadow-none"
           data-bs-toggle="collapse"
           data-bs-target="#PageFields"
-          style={{padding: '8px', position: 'absolute', top: -25, right: 0}}
+          style={{padding: '2px 8px 0 0', position: 'absolute', top: 0, right: 0}}
           onClick={()=>setCollapsed(!collapsed)}
         />
         <div

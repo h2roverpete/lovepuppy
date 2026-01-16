@@ -19,7 +19,7 @@ export const SiteContext = createContext({
   error: null,
   setError: null,
   login: false,
-  getChildren: null,
+  getChildren: (pageId, showHidden) => console.error(`getChildren() not defined.`),
   updateOutlineData: (data) => console.error(`updateOutlineData() not defined.`),
 });
 
@@ -150,7 +150,6 @@ export default function Site(props) {
    * @param {PageData} pageData
    */
   function updateOutlineData(pageData) {
-    console.debug(`Update outline data for page ${pageData.PageID}`)
     if (outlineData) {
       const newOutlineData = [];
       outlineData.map((item) => {
@@ -167,7 +166,6 @@ export default function Site(props) {
   }
 
   function deletePageFromOutline(pageId) {
-    console.debug(`Delete page ${pageId} from outline.`)
     if (outlineData) {
       const newOutlineData = [];
       outlineData.map((item) => {
@@ -188,6 +186,72 @@ export default function Site(props) {
     }
   }
 
+  function movePageBefore(pageData, beforePageData) {
+    console.debug(`Move page '${pageData.PageTitle} (${pageData.ParentID},${pageData.OutlineSeq})' before '${beforePageData.PageTitle} (${beforePageData.ParentID},${beforePageData.OutlineSeq})'`);
+    const newOutlineData = outlineData.map((item) => {
+      if (item.PageID === pageData.PageID) {
+        const changedItem = {...item};
+        changedItem.OutlineSeq = beforePageData.OutlineSeq;
+        changedItem.ParentID = beforePageData.ParentID;
+        return changedItem;
+      } else if (item.ParentID === beforePageData.ParentID && item.OutlineSeq >= beforePageData.OutlineSeq) {
+        // increment outline sequence
+        const changedItem = {...item};
+        changedItem.OutlineSeq++;
+        return changedItem;
+      } else {
+        // no change
+        return item;
+      }
+    });
+    newOutlineData.sort((a, b) => a.OutlineSeq - b.OutlineSeq);
+    setOutlineData(newOutlineData);
+  }
+
+  function movePageAfter(pageData, afterPageData) {
+    console.debug(`Move page '${pageData.PageTitle} (${pageData.ParentID},${pageData.OutlineSeq})' after '${afterPageData.PageTitle} (${afterPageData.ParentID},${afterPageData.OutlineSeq})'`);
+    const newOutlineData = outlineData.map((item) => {
+      if (item.PageID === pageData.PageID) {
+        const changedItem = {...item};
+        changedItem.OutlineSeq = afterPageData.OutlineSeq + 1;
+        changedItem.ParentID = afterPageData.ParentID;
+        return changedItem;
+      } else if (item.ParentID === afterPageData.ParentID && item.OutlineSeq > afterPageData.OutlineSeq) {
+        // increment outline sequence
+        const changedItem = {...item};
+        changedItem.OutlineSeq++;
+        return changedItem;
+      } else {
+        // no change
+        return item;
+      }
+    });
+    newOutlineData.sort((a, b) => a.OutlineSeq - b.OutlineSeq);
+    setOutlineData(newOutlineData);
+  }
+
+  function makeChildOf(pageData, parentPageData) {
+    console.debug(`Make page '${pageData.PageTitle} (${pageData.ParentID},${pageData.OutlineSeq})' child of '${parentPageData.PageTitle} (${parentPageData.ParentID},${parentPageData.OutlineSeq})'`);
+    const newOutlineData = outlineData.map((item) => {
+      if (item.PageID === pageData.PageID) {
+        const changedItem = {...item};
+        changedItem.OutlineSeq = 1;
+        changedItem.ParentID = parentPageData.PageID;
+        return changedItem;
+      } else if (item.ParentID === parentPageData.ParentID) {
+        // increment outline sequence
+        const changedItem = {...item};
+        changedItem.OutlineSeq++;
+        return changedItem;
+      } else {
+        // no change
+        return item;
+      }
+    });
+    newOutlineData.sort((a, b) => a.OutlineSeq - b.OutlineSeq);
+    setOutlineData(newOutlineData);
+  }
+
   // provide context to children
   return (
     <div className="Site" data-testid="Site">
@@ -195,12 +259,17 @@ export default function Site(props) {
         value={{
           siteData: siteData,
           outlineData: outlineData,
+          outline: {
+            deletePage: deletePageFromOutline,
+            addPage: addPageToOutline,
+            movePageBefore: movePageBefore,
+            movePageAfter: movePageAfter,
+            makeChildOf: makeChildOf,
+            updatePage: updateOutlineData,
+          },
           error: error,
           setError: setError,
-          getChildren: getChildren,
-          updateOutlineData: updateOutlineData,
-          deletePageFromOutline: deletePageFromOutline,
-          addPageToOutline: addPageToOutline,
+          getChildren: getChildren
         }}
       >
         <Routes>
