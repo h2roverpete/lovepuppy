@@ -3,7 +3,7 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useEdit} from "../editor/EditProvider";
 import {BsPencil} from "react-icons/bs";
-import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
+import {Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
 import {DropState} from "../editor/FileDropTarget";
@@ -251,6 +251,7 @@ function PageSection({pageSectionData}) {
   return (
     <>
       <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+        <ModalHeader><h5>Delete Section</h5></ModalHeader>
         <ModalBody>Are you sure you want to delete this section? This action cannot be undone.</ModalBody>
         <ModalFooter>
           <button className={'btn btn-sm btn-primary'} onClick={() => {
