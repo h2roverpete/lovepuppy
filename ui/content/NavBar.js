@@ -331,9 +331,10 @@ export default function NavBar(props) {
                       </label>
                       <input
                         ref={newTitleRef}
-                        className={'form-control' + (newPageTitle ? isValidTitle(newPageTitle) ? ' is-valid' : ' is-invalid' : '')}
+                        className={'form-control' + (newPageTitle?.length > 0 ? isValidTitle(newPageTitle) ? ' is-valid' : ' is-invalid' : '')}
                         id={'PageTitle'}
                         name={'PageTitle'}
+                        value={newPageTitle}
                         required={true}
                         placeholder={'My Page'}
                         type="text"
@@ -353,12 +354,13 @@ export default function NavBar(props) {
                       </label>
                       <input
                         ref={newRouteRef}
-                        className={'form-control' + (newPageRoute ? isValidRoute(newPageRoute) ? ' is-valid' : ' is-invalid' : '')}
+                        className={'form-control' + (newPageRoute?.length > 0 ? isValidRoute(newPageRoute) ? ' is-valid' : ' is-invalid' : '')}
                         id={'PageRoute'}
                         name={'PageRoute'}
                         placeholder={'/mypage'}
                         required={true}
                         type="text"
+                        value={newPageRoute}
                         style={{fontSize: '12pt'}}
                         onChange={(e) => {
                           setNewPageRoute(e.target.value)
@@ -393,11 +395,13 @@ export default function NavBar(props) {
                 </ModalFooter>
               </Modal>
               <button
-                style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
-                className={`btn btn-sm border border-light text-light`}
+                style={{border: 'none', boxShadow: 'none', margin: '0 0 0 10px', padding: '0 3px', zIndex: 200}}
+                className={`btn btn-sm border btn-light`}
                 type="button"
                 aria-expanded="false"
                 onClick={() => {
+                  setNewPageTitle(null);
+                  setNewPageRoute(null);
                   setShowNewPage(true);
                 }}
               ><BsPlus/></button>

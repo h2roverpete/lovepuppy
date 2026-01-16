@@ -141,7 +141,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
             >
               <button
                 style={{zIndex: 200, border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-                className={`btn btn-sm border border-secondary text-dark bg-white`}
+                className={`btn btn-sm border btn-light`}
                 type="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"

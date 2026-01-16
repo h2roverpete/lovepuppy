@@ -170,13 +170,6 @@ function PageSection({pageSectionData}) {
   }, [sectionImageRef, dropFileRef, canEdit, pageSectionData]);
 
   useEffect(() => {
-    if (sectionImageRef.current && canEdit) {
-      sectionImageRef.current.addEventListener('click', selectImageFile);
-      sectionImageRef.current.style.cursor = 'pointer';
-    }
-  }, [sectionImageRef, canEdit, pageSectionData]);
-
-  useEffect(() => {
     if (fileInputRef.current && canEdit) {
       fileInputRef.current.addEventListener('change', fileSelectedHandler);
     }
@@ -309,7 +302,7 @@ function PageSection({pageSectionData}) {
           >
             <button
               style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
-              className={`btn btn-sm border border-secondary text-dark bg-white`}
+              className={`btn btn-sm border btn-light`}
               type="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"

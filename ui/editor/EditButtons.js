@@ -26,20 +26,20 @@ export default function EditButtons(props) {
             onClick={() => props.callback(EditAction.CONFIRM)}
             type="button"
             style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-            className={`btn btn-sm border border-primary text-primary bg-white ${!props.editing ? ' d-none' : ''}`}
+            className={`btn btn-sm border text-primary btn-light ${!props.editing ? ' d-none' : ''}`}
           ><BsCheck/></Button>
           <Button
             onClick={() => props.callback(EditAction.CANCEL)}
             type="button"
             style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-            className={`btn btn-sm border border-secondary text-dark bg-white ${!props.editing ? ' d-none' : ''}`}
+            className={`btn btn-sm border btn-light ${!props.editing ? ' d-none' : ''}`}
           ><BsX/></Button>
           {props.showEditButton && !props.editing && (
             <Button
               onClick={() => props.callback(EditAction.EDIT)}
               type="button"
               style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-              className={`btn btn-sm border border-secondary text-dark bg-white`}
+              className={`btn btn-sm border btn-light`}
             ><BsPencil/></Button>
           )}
         </div>
