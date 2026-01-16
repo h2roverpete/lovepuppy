@@ -1,12 +1,12 @@
-import './css/Site.css';
+import './css/App.css';
 
-import {BrowserRouter} from "react-router";
 import Site from "framework/ui/content/Site";
 import MyPage from "./MyPage";
 import React from "react";
+import FrameworkApp from "framework/FrameworkApp";
 
 /**
- * App wraps the Site component in a React Router
+ * Wraps the Site component in the framework dependencies
  * and specifies the component the Site uses to render pages.
  *
  * @returns {JSX.Element}
@@ -14,8 +14,8 @@ import React from "react";
  */
 export default function App() {
   return (
-    <BrowserRouter>
+    <FrameworkApp>
       <Site pageElement={MyPage}/>
-    </BrowserRouter>
+    </FrameworkApp>
   )
 }
