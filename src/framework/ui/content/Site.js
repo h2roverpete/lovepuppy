@@ -1,9 +1,10 @@
-import {createContext, useCallback, useEffect, useMemo, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useNavigate} from "react-router";
-import RestAPI from "../../api/api.mjs";
+import {useRestApi} from "../../api/RestApi";
+import Logout from '../../auth/Logout';
 
 /**
  * @typedef ErrorData
@@ -13,18 +14,18 @@ import RestAPI from "../../api/api.mjs";
  */
 
 export const SiteContext = createContext({
-  restApi: null,
   siteData: null,
   outlineData: null,
   error: null,
   setError: null,
-  getChildren: null
+  login: false,
+  getChildren: null,
+  updateOutlineData: (data) => console.error(`updateOutlineData() not defined.`),
 });
 
 /**
  * @typedef SiteProps
  *
- * @property {RestAPI} restApi            Configured REST API.
  * @property {string} googleId            ID for Google tracking tag.
  * @property {JSX.Element} pageElement    Element to use for displaying page contents.
  * @property {[JSX.Element]} children     Child elements.
@@ -41,26 +42,19 @@ export const SiteContext = createContext({
  */
 export default function Site(props) {
 
-  const restApi = useMemo(() => {
-    return props.restApi ? props.restApi : new RestAPI(
-      parseInt(process.env.REACT_APP_SITE_ID),
-      process.env.REACT_APP_BACKEND_HOST,
-      process.env.REACT_APP_API_KEY
-    );
-  }, [props.restApi]);
-
   useMemo(() => {
     // Google Analytics, if provided.
     if (props.googleId || process.env.REACT_APP_GOOGLE_CLIENT_ID) {
       ReactGA.initialize(props.googleId ? props.googleId : process.env.REACT_APP_GOOGLE_CLIENT_ID);
     }
     return true;
-  },[props.googleId]);
+  }, [props.googleId]);
 
   const [siteData, setSiteData] = useState(null);
   const [outlineData, setOutlineData] = useState(null);
   const [error, __setError__] = useState(null); // use public setter, not __setError__
   const navigate = useNavigate();
+  const {getSite, getSiteOutline} = useRestApi();
 
   /**
    * Display the site in an error state.
@@ -108,7 +102,7 @@ export default function Site(props) {
   useEffect(() => {
     if (!siteData) {
       // load site data
-      restApi?.getSite().then((data) => {
+      getSite().then((data) => {
         console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(error => {
@@ -119,13 +113,13 @@ export default function Site(props) {
         setSiteData(null);
       });
     }
-  }, [restApi, siteData, setError]);
+  }, [getSite, siteData, setError]);
 
   useEffect(() => {
     if (!outlineData) {
       // load site outline
-      restApi?.getSiteOutline().then((data) => {
-        console.debug(`Loaded site ${restApi.siteId} outline.`);
+      getSiteOutline().then((data) => {
+        console.debug(`Loaded site outline.`);
         setOutlineData(data);
       }).catch(error => {
         setError({
@@ -135,7 +129,7 @@ export default function Site(props) {
         setOutlineData(null);
       });
     }
-  }, [restApi, outlineData, setError]);
+  }, [getSiteOutline, outlineData, setError]);
 
   let redirect;
   if (props.redirects && window.location.pathname === '/') {
@@ -151,20 +145,74 @@ export default function Site(props) {
   const params = new URLSearchParams(window.location.search);
   let cfmPageId = parseInt(params.get('pageid'));
 
+  /**
+   * Refresh a page in the site outline.
+   * @param {PageData} pageData
+   */
+  function updateOutlineData(pageData) {
+    console.debug(`Update outline data for page ${pageData.PageID}`)
+    if (outlineData) {
+      const newOutlineData = [];
+      outlineData.map((item) => {
+        newOutlineData.push(item);
+        if (item.PageID === pageData.PageID) {
+          item.PageTitle = pageData.PageTitle;
+          item.NavTitle = pageData.NavTitle;
+          item.PageHidden = pageData.PageHidden;
+        }
+        return item;
+      })
+      setOutlineData(newOutlineData);
+    }
+  }
+
+  function deletePageFromOutline(pageId) {
+    console.debug(`Delete page ${pageId} from outline.`)
+    if (outlineData) {
+      const newOutlineData = [];
+      outlineData.map((item) => {
+        if (item.PageID !== pageId) {
+          newOutlineData.push(item);
+        }
+        return item;
+      })
+      setOutlineData(newOutlineData);
+    }
+  }
+
+  function addPageToOutline(pageData) {
+    console.debug(`Add page ${pageData.PageID} to outline.`)
+    if (outlineData) {
+      const newOutlineData = [...outlineData, pageData];
+      setOutlineData(newOutlineData);
+    }
+  }
+
   // provide context to children
   return (
     <div className="Site" data-testid="Site">
       <SiteContext
         value={{
-          restApi: restApi,
           siteData: siteData,
           outlineData: outlineData,
           error: error,
           setError: setError,
-          getChildren: getChildren
+          getChildren: getChildren,
+          updateOutlineData: updateOutlineData,
+          deletePageFromOutline: deletePageFromOutline,
+          addPageToOutline: addPageToOutline,
         }}
       >
         <Routes>
+          <Route
+            path="/login"
+            element={<props.pageElement login={true}/>
+            }
+          />
+          <Route
+            path="/logout"
+            element={<Logout/>}
+          />
           <>{error && (
             // error page display
             <Route
@@ -219,4 +267,8 @@ export default function Site(props) {
       </SiteContext>
     </div>
   )
+}
+
+export function useSiteContext() {
+  return useContext(SiteContext)
 }

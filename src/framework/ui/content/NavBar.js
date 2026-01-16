@@ -1,9 +1,13 @@
-import {useContext, useRef} from "react";
-import {SiteContext} from "./Site";
-import {PageContext} from "./Page";
+import {useRef, useState} from "react";
+import {useSiteContext} from "./Site";
+import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {Nav, NavDropdown} from "react-bootstrap";
+import {Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
+import {useAuth} from "../../auth/AuthProvider";
+import {useEdit} from "../editor/EditProvider";
+import {BsPlus} from "react-icons/bs";
+import {useRestApi} from "../../api/RestApi";
 
 /**
  * @typedef NavBarProps
@@ -13,6 +17,7 @@ import {useNavigate} from "react-router";
  * @property {string} [icon]            Logo icon for branding. When provided, default brand text is blank.
  * @property {string} [expand]          Bootstrap width boundary to expand/collapse the nav bar, use empty string to prevent collapsing.
  * @property {string} [fixed]           Fix the navbar to a viewport location, i.e. 'top', 'bottom'
+ * @property {boolean} [showLogin]      Show a top level element for logging in?
  */
 
 /**
@@ -24,10 +29,17 @@ import {useNavigate} from "react-router";
  */
 export default function NavBar(props) {
 
-  const {siteData, getChildren} = useContext(SiteContext);
-  const {pageData, breadcrumbs} = useContext(PageContext);
-  const navigator = useNavigate();
+  const {siteData, getChildren, addPageToOutline} = useSiteContext();
+  const {pageData, breadcrumbs} = usePageContext();
+  const navigate = useNavigate();
   const togglerRef = useRef(null);
+  const {token} = useAuth();
+  const {canEdit} = useEdit();
+  const {insertOrUpdatePage} = useRestApi();
+
+  const [showNewPage, setShowNewPage] = useState(false);
+  const [newPageTitle, setNewPageTitle] = useState(null);
+  const [newPageRoute, setNewPageRoute] = useState(null);
 
   function navigateTo(to) {
     if ((togglerRef.current.style.visible || togglerRef.current.style.display !== 'none') && !togglerRef.current.classList.contains("collapsed")) {
@@ -35,7 +47,7 @@ export default function NavBar(props) {
       togglerRef.current.click();
     }
     // react-router navigation
-    navigator(to);
+    navigate(to);
   }
 
   function isInCurrentPath(pageId) {
@@ -95,6 +107,38 @@ export default function NavBar(props) {
     );
   }
 
+  function isValidTitle(title) {
+    return title && title.match[/[a-zA-Z]/] !== null;
+  }
+
+  function isValidRoute(route) {
+    return route && route.match(/^\/[a-z0-9]+$/) !== null;
+  }
+
+  const newTitleRef = useRef(null);
+  const newRouteRef = useRef(null);
+  const newPageHiddenRef = useRef(null);
+
+  function insertNewPage() {
+    const data = {
+      SiteID: siteData.SiteID,
+      ParentID: 0,
+      PageTitle: newPageTitle,
+      PageRoute: newPageRoute,
+      PageHidden: newPageHiddenRef.current.checked
+    }
+    console.debug(`Insert new page...`);
+    insertOrUpdatePage(data)
+      .then((result) => {
+        console.debug(`Page inserted.`);
+        addPageToOutline(result);
+        navigate(result.PageRoute)
+      })
+      .catch((e) => {
+        console.error(`Error inserting new page.`, e);
+      });
+  }
+
   return (
     <Navbar
       expand={props.expand ? props.expand : 'sm'}
@@ -127,7 +171,7 @@ export default function NavBar(props) {
                 data-testid="NavBarBrandIcon"
               />
             )}</>
-            <>{props.brand?.length && (
+            <>{props.brand?.length > 0 && (
               <span
                 className={'NavBarBrandText text-nowrap'}
                 onClick={() => {
@@ -156,7 +200,7 @@ export default function NavBar(props) {
                   <RecursiveDropdown pageData={item}/>
                 ) : (
                   <Nav.Link
-                    onClick={(event) => navigateTo(item.PageRoute)}
+                    onClick={() => navigateTo(item.PageRoute)}
                     className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
                     key={item.PageID}
                     data-testid={`NavItem-${item.PageID}`}
@@ -166,7 +210,115 @@ export default function NavBar(props) {
                 )}
               </div>
             ))}
+            <>{props.showLogin === true && (
+              <>{token ? (
+                <Nav.Link
+                  onClick={() => navigateTo('/logout')}
+                  className={`NavItem text-nowrap`}
+                  key={`Logout`}
+                  data-testid={`NavItem-Logout`}
+                >
+                  Log Out
+                </Nav.Link>
+              ) : (
+                <Nav.Link
+                  onClick={() => navigateTo('/login')}
+                  className={`NavItem text-nowrap`}
+                  key={`Login`}
+                  data-testid={`NavItem-Login`}
+                >
+                  Log In
+                </Nav.Link>
+              )}</>
+            )}</>
           </Nav>
+          {canEdit && (
+            <>
+              <Modal show={showNewPage} onHide={() => setShowNewPage(false)}>
+                <ModalHeader><h5>New Page</h5></ModalHeader>
+                <ModalBody>
+                  <div className="d-flex flex-column">
+                    <div className="d-flex align-items-center text-start mb-2">
+                      <label
+                        htmlFor={'PageTitle'}
+                        className='col-3 col-sm-2 text-nowrap'
+                      >
+                        Title
+                      </label>
+                      <input
+                        ref={newTitleRef}
+                        className={'form-control' + (newPageTitle ? isValidTitle(newPageTitle) ? ' is-valid' : ' is-invalid' : '')}
+                        id={'PageTitle'}
+                        name={'PageTitle'}
+                        required={true}
+                        placeholder={'My Page'}
+                        type="text"
+                        style={{fontSize: '12pt'}}
+                        onChange={(e) => {
+                          setNewPageTitle(e.target.value)
+                        }}
+                      />
+                    </div>
+
+                    <div className="d-flex align-items-center text-start">
+                      <label
+                        htmlFor={'PageRoute'}
+                        className='col-3 col-sm-2 text-nowrap'
+                      >
+                        Route
+                      </label>
+                      <input
+                        ref={newRouteRef}
+                        className={'form-control' + (newPageRoute ? isValidRoute(newPageRoute) ? ' is-valid' : ' is-invalid' : '')}
+                        id={'PageRoute'}
+                        name={'PageRoute'}
+                        placeholder={'/mypage'}
+                        required={true}
+                        type="text"
+                        style={{fontSize: '12pt'}}
+                        onChange={(e) => {
+                          setNewPageRoute(e.target.value)
+                        }}
+                      />
+                    </div>
+                    <div className="d-flex align-items-center text-start">
+                      <label className={'col-2'} htmlFor={'PageHidden'}></label>
+                      <input
+                        type="checkbox"
+                        id={'PageHidden'}
+                        ref={newPageHiddenRef}
+                        className={'me-1'}
+                      />
+                      <label className={'col-form-label'} htmlFor={'PageHidden'}>Hide page from site navigation</label>
+                    </div>
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <button
+                    className={'btn btn-sm btn-primary'}
+                    disabled={!(isValidRoute(newPageRoute) && isValidTitle(newPageTitle))}
+                    onClick={() => {
+                      insertNewPage();
+                      setShowNewPage(false);
+                    }}
+                  >
+                    Create New Page
+                  </button>
+                  <button className={'btn btn-sm btn-secondary'} onClick={() => setShowNewPage(false)}>Cancel
+                  </button>
+                </ModalFooter>
+              </Modal>
+              <button
+                style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
+                className={`btn btn-sm border border-light text-light`}
+                type="button"
+                aria-expanded="false"
+                onClick={() => {
+                  setShowNewPage(true);
+                }}
+              ><BsPlus/></button>
+            </>
+          )}
         </Navbar.Collapse>
       </div>
     </Navbar>

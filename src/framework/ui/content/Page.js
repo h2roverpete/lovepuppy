@@ -1,5 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
+import {useRestApi} from "../../api/RestApi";
 
 export const PageContext = createContext(
   {
@@ -8,6 +9,10 @@ export const PageContext = createContext(
     sectionData: null,
     breadcrumbs: null,
     error: null,
+    login: false,
+    setPageData: (data) => console.error(`setPageData() not defined.`),
+    setSectionData: (data) => console.error(`setSectionData() not defined.`),
+    updatePageSection: (data) => console.error(`updatePageSection() not defined.`),
   });
 
 /**
@@ -16,6 +21,7 @@ export const PageContext = createContext(
  * @property {[JSX.Element]} children   Child elements.
  * @property {number} [pageId]          Specific page ID to display.
  * @property {ErrorData} [error]        Error information to display.
+ * @property {boolean} [login]          User is logging in or out.
  */
 
 /**
@@ -29,11 +35,12 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, restApi, error, setError} = useContext(SiteContext);
+  const {outlineData, error, setError} = useContext(SiteContext);
   const [pageId, __setPageId__] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
+  const {getPage, getPageSections} = useRestApi();
 
   let errorData;
   if (error) {
@@ -49,25 +56,30 @@ export default function Page(props) {
     setPageId(props.pageId);
   }
 
+  if (props.login && pageId !== 0) {
+    // clear page contents if login is true
+    setPageId(0);
+  }
+
   useEffect(() => {
     if (pageId && !pageData) {
       // load page data
-      restApi?.getPage(pageId).then((data) => {
+      getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
         setPageData(data); // update state
       })
     }
-  }, [restApi, pageData, pageId]);
+  }, [getPage, pageData, pageId]);
 
   useEffect(() => {
     if (pageId && !sectionData) {
       // load page sections
-      restApi?.getPageSections(pageId).then((data) => {
+      getPageSections(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} sections.`);
         setSectionData(data); // update state
       })
     }
-  }, [restApi, pageData, pageId, sectionData]);
+  }, [getPageSections, pageId, sectionData]);
 
   useEffect(() => {
     if (pageData && outlineData && !breadcrumbs) {
@@ -75,6 +87,23 @@ export default function Page(props) {
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
   }, [pageData, outlineData, breadcrumbs])
+
+  /**
+   * Update a page section that has been edited.
+   * @param newData {PageSectionData} Data for section that was updated.
+   */
+  function updatePageSection(newData) {
+    for (let i = 0; i < sectionData.length; i++) {
+      if (sectionData[i].PageSectionID === newData.PageSectionID) {
+        console.debug(`Updating data for page section ${newData.PageSectionID}.`);
+        // need new array to trigger updates
+        const newSectionData = [...sectionData];
+        newSectionData[i] = newData;
+        setSectionData(newSectionData);
+        break;
+      }
+    }
+  }
 
   /**
    * Function for changing page ID.
@@ -100,7 +129,11 @@ export default function Page(props) {
           pageData: pageData,
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
+          login: props.login === true,
           error: errorData,
+          setPageData: setPageData,
+          setSectionData: setSectionData,
+          updatePageSection: updatePageSection
         }}
       >
         {props.children}
@@ -128,4 +161,8 @@ function buildBreadcrumbs(outlineData, parentId) {
   return breadcrumbs.sort((a, b) => {
     return b?.OutlineSeq - a?.OutlineSeq
   });
+}
+
+export function usePageContext() {
+  return useContext(PageContext)
 }

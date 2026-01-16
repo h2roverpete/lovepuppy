@@ -1,8 +1,8 @@
 import {useContext, useEffect, useState} from "react";
 import {PageContext} from "../content/Page";
-import {SiteContext} from "../content/Site";
 import "react-image-gallery/styles/css/image-gallery.css";
 import ImageGallery from "react-image-gallery";
+import {useRestApi} from "../../api/RestApi";
 
 /**
  * @typedef GalleryProps
@@ -20,31 +20,31 @@ import ImageGallery from "react-image-gallery";
 export default function Gallery(props) {
 
   const {pageData} = useContext(PageContext);
-  const {restApi} = useContext(SiteContext);
   const [galleryConfig, setGalleryConfig] = useState(null);
   const [galleryPhotos, setGalleryPhotos] = useState(null);
+  const {getGallery, getPhotos} = useRestApi();
 
   useEffect(() => {
-    if (restApi && props.galleryId && pageData?.PageID === props.pageId && !galleryConfig) {
-      restApi.getGallery(props.galleryId).then((data) => {
+    if (props.galleryId && pageData?.PageID === props.pageId && !galleryConfig) {
+      getGallery(props.galleryId).then((data) => {
         console.debug(`Loaded gallery ${props.galleryId}.`);
         setGalleryConfig(data);
       }).catch(error => {
         console.error(`Error loading gallery ${props.galleryId}: ${error}`);
       })
     }
-  }, [restApi, props.galleryId, props.pageId, pageData?.PageID, galleryConfig]);
+  }, [getGallery, props.galleryId, props.pageId, pageData?.PageID, galleryConfig]);
 
   useEffect(() => {
-    if (restApi && props.galleryId && pageData?.PageID === props.pageId && !galleryPhotos) {
-      restApi.getPhotos(props.galleryId).then((data) => {
+    if (props.galleryId && pageData?.PageID === props.pageId && !galleryPhotos) {
+      getPhotos(props.galleryId).then((data) => {
         console.debug(`Loaded ${data.length} photos for gallery ${props.galleryId}.`);
         setGalleryPhotos(data);
       }).catch(error => {
         console.error(`Error loading photos for gallery ${props.galleryId}: ${error}`);
       })
     }
-  }, [restApi, props.galleryId, props.pageId, pageData?.PageID, galleryPhotos]);
+  }, [getPhotos, props.galleryId, props.pageId, pageData?.PageID, galleryPhotos]);
 
   const images = [];
   if (galleryPhotos) {

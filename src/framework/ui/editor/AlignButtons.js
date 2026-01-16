@@ -1,0 +1,80 @@
+import {Button} from "react-bootstrap";
+import {BsTextCenter, BsTextLeft, BsTextRight} from "react-icons/bs";
+import {useEffect, useState} from "react";
+
+/**
+ * @typedef AlignButtonProps
+ * @property {boolean} editable
+ * @property {boolean} editing
+ * @property {callback} callback
+ * @property {string} align
+ * @property {object} style
+ */
+
+/**
+ * Display left/center/right alignment buttons when editable.
+ *
+ * @param {AlignButtonProps} props
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function AlignButtons(props) {
+  const [align, setAlign] = useState(null);
+  useEffect(() => {
+    if (align === null && props.align) {
+      setAlign(props.align);
+    }
+  }, [align, props.align]);
+  return (
+    <>
+      {props.editing && (
+        <div className={'btn-group btn-group-toggle'} style={props.style}>
+          <Button
+            onClick={() => {
+              setAlign('left');
+              props.callback(AlignAction.ALIGN_LEFT);
+            }}
+            name={'align'}
+            type="radio"
+            checked={align==='left'}
+            style={{border: 'none', boxShadow: 'none', margin: '2px 1px 2px 2px', padding: '0 5px'}}
+            className={`btn btn-sm border border-secondary ${align === 'left' ? 'text-light' : ' text-dark bg-white'}`}
+          ><BsTextLeft/></Button>
+          <Button
+            onClick={() => {
+              setAlign('center');
+              props.callback(AlignAction.ALIGN_CENTER);
+            }}
+            type="radio"
+            name={'align'}
+            checked={align==='center'}
+            style={{border: 'none', boxShadow: 'none', margin: '2px -2px 2px -2px', padding: '0 5px'}}
+            className={`btn btn-sm border border-secondary ${align === 'center' ? ' text-light' : ' text-dark bg-white'}`}
+          ><BsTextCenter/></Button>
+          <Button
+            onClick={() => {
+              setAlign('right');
+              props.callback(AlignAction.ALIGN_RIGHT);
+            }}
+            type="radio"
+            name={'align'}
+            checked={align==='right'}
+            style={{border: 'none', boxShadow: 'none', margin: '2px 2px 2px 1px', padding: '0 5px'}}
+            className={`btn btn-sm border border-secondary  ${align === 'right' ? ' text-light' : ' text-dark bg-white'}`}
+          ><BsTextRight/></Button>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Actions for callback
+ *
+ * @enum {string}
+ */
+export const AlignAction = {
+  ALIGN_LEFT: "alignLeft",
+  ALIGN_RIGHT: "alignRight",
+  ALIGN_CENTER: "alignCenter",
+}

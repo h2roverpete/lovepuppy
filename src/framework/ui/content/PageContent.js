@@ -1,3 +1,5 @@
+import PageFields from "../editor/PageFields";
+
 /**
  * Element to show page content
  *
@@ -10,6 +12,7 @@ export default function PageContent({children}) {
 
   return (
     <div className="PageContent container-fluid" data-testid="PageContent">
+      <PageFields/>
       {children}
     </div>
   )
