@@ -36,9 +36,11 @@ export default function AlignButtons(props) {
             }}
             name={'align'}
             type="radio"
+            variant={'secondary'}
+            size={'sm'}
             checked={align==='left'}
             style={{border: 'none', boxShadow: 'none', margin: '2px 1px 2px 2px', padding: '0 5px'}}
-            className={`btn btn-sm border btn-light ${align === 'left' ? 'text-light bg-primary' : ''}`}
+            className={`border border-secondary btn-light ${align === 'left' ? 'text-light bg-primary' : ''}`}
           ><BsTextLeft/></Button>
           <Button
             onClick={() => {
@@ -46,10 +48,12 @@ export default function AlignButtons(props) {
               props.callback(AlignAction.ALIGN_CENTER);
             }}
             type="radio"
+            variant={'secondary'}
+            size={'sm'}
             name={'align'}
             checked={align==='center'}
             style={{border: 'none', boxShadow: 'none', margin: '2px -2px 2px -2px', padding: '0 5px'}}
-            className={`btn btn-sm border btn-light ${align === 'center' ? 'text-light bg-primary' : ''}`}
+            className={`border border-secondary btn-light ${align === 'center' ? 'text-light bg-primary' : ''}`}
           ><BsTextCenter/></Button>
           <Button
             onClick={() => {
@@ -57,10 +61,12 @@ export default function AlignButtons(props) {
               props.callback(AlignAction.ALIGN_RIGHT);
             }}
             type="radio"
+            variant={'secondary'}
+            size={'sm'}
             name={'align'}
             checked={align==='right'}
             style={{border: 'none', boxShadow: 'none', margin: '2px 2px 2px 1px', padding: '0 5px'}}
-            className={`btn btn-sm border btn-light  ${align === 'right' ? 'text-light bg-primary' : ''}`}
+            className={`border border-secondary btn-light  ${align === 'right' ? 'text-light bg-primary' : ''}`}
           ><BsTextRight/></Button>
         </div>
       )}

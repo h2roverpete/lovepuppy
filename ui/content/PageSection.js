@@ -6,7 +6,7 @@ import {BsPencil} from "react-icons/bs";
 import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
-import {DropState} from "./FileDropTarget";
+import {DropState} from "../editor/FileDropTarget";
 
 /**
  * Generate a page section
@@ -308,8 +308,8 @@ function PageSection({pageSectionData}) {
               aria-expanded="false"
             ><BsPencil/></button>
             <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
-              <span className="dropdown-item" onClick={() => setEditingTitle(true)}>Edit Section Title</span>
-              <span className="dropdown-item" onClick={() => setEditingText(true)}>Edit Section Text</span>
+              <span className="dropdown-item" onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
+              <span className="dropdown-item" onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Section Text`}</span>
               {pageSectionData.PageSectionSeq > 1 && (
                 <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
               )}

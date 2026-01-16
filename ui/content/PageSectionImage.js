@@ -3,7 +3,7 @@ import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "./Page";
 import {useEdit} from "../editor/EditProvider";
 import {useSiteContext} from "./Site";
-import FileDropTarget from "./FileDropTarget";
+import FileDropTarget from "../editor/FileDropTarget";
 
 /**
  * Insert an editable page section image.

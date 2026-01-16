@@ -104,10 +104,10 @@ export default function PageFields() {
     <>{canEdit && (
       <div className="accordion" style={{width: "100%", position: "relative", minHeight: '20px'}}>
         <Button
-          className="accordion-button collapsed bg-transparent border-0 shadow-none"
+          className="accordion-button collapsed bg-transparent border-none shadow-none"
           data-bs-toggle="collapse"
           data-bs-target="#PageFields"
-          style={{padding: '8px', position: 'absolute', top: -25, right: 0}}
+          style={{padding: '2px 8px 0 0', position: 'absolute', top: 0, right: 0}}
           onClick={()=>setCollapsed(!collapsed)}
         />
         <div

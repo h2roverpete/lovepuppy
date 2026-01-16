@@ -24,22 +24,25 @@ export default function EditButtons(props) {
         <div style={{whiteSpace: "nowrap", position: 'absolute', top: '2px', right: '2px'}}>
           <Button
             onClick={() => props.callback(EditAction.CONFIRM)}
-            type="button"
+            variant={'secondary'}
+            size={'sm'}
             style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-            className={`btn btn-sm border text-primary btn-light ${!props.editing ? ' d-none' : ''}`}
+            className={`border text-primary border-primary btn-light ${!props.editing ? ' d-none' : ''}`}
           ><BsCheck/></Button>
           <Button
             onClick={() => props.callback(EditAction.CANCEL)}
-            type="button"
+            variant={'secondary'}
+            size={'sm'}
             style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-            className={`btn btn-sm border btn-light ${!props.editing ? ' d-none' : ''}`}
+            className={`border border-danger text-danger btn-light ${!props.editing ? ' d-none' : ''}`}
           ><BsX/></Button>
           {props.showEditButton && !props.editing && (
             <Button
               onClick={() => props.callback(EditAction.EDIT)}
-              type="button"
+              variant={'secondary'}
+              size={'sm'}
               style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-              className={`btn btn-sm border btn-light`}
+              className={`border btn-light`}
             ><BsPencil/></Button>
           )}
         </div>

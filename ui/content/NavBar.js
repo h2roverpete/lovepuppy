@@ -2,7 +2,7 @@ import {useRef, useState} from "react";
 import {useSiteContext} from "./Site";
 import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavDropdown} from "react-bootstrap";
+import {Button, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
@@ -394,17 +394,19 @@ export default function NavBar(props) {
                   </button>
                 </ModalFooter>
               </Modal>
-              <button
+              <Button
                 style={{border: 'none', boxShadow: 'none', margin: '0 0 0 10px', padding: '0 3px', zIndex: 200}}
-                className={`btn btn-sm border btn-light`}
+                className={`border border-secondary btn-light`}
                 type="button"
+                variant={'secondary'}
+                size={'sm'}
                 aria-expanded="false"
                 onClick={() => {
                   setNewPageTitle(null);
                   setNewPageRoute(null);
                   setShowNewPage(true);
                 }}
-              ><BsPlus/></button>
+              ><BsPlus/></Button>
             </>
           )}
         </Navbar.Collapse>
