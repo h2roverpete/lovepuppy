@@ -8,6 +8,7 @@ import {useNavigate} from "react-router";
 import {Permission, useAuth} from "./AuthProvider";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
+import {Button} from "react-bootstrap";
 
 /**
  * @typedef LoginProps
@@ -127,7 +128,7 @@ const Login = (props) => {
             required={true}
           />
           <div className="form-group mt-4">
-            <button className="btn btn-primary">Log In</button>
+            <Button type="submit" variant="primary">Log In</Button>
           </div>
         </form>
       </div>

@@ -380,8 +380,10 @@ export default function NavBar(props) {
                   </div>
                 </ModalBody>
                 <ModalFooter>
-                  <button
-                    className={'btn btn-sm btn-primary'}
+                  <Button variant={"secondary"} onClick={() => setShowNewPage(false)}>Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
                     disabled={!(isValidRoute(newPageRoute) && isValidTitle(newPageTitle))}
                     onClick={() => {
                       insertNewPage();
@@ -389,9 +391,7 @@ export default function NavBar(props) {
                     }}
                   >
                     Create New Page
-                  </button>
-                  <button className={'btn btn-sm btn-secondary'} onClick={() => setShowNewPage(false)}>Cancel
-                  </button>
+                  </Button>
                 </ModalFooter>
               </Modal>
               <Button

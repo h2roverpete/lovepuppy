@@ -1,9 +1,10 @@
-import {useEffect, useState, memo, useContext} from "react";
+import {useEffect, useState, memo, useContext, useRef} from "react";
 import GuestFields from "./GuestFields";
 import GuestFeedbackFields from "./GuestFeedbackFields";
 import {PageContext} from "../content/Page";
 import '../forms/Forms.css'
 import {useRestApi} from "../../api/RestApi";
+import {Button} from "react-bootstrap";
 
 /**
  * @typedef GuestBookProps
@@ -35,6 +36,8 @@ function GuestBook(props) {
 
   // has form been submitted?
   const [submitted, setSubmitted] = useState(false);
+
+  const submitButtonRef = useRef(null);
 
   // load guest book configuration when initialized
   useEffect(() => {
@@ -136,30 +139,35 @@ function GuestBook(props) {
     })
   }
 
+  function isDataValid() {
+    return (
+      guestData?.FirstName?.length > 0 &&
+      guestData?.LastName?.length > 0 &&
+      guestData?.Email?.length > 0 && guestData?.Email?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) !== null
+    )
+  }
+
   return (
     <> {props.pageId === pageData?.PageID && guestBookConfig && (
       <div className="guestbook">
         {submitted ? (
           <>
             <p dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage}}/>
-            <button
-              className="btn btn-lg btn-primary"
+            <Button
+              variant="primary"
               onClick={() => {
                 // clear submit flag and feedback ID to submit again
                 setSubmitted(false);
                 props.onChange?.({guestFeedbackId: 0});
               }}>
               {guestBookConfig.AgainMessage}
-            </button>
+            </Button>
           </>
         ) : (
           <>
             <p dangerouslySetInnerHTML={{__html: guestBookConfig.GuestBookMessage}}/>
             <form
               encType="multipart/form-data"
-              onSubmit={(e) => {
-                handleSubmit(e);
-              }}
               className="needs-validation"
               id="GuestBookForm"
             >
@@ -175,8 +183,14 @@ function GuestBook(props) {
               />
               <div className="form-errors" id="FormErrors"></div>
               <div className="form-group mt-4">
-                <input type="submit" value={guestBookConfig.SubmitButtonName}
-                       className="btn btn-lg btn-primary"/>
+                <Button
+                  variant={'primary'}
+                  disabled={!isDataValid()}
+                  onClick={(e) => handleSubmit(e)}
+                  ref={submitButtonRef}
+                >
+                  {guestBookConfig.SubmitButtonName}
+                </Button>
               </div>
             </form>
           </>
