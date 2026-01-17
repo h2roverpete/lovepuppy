@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from "react";
 import EditButtons, {EditAction} from "./EditButtons";
 import {useEdit} from "./EditProvider";
-import {Modal, ModalBody, ModalFooter} from "react-bootstrap";
+import {Button, Modal, ModalBody, ModalFooter} from "react-bootstrap";
 import AlignButtons, {AlignAction} from "./AlignButtons";
 
 /**
@@ -177,8 +177,8 @@ export default function EditableField(props) {
         <Modal show={showConfirmation} onHide={onHideConfirmation}>
           <ModalBody>Do you want to save your changes?</ModalBody>
           <ModalFooter>
-            <button className={'btn btn-sm btn-primary'} onClick={() => commitEdits()}>Save</button>
-            <button className={'btn btn-sm btn-secondary'} onClick={() => cancelEditing()}>Cancel</button>
+            <Button variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
+            <Button variant="primary" onClick={() => commitEdits()}>Save</Button>
           </ModalFooter>
         </Modal>
 

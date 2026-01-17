@@ -4,6 +4,7 @@ import {usePageContext} from "./Page";
 import {useEdit} from "../editor/EditProvider";
 import {useSiteContext} from "./Site";
 import FileDropTarget from "../editor/FileDropTarget";
+import {Button} from "react-bootstrap";
 
 /**
  * Insert an editable page section image.
@@ -139,13 +140,15 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
               className="dropdown"
               style={{position: 'absolute', bottom: '0', right: '2px', zIndex: 100}}
             >
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 style={{zIndex: 200, border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px'}}
-                className={`btn btn-sm border btn-light`}
+                className={`border btn-light`}
                 type="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
-              ><BsArrowsMove/></button>
+              ><BsArrowsMove/></Button>
               <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
                 {pageSectionData.ImageAlign !== 'left' && (
                   <span className="dropdown-item" onClick={() => setImageAlign('left')}>Align Left</span>)}

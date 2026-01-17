@@ -2,7 +2,7 @@ import React from 'react';
 import {useCookies} from "react-cookie";
 import {useContext, useMemo} from "react";
 import axios from "axios";
-import {AuthContext, useAuth} from "../auth/AuthProvider";
+import {useAuth} from "../auth/AuthProvider";
 
 export const RestApiContext = React.createContext({});
 
