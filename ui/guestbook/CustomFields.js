@@ -1,5 +1,6 @@
 import DatePicker from "react-datepicker";
 import SelectField from "../forms/SelectField";
+import {useGuestBook} from "./GuestBook";
 
 /**
  * Guest Book custom fields.
@@ -10,42 +11,13 @@ import SelectField from "../forms/SelectField";
  * @returns {JSX.Element}
  * @constructor
  */
-function CustomFields({guestBookConfig, feedbackData, onChange}) {
+function CustomFields({feedbackData, onChange}) {
 
   // build custom field information
-  const customFields = [];
-  if (guestBookConfig) {
-    for (let i = 0; i <= 8; i++) {
-      if (guestBookConfig[`Custom${i}Label`] && guestBookConfig[`Custom${i}Type`]) {
-        let options;
-        if (guestBookConfig[`Custom${i}Options`]) {
-          options = []
-          const optionValues = guestBookConfig[`Custom${i}Options`].split(",");
-          optionValues.map((option) => {
-            options.push({
-              value: option,
-              label: option
-            })
-            return option;
-          })
-        }
-        customFields.push({
-          seq: i,
-          label: guestBookConfig[`Custom${i}Label`],
-          type: guestBookConfig[`Custom${i}Type`],
-          userEditable: guestBookConfig[`Custom${i}UserEditable`],
-          required: guestBookConfig[`Custom${i}Required`],
-          options: options,
-          emptyLabel: guestBookConfig[`Custom${i}EmptyLabel`],
-          value: feedbackData?.[`Custom${i}`]
-        })
-      }
-    }
-  }
-
+  const {customFields} = useGuestBook();
   return (
     <>
-      {customFields.map(field => (
+      {customFields?.map(field => (
         <div key={field.seq} className={'form-group col-xs-12 col-sm-6' + (field.seq === 1 ? " mt-4" : " mt-2")}>
           <label
             className={"form-label" + (field.required ? ' required' : '')}
@@ -95,7 +67,6 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
       ))}
     </>
   )
-
 }
 
 export default CustomFields;

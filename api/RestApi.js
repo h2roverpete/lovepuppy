@@ -117,6 +117,11 @@ export default function RestApi(props) {
     return response.data;
   }
 
+  async function insertOrUpdateGuestBook(data) {
+    const response = await axios.post(`${host}/api/v1/guestbook`, data);
+    return response.data;
+  }
+
   async function getGuest(guestId) {
     const response = await axios.get(`${host}/api/v1/guestbook/guest/${guestId}`);
     return response.data;
@@ -215,6 +220,7 @@ export default function RestApi(props) {
       getSiteOutline: getSiteOutline,
       getSitemap: getSitemap,
       getGuestBook: getGuestBook,
+      insertOrUpdateGuestBook: insertOrUpdateGuestBook,
       getGuest: getGuest,
       insertOrUpdateGuest: insertOrUpdateGuest,
       getGuestFeedback: getGuestFeedback,

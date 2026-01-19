@@ -30,12 +30,7 @@ for (const data of stateList) {
 function StateField(props) {
   return (
     <SelectField
-      name={props.name}
-      value={props.value}
-      className={props.className}
-      required={props.required}
-      prompt={props.prompt}
-      onChange={props.onChange}
+      {...props}
       options={options}
     />
   )
