@@ -1,8 +1,8 @@
 import {useGuestBook} from "./GuestBook";
 import {useEdit} from "../editor/EditProvider";
 import {
-  Accordion, AccordionBody,
-  AccordionButton, AccordionHeader, AccordionItem,
+  Accordion,
+  AccordionButton, AccordionItem,
   Button, Col,
   Form,
   Row

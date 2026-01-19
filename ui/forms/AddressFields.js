@@ -1,6 +1,6 @@
 import CountryField from "./CountryField";
 import StateField from "./StateField";
-import {FormControl, Row, Col, Form, FormLabel} from "react-bootstrap";
+import {FormControl, Row, Col, FormLabel} from "react-bootstrap";
 
 /**
  * @class AddressData

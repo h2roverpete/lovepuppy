@@ -5,7 +5,6 @@ import {PageContext} from "../content/Page";
 import '../forms/Forms.css'
 import {useRestApi} from "../../api/RestApi";
 import {Button} from "react-bootstrap";
-import {useEdit} from "../editor/EditProvider";
 import GuestBookConfig from "./GuestBookConfig";
 import {isValidEmail} from "../forms/EmailField";
 
