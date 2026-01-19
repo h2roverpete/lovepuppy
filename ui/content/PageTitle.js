@@ -7,6 +7,7 @@ import {useSiteContext} from "./Site";
 
 /**
  * @typedef PageTitleProps
+ * @property alwaysShow {Boolean}
  */
 
 /**
@@ -77,7 +78,7 @@ export default function PageTitle(props) {
         alwaysShow={props.alwaysShow === true}
       />
     ) : (
-      <>{(pageData?.PageTitle.length || error?.title.length || login) && (
+      <>{(pageData?.PageTitle.length || error?.title.length || props.alwaysShow || login) && (
         <>{title}</>
       )}</>
     )}</>

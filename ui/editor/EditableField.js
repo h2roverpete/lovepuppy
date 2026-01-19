@@ -177,8 +177,8 @@ export default function EditableField(props) {
         <Modal show={showConfirmation} onHide={onHideConfirmation}>
           <ModalBody>Do you want to save your changes?</ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
-            <Button variant="primary" onClick={() => commitEdits()}>Save</Button>
+            <Button size={'sm'} variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
+            <Button size={'sm'} variant="primary" onClick={() => commitEdits()}>Save</Button>
           </ModalFooter>
         </Modal>
 
