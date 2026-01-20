@@ -1,6 +1,5 @@
 import DatePicker from "react-datepicker";
-import SelectField from "../forms/SelectField";
-import {useGuestBook} from "./GuestBook";
+import {Col, FormCheck, FormControl, FormLabel, FormSelect, Row} from "react-bootstrap";
 
 /**
  * Guest Book custom fields.
@@ -11,60 +10,111 @@ import {useGuestBook} from "./GuestBook";
  * @returns {JSX.Element}
  * @constructor
  */
-function CustomFields({feedbackData, onChange}) {
+function CustomFields({guestBookConfig, feedbackData, onChange}) {
 
-  // build custom field information
-  const {customFields} = useGuestBook();
+  const customFields = [];
+  if (guestBookConfig) {
+    for (let i = 1; i <= 8; i++) {
+      if (guestBookConfig[`Custom${i}Type`]?.length > 0) {
+        customFields.push((
+          <Row>
+            <Col sm={12}>
+              <FormLabel
+                htmlFor={`Custom${i}`}
+                className={guestBookConfig[`Custom${i}Required`] === true ? 'required' : ''}
+                column={true}
+              >
+                {guestBookConfig[`Custom${i}Label`]}
+              </FormLabel>
+            </Col>
+            <Col sm={'auto'}>
+              {((guestBookConfig[`Custom${i}Type`] === "text" && guestBookConfig[`Custom${i}Options`]?.length > 0) || guestBookConfig[`Custom${i}Type`] === "popup") && (
+                <FormSelect
+                  id={`Custom${i}`}
+                  onChange={(e) => {
+                    onChange({name: `Custom${i}`, value: e.target.value})
+                  }}
+                  value={feedbackData?.[`Custom${i}`]}
+                >
+                  {guestBookConfig[`Custom${i}EmptyLabel`]?.length > 0 && (
+                    <option value={''}>{guestBookConfig[`Custom${i}EmptyLabel`]}</option>
+                  )}
+                  {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </FormSelect>
+              )}
+              {(guestBookConfig[`Custom${i}Type`] === 'text' && guestBookConfig[`Custom${i}Options`]?.length === 0) && (
+                <FormControl
+                  name={`Custom${i}`}
+                  onChange={(e) => {
+                    onChange({name: `Custom${i}`, value: e.target.value})
+                  }}
+                  value={feedbackData?.[`Custom${i}`]}
+                />
+              )}
+              {guestBookConfig[`Custom${i}Type`] === 'date' && (
+                <DatePicker
+                  selected={feedbackData?.[`Custom${i}`]}
+                  onChange={(date) => {
+                    onChange?.({
+                      name: `Custom${i}`,
+                      value: date.toISOString()
+                    })
+                  }}
+                  showMonthYearDropdown
+                  id={`Custom${i}`}
+                  name={`Custom${i}`}
+                  className="form-control"
+                  minDate={new Date()}
+                  placeholderText={`Select a date.`}
+                />
+              )}
+              {guestBookConfig[`Custom${i}Type`] === 'radio' && (<>
+                {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
+                  <FormCheck
+                    type={'radio'}
+                    name={`Custom${i}`}
+                    label={option.trim()}
+                    value={option.trim()}
+                    checked={feedbackData?.[`Custom${i}`] === option.trim()}
+                    onChange={(e) => {
+                      onChange({name: `Custom${i}`, value: option.trim()})
+                    }}
+                    inline
+                  />
+                ))}
+              </>)}
+              {guestBookConfig[`Custom${i}Type`] === 'check' && guestBookConfig[`Custom${i}Options`]?.length > 0 && (<>
+                {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
+                  <FormCheck
+                    name={`Custom${i}`}
+                    label={option.trim()}
+                    value={option.trim()}
+                    checked={feedbackData?.[`Custom${i}`]?.split(',').includes(option.trim())}
+                    onChange={(e) => {
+                      const value = feedbackData?.[`Custom${i}`]?.length > 0 ? feedbackData[`Custom${i}`].split(',') : [];
+                      if (e.target.checked && !value.includes(option.trim())) {
+                        value.push(option.trim());
+                      } else if (!e.target.checked && value.includes(option.trim())) {
+                        value.splice(value.indexOf(option.trim()), 1);
+                      }
+                      onChange({name: `Custom${i}`, value: value.toString()})
+                    }}
+                    inline
+                  />
+                ))}
+              </>)}
+            </Col>
+          </Row>
+        ))
+      }
+    }
+  }
+
   return (
     <>
-      {customFields?.map(field => (
-        <div key={field.seq} className={'form-group col-xs-12 col-sm-6' + (field.seq === 1 ? " mt-4" : " mt-2")}>
-          <label
-            className={"form-label" + (field.required ? ' required' : '')}
-            htmlFor={`Custom${field.seq}`}
-            style={{marginRight: "10px"}}
-          >
-            {field.label}
-          </label>
-          {field.type === "text" && field.options && (
-            <SelectField
-              required={field.required}
-              name={`Custom${field.seq}`}
-              onChange={onChange}
-              value={feedbackData[`Custom${field.seq}`]}
-              options={field.options}
-              prompt={field.emptyLabel}
-            />
-          )}
-          {field.type === 'text' && !field.options && (
-            <input
-              type="text"
-              name={`Custom${field.seq}`}
-              className="form-control"
-              onChange={e => onChange?.(e.target)}
-              required={field.required}
-            />
-          )}
-          {field.type === 'date' && (
-            <DatePicker
-              selected={feedbackData[`Custom${field.seq}`]}
-              onChange={(date) => {
-                onChange?.({
-                  name: `Custom${field.seq}`,
-                  value: date.toISOString()
-                })
-              }}
-              showMonthYearDropdown
-              id={`Custom${field.seq}`}
-              name={`Custom${field.seq}`}
-              className="form-control"
-              minDate={new Date()}
-              placeholderText={`Select a date.`}
-              required={field.required}
-            />
-          )}
-        </div>
-      ))}
+      {customFields?.map(field => (field))}
     </>
   )
 }

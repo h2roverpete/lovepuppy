@@ -23,8 +23,20 @@ export const GuestBookContext = createContext({
 });
 
 export function useGuestBook() {
-  return useContext(GuestBookContext)
+  return useContext(GuestBookContext);
 }
+
+/**
+ * @callback DataChange
+ * @param {String} name
+ * @param {any} value
+ */
+
+
+/**
+ * @callback DataChangedCallback
+ * @param {DataChange} changeInfo
+ */
 
 /**
  * Guest Book component
@@ -39,9 +51,6 @@ function GuestBook(props) {
 
   // guest book configuration
   const [guestBookConfig, setGuestBookConfig] = useState(null);
-
-  // custom field configuration
-  const [customFields, setCustomFields] = useState(null);
 
   // user entered values
   const [guestData, setGuestData] = useState({});
@@ -62,40 +71,6 @@ function GuestBook(props) {
       });
     }
   }, [props.guestBookId, getGuestBook]);
-
-  useEffect(() => {
-    if (guestBookConfig) {
-      // build custom field information
-      const fields = [];
-      for (let i = 0; i <= 8; i++) {
-        if (guestBookConfig[`Custom${i}Label`] && guestBookConfig[`Custom${i}Type`]) {
-          let options;
-          if (guestBookConfig[`Custom${i}Options`]) {
-            options = []
-            const optionValues = guestBookConfig[`Custom${i}Options`].split(",");
-            optionValues.map((option) => {
-              options.push({
-                value: option,
-                label: option
-              })
-              return option;
-            })
-          }
-          fields.push({
-            seq: i,
-            label: guestBookConfig[`Custom${i}Label`],
-            type: guestBookConfig[`Custom${i}Type`],
-            userEditable: guestBookConfig[`Custom${i}UserEditable`],
-            required: guestBookConfig[`Custom${i}Required`],
-            options: options,
-            emptyLabel: guestBookConfig[`Custom${i}EmptyLabel`],
-            value: guestFeedbackData?.[`Custom${i}`]
-          })
-        }
-      }
-      setCustomFields(fields);
-    }
-  }, [guestBookConfig, guestFeedbackData]);
 
   useEffect(() => {
     if (props.guestId) {
@@ -190,8 +165,27 @@ function GuestBook(props) {
     return (
       guestData?.FirstName?.length > 0 &&
       guestData?.LastName?.length > 0 &&
-      guestData?.Email?.length > 0 && isValidEmail(guestData?.Email)
+      (guestData?.Email?.length > 0 && isValidEmail(guestData?.Email)) &&
+      (guestBookConfig?.ShowLodgingFields ?
+          guestFeedbackData?.ArrivalDate?.length > 0 &&
+          guestFeedbackData?.DepartureDate?.length > 0 &&
+          guestFeedbackData?.NumberOfGuests?.length > 0 :
+          true
+      ) &&
+      areCustomFieldsValid()
     )
+  }
+
+  function areCustomFieldsValid() {
+    for (let i=1; i<=8; i++) {
+      if (guestBookConfig?.[`Custom${i}Type`].length > 0
+        && guestBookConfig?.[`Custom${i}Required`] === true
+        && !guestFeedbackData?.[`Custom${i}`]?.length
+      ) {
+        return false;
+      }
+    }
+    return true;
   }
 
   return (
@@ -199,7 +193,6 @@ function GuestBook(props) {
       {
         guestBookConfig: guestBookConfig,
         setGuestBookConfig: setGuestBookConfig,
-        customFields: customFields,
       }
     }>
       {props.pageId === pageData?.PageID && guestBookConfig && (

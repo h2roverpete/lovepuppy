@@ -54,10 +54,10 @@ function AddressFields({address, onChange}) {
         </Col>
       </Row>
 
-      <Row>
+      <Row className="mt-2">
+        <FormLabel htmlFor="Country" column={true} sm={'auto'}>Country</FormLabel>
         <Col sm={6}>
-        <FormLabel htmlFor="Country" column={true}>Country</FormLabel>
-        <CountryField
+          <CountryField
           id="Country"
           name="Country"
           onChange={onChange}
@@ -66,9 +66,9 @@ function AddressFields({address, onChange}) {
         </Col>
       </Row>
 
-      <Row className="mt-2">
+      <Row>
         <Col sm={5}>
-          <FormLabel className="form-label" htmlFor="City" column={'lg'}>City</FormLabel>
+          <FormLabel className="form-label" htmlFor="City" column={true}>City</FormLabel>
           <FormControl
             id="City"
             value={address?.City}
@@ -79,7 +79,7 @@ function AddressFields({address, onChange}) {
         </Col>
 
         <Col sm={4}>
-          <FormLabel className="form-label" htmlFor="State" column={'lg'}>State</FormLabel>
+          <FormLabel className="form-label" htmlFor="State" column={true}>State</FormLabel>
           {address.Country === 'US' ? (
             <StateField
               id="State"
@@ -98,7 +98,7 @@ function AddressFields({address, onChange}) {
         </Col>
 
         <Col sm={3}>
-          <FormLabel column='lg' htmlFor="Zip">Zip</FormLabel>
+          <FormLabel column={true} htmlFor="Zip">{address.Country === 'US' ? 'Zip' : 'Postcode'}</FormLabel>
           <FormControl
             id="Zip"
             value={address?.Zip}

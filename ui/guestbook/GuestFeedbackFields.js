@@ -17,15 +17,16 @@ function GuestFeedbackFields({guestBookConfig, guestFeedbackData, onChange}) {
       <LodgingFields lodgingData={guestFeedbackData} onChange={onChange}/>
     )}
     <CustomFields
+      guestBookConfig={guestBookConfig}
       feedbackData={guestFeedbackData}
       onChange={onChange}
     />
     {guestBookConfig.ShowFeedback && (
-      <Row>
+      <Row className={'mt-2'}>
         <Col>
           <FormLabel
             htmlFor="FeedbackText"
-            column={'lg'}
+            column={true}
           >
             {guestBookConfig.TextCaption ? guestBookConfig.TextCaption : 'Questions or Comments'}
           </FormLabel>

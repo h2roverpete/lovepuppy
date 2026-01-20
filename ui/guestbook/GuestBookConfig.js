@@ -2,14 +2,14 @@ import {useGuestBook} from "./GuestBook";
 import {useEdit} from "../editor/EditProvider";
 import {
   Accordion,
-  AccordionButton, AccordionItem,
-  Button, Col,
+  AccordionButton, Button, Col,
   Form,
   Row
 } from "react-bootstrap";
 import {useEffect, useRef, useState} from "react";
 import EmailField from "../forms/EmailField";
 import {useRestApi} from "../../api/RestApi";
+import CustomFieldsConfig from "./CustomFieldsConfig";
 
 export default function GuestBookConfig() {
   const {guestBookConfig, setGuestBookConfig} = useGuestBook();
@@ -39,7 +39,7 @@ export default function GuestBookConfig() {
     SubmitButtonName: '',
     AlwaysEmail: false,
   });
-  const [activeKey, setActiveKey] = useState(null);
+  const [activeKey, setActiveKey] = useState('');
 
   const submitButton = useRef(null);
   const revertButton = useRef(null);
@@ -89,6 +89,32 @@ export default function GuestBookConfig() {
       submitButton.current.disabled = true;
       revertButton.current.disabled = true;
     }
+  }
+
+  /**
+   * Enable another custom field.
+   */
+  function addCustomField() {
+    for (let i = 1; i <= 8; i++) {
+      if (!edits[`Custom${i}Type`]) {
+        onDataChanged({name: `Custom${i}Type`, value: 'text'});
+        break;
+      }
+    }
+  }
+
+  /**
+   * How many custom fields are in use?
+   * @returns {number} Index of last custom field
+   */
+  function lastCustomField() {
+    let last = 0;
+    for (let i = 1; i <= 8; i++) {
+      if (edits[`Custom${i}Type`]) {
+        last = i;
+      }
+    }
+    return last;
   }
 
   return (
@@ -153,7 +179,7 @@ export default function GuestBookConfig() {
                   htmlFor={'GuestBookCCEmail'}
                   column={'sm'}
                 >
-                  Copy Feedback To
+                  CC Feedback To
                 </Form.Label>
                 <EmailField
                   size={'sm'}
@@ -163,38 +189,42 @@ export default function GuestBookConfig() {
                 />
               </Col>
             </Row>
-            <Form.Group>
-              <Form.Label
-                size={"sm"}
-                htmlFor={'GuestBookMessage'}
-                column={'sm'}
-              >
-                Before Submit Message
-              </Form.Label>
-              <Form.Control
-                as={"textarea"}
-                size={"sm"}
-                id={'GuestBookMessage'}
-                value={edits.GuestBookMessage}
-                onChange={(e) => onDataChanged({name: 'GuestBookMessage', value: e.target.value})}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label
-                size={"sm"}
-                htmlFor={'DoneMessage'}
-                column={'sm'}
-              >
-                After Submit Message
-              </Form.Label>
-              <Form.Control
-                as={"textarea"}
-                size={"sm"}
-                id={'DoneMessage'}
-                value={edits.DoneMessage}
-                onChange={(e) => onDataChanged({name: 'DoneMessage', value: e.target.value})}
-              />
-            </Form.Group>
+            <Row>
+              <Col>
+                <Form.Label
+                  size={"sm"}
+                  htmlFor={'GuestBookMessage'}
+                  column={'sm'}
+                >
+                  Before Submit Message
+                </Form.Label>
+                <Form.Control
+                  as={"textarea"}
+                  size={"sm"}
+                  id={'GuestBookMessage'}
+                  value={edits.GuestBookMessage}
+                  onChange={(e) => onDataChanged({name: 'GuestBookMessage', value: e.target.value})}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Form.Label
+                  size={"sm"}
+                  htmlFor={'DoneMessage'}
+                  column={'sm'}
+                >
+                  After Submit Message
+                </Form.Label>
+                <Form.Control
+                  as={"textarea"}
+                  size={"sm"}
+                  id={'DoneMessage'}
+                  value={edits.DoneMessage}
+                  onChange={(e) => onDataChanged({name: 'DoneMessage', value: e.target.value})}
+                />
+              </Col>
+            </Row>
             <Row>
               <Col sm={6}>
                 <Form.Label
@@ -228,22 +258,9 @@ export default function GuestBookConfig() {
               </Col>
             </Row>
             <Row className="mt-2">
-              <Col>
-                <Form.Check
-                  checked={edits.AlwaysEmail}
-                  className={'form-control-sm'}
-                  label={'Always send email, even without feedback'}
-                  onChange={(e) => onDataChanged({name: 'AlwaysEmail', value: e.target.checked})}
-                />
-              </Col>
-            </Row>
-            <Row className="mt-2">
-              <Col sm={2}>
-                <Form.Label column={'sm'}>Show Inputs:</Form.Label>
-              </Col>
+              <Form.Label column={'sm'} sm={2}>Show Inputs:</Form.Label>
               <Col sm={3}>
                 <Form.Check
-                  inline
                   checked={edits.ShowName}
                   className={'form-control-sm'}
                   label={'Name'}
@@ -303,42 +320,56 @@ export default function GuestBookConfig() {
                 />
               </Col>
             </Row>
+            {edits.ShowFeedback && (
+              <Row className="mt-2">
+                <Form.Label
+                  size={"sm"}
+                  htmlFor={'TextCaption'}
+                  column={'sm'}
+                  sm={'auto'}
+                >
+                  Feedback Prompt
+                </Form.Label>
+                <Col sm={'auto'}>
+                  <Form.Control
+                    size={"sm"}
+                    id={'TextCaption'}
+                    value={edits.TextCaption}
+                    placeholder={'Questions or Comments'}
+                    onChange={(e) => onDataChanged({name: 'TextCaption', value: e.target.value})}
+                  />
+                </Col>
+              </Row>
+            )}
+            {edits.ShowMailingList && (
+              <Row className="mt-2">
+                <Col>
+                  <Form.Check
+                    checked={edits.MailingListDefault}
+                    className={'form-control-sm'}
+                    label={'Mailing list checked by default'}
+                    onChange={(e) => onDataChanged({name: 'MailingListDefault', value: e.target.checked})}
+                  />
+                </Col>
+              </Row>
+            )}
             <Row>
               <Col>
                 <Form.Check
-                  checked={edits.MailingListDefault}
+                  checked={edits.AlwaysEmail}
                   className={'form-control-sm'}
-                  label={'Mailing list checked by default'}
-                  disabled={!edits.ShowMailingList}
-                  onChange={(e) => onDataChanged({name: 'MailingListDefault', value: e.target.checked})}
-                  />
+                  label={'Always send email to admin, even without feedback'}
+                  onChange={(e) => onDataChanged({name: 'AlwaysEmail', value: e.target.checked})}
+                />
               </Col>
             </Row>
-            <Accordion defaultActiveKey={null} className={'mt-2'}>
-              <AccordionItem
-                eventKey={'custom'}
-                style={{background: 'transparent', border: 'none'}}
-              >
-                <AccordionButton
-                  style={{background: 'transparent', boxShadow: 'none', padding: 0}}
-                >
-                  <h5>Custom Field Configuration</h5>
-                </AccordionButton>
-                <Accordion.Body>
-                  <Row>
-                    <Col sm={12}>
-
-                    </Col>
-                  </Row>
-                </Accordion.Body>
-              </AccordionItem>
-            </Accordion>
-            <Row>
-              <Col>
+            <CustomFieldsConfig guestBookConfig={edits} onChange={onDataChanged}/>
+            <Row className="mt-2">
+              <Col xs={7}>
                 <Button
                   variant="primary"
                   size="sm"
-                  className="me-2 mt-2"
+                  className="me-2"
                   onClick={onSubmit}
                   ref={submitButton}
                 >
@@ -347,12 +378,19 @@ export default function GuestBookConfig() {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="me-2 mt-2"
                   onClick={onRevert}
                   ref={revertButton}
                 >
                   Revert
                 </Button>
+              </Col>
+              <Col style={{textAlign: 'end'}}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={lastCustomField() >= 8}
+                  onClick={addCustomField}
+                >Add a Field</Button>
               </Col>
             </Row>
           </Accordion.Body>

@@ -50,9 +50,9 @@ function LodgingFields({lodgingData, onChange}) {
 
   return (
     <>
-      <Row>
+      <Row className="mt-2">
         <Col sm={4}>
-          <FormLabel htmlFor="arrivaldate" column={"lg"} className={"me-2"}>Arrival Date</FormLabel>
+          <FormLabel htmlFor="arrivaldate" column={true} className={"required"}>Arrival Date</FormLabel>
         </Col>
         <Col>
           <DatePicker
@@ -80,7 +80,7 @@ function LodgingFields({lodgingData, onChange}) {
       </Row>
       <Row>
         <Col sm={4}>
-          <FormLabel htmlFor="departuredate" column={"lg"} className={"me-2"}>Departure Date</FormLabel>
+          <FormLabel htmlFor="departuredate" column={true} className={"required"}>Departure Date</FormLabel>
         </Col>
         <Col>
           <DatePicker
@@ -107,10 +107,8 @@ function LodgingFields({lodgingData, onChange}) {
         </Col>
       </Row>
       <Row>
-        <Col sm={4}>
-          <label className="control-label required" htmlFor="NumberOfGuests">Number of Guests</label>
-        </Col>
-        <Col xs={3}>
+          <FormLabel column={true} sm={4} className="required" htmlFor="NumberOfGuests">Number of Guests</FormLabel>
+        <Col sm={2}>
           <SelectField
             name="NumberOfGuests"
             required={true}

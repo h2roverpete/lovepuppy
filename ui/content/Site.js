@@ -179,10 +179,12 @@ export default function Site(props) {
   }
 
   function addPageToOutline(pageData) {
-    console.debug(`Add page ${pageData.PageID} to outline.`)
-    if (outlineData) {
+    if (outlineData && pageData) {
+      console.debug(`Add page ${pageData.PageID} to outline.`)
       const newOutlineData = [...outlineData, pageData];
       setOutlineData(newOutlineData);
+    } else {
+      console.error(`Can't add page to outline. Outline or page data are null.`);
     }
   }
 

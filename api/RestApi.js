@@ -30,25 +30,41 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdatePageSection(data) {
-    const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}/sections`, data);
-    return response.data;
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}/sections`, data);
+        return response.data;
+      }
+    });
   }
 
   async function uploadSectionImage(pageId, pageSectionId, file) {
-    const formData = new FormData();
-    formData.append('SectionImage', file);
-    const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`, formData);
-    return response.data;
+    return await restApiCall(() => {
+      return async () => {
+        const formData = new FormData();
+        formData.append('SectionImage', file);
+        const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`, formData);
+        return response.data;
+      }
+    });
   }
 
   async function deleteSectionImage(pageId, pageSectionId) {
-    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`);
-    return response.data;
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`);
+        return response.data;
+      }
+    });
   }
 
   async function deletePageSection(pageId, pageSectionId) {
-    const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}`);
-    return response.data;
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}`);
+        return response.data;
+      }
+    });
   }
 
   async function insertOrUpdatePage(data) {
@@ -118,8 +134,12 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdateGuestBook(data) {
-    const response = await axios.post(`${host}/api/v1/guestbook`, data);
-    return response.data;
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/guestbook`, data);
+        return response.data;
+      }
+    });
   }
 
   async function getGuest(guestId) {
@@ -179,26 +199,31 @@ export default function RestApi(props) {
 
   /**
    * Execute a "protected" REST API call.
-   * Protected calls modify site content and require a valid OAuth token
+   *
+   * Protected calls modify site content and require a valid OAuth token and permissions
    * in addition to an API key.
    *
    * If the original call throws an Auth error, attempts to refresh the auth token
    * and executes the call again.
    *
-   * @param callFactory {RestApiCallFactory} Factory function returning a Promise which runs the API call and returns a result.
+   * @param callFactory {RestApiCallFactory} Factory function returns a Promise which runs the API call and returns a result.
    * @returns {any} Response from Rest API call
    */
   async function restApiCall(callFactory) {
     try {
       return await (callFactory())();
     } catch (error) {
-      if (error.code === 401) {
+      if (error.status === 401) {
         try {
+          console.warn(`Auth token invalid. Refreshing...`);
           await refreshAuthToken();
+          console.debug(`Retrying REST API call.`);
           return await (callFactory())();
         } catch (err2) {
           throw error;
         }
+      } else {
+        throw error;
       }
     }
   }
