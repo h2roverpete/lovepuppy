@@ -1,19 +1,38 @@
-/* Guest book field labels */
-form {
-
-}
-
-label {
-}
-
-/* Form input fields */
-li.country,
-input.form-control.phone,
+/* Guest book form elements (large form) */
+.col-form-label,
+.form-label,
+label.form-check-label,
+div.form-control,
 input.form-control,
+input.form-control.phone,
+select.form-control,
 textarea.form-control,
-select.form-control {
-  font-size: 14pt;
-  height: auto;
+.btn {
+
+}
+
+/* Admin form elements (small form) */
+.col-form-label-sm,
+div.form-control-sm,
+div.form-control-sm label,
+input.form-control-sm,
+select.form-control-sm,
+textarea.form-control-sm,
+.btn-sm {
+  line-height:1.2;
+}
+
+/* Extra style for phone and fields */
+input.form-control.phone,
+li.country {
+}
+
+/* checkbox height adjustment */
+input.form-check-input {
+}
+
+/* small checkbox height adjustment */
+div.form-control-sm input.form-check-input {
 }
 
 /* Guest book submit button */
