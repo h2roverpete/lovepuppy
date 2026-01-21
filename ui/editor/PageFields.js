@@ -3,7 +3,7 @@ import {
   Accordion,
   AccordionButton,
   Button,
-  Col, FormCheck, FormControl, FormLabel,
+  Col, FormCheck, FormControl, FormLabel, FormSelect,
   Modal,
   ModalBody,
   ModalFooter,
@@ -23,10 +23,10 @@ import {useNavigate} from "react-router";
  */
 export default function PageFields() {
 
-  const {insertOrUpdatePage, insertOrUpdatePageSection, deletePage} = useRestApi();
+  const {insertOrUpdatePage, insertOrUpdatePageSection, deletePage, insertOrUpdateGuestBook} = useRestApi();
   const {canEdit} = useEdit();
   const {pageData, setPageData, setSectionData} = usePageContext();
-  const {outline} = useSiteContext()
+  const {outline, siteData} = useSiteContext()
   const [edits, setEdits] = useState({
     NavTitle: '',
     PageMetaTitle: '',
@@ -119,6 +119,33 @@ export default function PageFields() {
   const submitButton = useRef(null);
   const revertButton = useRef(null);
 
+  const [showAddExtras, setShowAddExtras] = useState(false);
+  const extraTypeRef = useRef(null);
+
+  function onAddExtra() {
+    if (extraTypeRef.current && siteData) {
+      switch (extraTypeRef.current.value) {
+        case 'gallery':
+
+        case 'guestbook':
+          insertOrUpdateGuestBook({
+            GuestBookName: siteData.SiteName,
+            PageID: pageData.PageID,
+            ShowName: true,
+            ShowEmail: true,
+            ShowPhone: true,
+            ShowFeedback: true
+          }).then((result)=>{
+
+          }).catch((error)=>{
+            console.error(`Error adding guest book.`, error);
+          })
+        default:
+          console.error(`Unsupported extra type ${extraTypeRef.current.value}`)
+      }
+    }
+  }
+
   return (
     <>{canEdit && (
       <>
@@ -131,6 +158,33 @@ export default function PageFields() {
               setShowDeleteConfirmation(false);
               onDeletePage();
             }}>Delete</Button>
+          </ModalFooter>
+        </Modal>
+        <Modal show={showAddExtras} onHide={() => {
+          setShowAddExtras(false)
+        }}>
+          <ModalHeader><h5>Add an Extra</h5></ModalHeader>
+          <ModalBody>
+            <Row>
+              <FormLabel column={'sm'} htmlFor={'ExtraType'} sm={'auto'}>Extra to Add</FormLabel>
+              <Col>
+                <FormSelect
+                  id="ExtraType"
+                  size={'sm'}
+                  ref={extraTypeRef}
+                >
+                  <option value='gallery'>Photo Gallery</option>
+                  <option value='guestbook'>Guest Book</option>
+                </FormSelect>
+              </Col>
+            </Row>
+          </ModalBody>
+          <ModalFooter>
+            <Button size="sm" variant="secondary" onClick={() => setShowAddExtras(false)}>Cancel</Button>
+            <Button size="sm" variant="primary" onClick={() => {
+              onAddExtra();
+              setShowAddExtras(false);
+            }}>Add Extra to Page</Button>
           </ModalFooter>
         </Modal>
         <Accordion
@@ -281,6 +335,14 @@ export default function PageFields() {
                     onClick={onAddSection}
                   >
                     Add Section
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="me-2 mt-2"
+                    onClick={() => setShowAddExtras(true)}
+                  >
+                    Add Extra
                   </Button>
                   <Button
                     variant="danger"
