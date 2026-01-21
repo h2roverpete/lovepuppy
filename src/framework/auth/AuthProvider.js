@@ -1,4 +1,4 @@
-import {useContext, createContext, useState, useEffect} from "react";
+import {useContext, createContext, useState, useEffect, useImperativeHandle} from "react";
 import {useCookies} from 'react-cookie';
 import {useRestApi} from "../api/RestApi";
 import EditProvider from "../ui/editor/EditProvider";
@@ -25,11 +25,17 @@ export default function AuthProvider(props) {
   const [scope, setScope] = useState(null);
   const [username, setUsername] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const {checkToken, refreshToken} = useRestApi();
+  const {checkToken, refreshToken, refreshAuthTokenRef} = useRestApi();
 
   useEffect(() => {
     setIsAuthenticated(cookies.token && username && scope);
   }, [cookies.token, username, scope]);
+
+  useImperativeHandle(refreshAuthTokenRef, () => {
+    return {
+      refreshAuthToken: refreshAuthToken,
+    }
+  });
 
   /**
    * Check if a permission is present.
@@ -84,10 +90,10 @@ export default function AuthProvider(props) {
   }
 
   async function refreshAuthToken() {
-    console.debug(`Refreshing token...`);
+    console.debug(`Refreshing auth token...`);
     const newToken = await refreshToken(cookies.token.refresh_token, window.location.host);
     setToken(newToken);
-    return true;
+    return newToken;
   }
 
   return (
@@ -97,7 +103,7 @@ export default function AuthProvider(props) {
         setToken: setToken,
         hasPermission: hasPermission,
         isAuthenticated: isAuthenticated,
-        refreshToken: refreshToken,
+        refreshAuthToken: refreshAuthToken,
       }}>
       <EditProvider>
         {props.children}

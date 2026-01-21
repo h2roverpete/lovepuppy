@@ -1,4 +1,4 @@
-import {Col, FormCheck, FormControl, FormLabel, FormSelect, Row} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 
 
@@ -48,23 +48,23 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
   return (<>
     <Row className="mb-2">
       <Col sm={2}>
-        <FormLabel htmlFor={`Custom${fieldNum}Label`} column={'sm'}>Label</FormLabel>
-        <FormControl
+        <Form.Label htmlFor={`Custom${fieldNum}Label`} column={'sm'}>Label</Form.Label>
+        <Form.Control
           size="sm"
           id={`Custom${fieldNum}Label`}
           required={true}
-          value={guestBookConfig[`Custom${fieldNum}Label`]}
+          value={guestBookConfig[`Custom${fieldNum}Label`] || ''}
           onChange={(e) => onChange({
             name: `Custom${fieldNum}Label`,
             value: e.target.value
           })}/>
       </Col>
       <Col sm={3}>
-        <FormLabel htmlFor={`Custom${fieldNum}Type`} column={'sm'}>Type</FormLabel>
-        <FormSelect
+        <Form.Label htmlFor={`Custom${fieldNum}Type`} column={'sm'}>Type</Form.Label>
+        <Form.Select
           size="sm"
           id={`Custom${fieldNum}Type`}
-          value={guestBookConfig[`Custom${fieldNum}Type`]}
+          value={guestBookConfig[`Custom${fieldNum}Type`] || ''}
           onChange={(e) => {
             onChange({
               name: `Custom${fieldNum}Type`,
@@ -77,16 +77,16 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
           <option value={'popup'}>popup</option>
           <option value={'radio'}>radio buttons</option>
           <option value={'check'}>check boxes</option>
-        </FormSelect>
+        </Form.Select>
       </Col>
       {guestBookConfig[`Custom${fieldNum}Type`] === 'popup' && (<>
         <Col sm={2}>
-          <FormLabel htmlFor={`Custom${fieldNum}EmptyLabel`} column={'sm'}>Prompt</FormLabel>
-          <FormControl
+          <Form.Label htmlFor={`Custom${fieldNum}EmptyLabel`} column={'sm'}>Prompt</Form.Label>
+          <Form.Control
             size="sm"
             id={`Custom${fieldNum}EmptyLabel`}
             placeholder={'(select)'}
-            value={guestBookConfig[`Custom${fieldNum}EmptyLabel`]}
+            value={guestBookConfig[`Custom${fieldNum}EmptyLabel`] || ''}
             onChange={(e) => onChange({
               name: `Custom${fieldNum}EmptyLabel`,
               value: e.target.value
@@ -98,12 +98,12 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
         ||  guestBookConfig[`Custom${fieldNum}Type`] === 'radio')
         && (<>
         <Col sm={5}>
-          <FormLabel htmlFor={`Custom${fieldNum}Options`} column={'sm'}>Options</FormLabel>
-          <FormControl
+          <Form.Label htmlFor={`Custom${fieldNum}Options`} column={'sm'}>Options</Form.Label>
+          <Form.Control
             size="sm"
             id={`Custom${fieldNum}Options`}
             placeholder={'option 1, option 2'}
-            value={guestBookConfig[`Custom${fieldNum}Options`]}
+            value={guestBookConfig[`Custom${fieldNum}Options`] || ''}
             onChange={(e) => onChange({
               name: `Custom${fieldNum}Options`,
               value: e.target.value
@@ -111,10 +111,10 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
         </Col>
       </>)}
       <Col sm={4} className="d-flex align-items-end">
-        <FormCheck
+        <Form.Check
           className="form-control-sm"
           id={`Custom${fieldNum}Required`}
-          checked={guestBookConfig[`Custom${fieldNum}Required`] === true}
+          checked={guestBookConfig[`Custom${fieldNum}Required`] || false}
           label={'Required'}
           onChange={(e) => onChange({
             name: `Custom${fieldNum}Required`,

@@ -1,6 +1,6 @@
 import CountryField from "./CountryField";
 import StateField from "./StateField";
-import {FormControl, Row, Col, FormLabel} from "react-bootstrap";
+import {Form, Row, Col} from "react-bootstrap";
 
 /**
  * @class AddressData
@@ -30,46 +30,45 @@ function AddressFields({address, onChange}) {
   return (
     <>
       <Row className="mt-2">
-        <Col>
-        <label className="form-label" htmlFor="Address1">Address</label>
-        <FormControl
-          type="text"
-          id="Address1"
-          value={address?.Address1}
-          onChange={e => {
-            onChange?.({name: 'Address1', value: e.target.value});
-          }}
-          size="30"
-          maxLength="50"
-        />
-        <FormControl
-          value={address?.Address2}
-          className="mt-2"
-          onChange={e => {
-            onChange?.({name: 'Address2', value: e.target.value});
-          }}
-          size="30"
-          maxLength="50"
-        />
+        <Col sm={8}>
+          <Form.Control
+            type="text"
+            id="Address1"
+            value={address?.Address1}
+            onChange={e => {
+              onChange?.({name: 'Address1', value: e.target.value});
+            }}
+            size="30"
+            maxLength="50"
+          />
+          <Form.Control
+            value={address?.Address2}
+            className="mt-2"
+            onChange={e => {
+              onChange?.({name: 'Address2', value: e.target.value});
+            }}
+            size="30"
+            maxLength="50"
+          />
         </Col>
       </Row>
 
       <Row className="mt-2">
-        <FormLabel htmlFor="Country" column={true} sm={'auto'}>Country</FormLabel>
-        <Col sm={6}>
+        <Col sm={8}>
+          <Form.Label htmlFor="Country" column={true}>Country</Form.Label>
           <CountryField
-          id="Country"
-          name="Country"
-          onChange={onChange}
-          value={address?.Country.toUpperCase()}
-        />
+            id="Country"
+            name="Country"
+            onChange={onChange}
+            value={address?.Country.toUpperCase()}
+          />
         </Col>
       </Row>
 
       <Row>
-        <Col sm={5}>
-          <FormLabel className="form-label" htmlFor="City" column={true}>City</FormLabel>
-          <FormControl
+        <Col sm={4}>
+          <Form.Label className="form-label" htmlFor="City" column={true}>City</Form.Label>
+          <Form.Control
             id="City"
             value={address?.City}
             onChange={e => {
@@ -79,16 +78,16 @@ function AddressFields({address, onChange}) {
         </Col>
 
         <Col sm={4}>
-          <FormLabel className="form-label" htmlFor="State" column={true}>State</FormLabel>
+          <Form.Label className="form-label" htmlFor="State" column={true}>State</Form.Label>
           {address.Country === 'US' ? (
             <StateField
               id="State"
               name="State"
-              onChange={onChange}
+              onChange={(e) => onChange({name: 'State', value: e.target.value})}
               value={address?.State}
             />
           ) : (
-            <FormControl
+            <Form.Control
               value={address?.State}
               onChange={e => {
                 onChange?.({name: 'State', value: e.target.value});
@@ -98,8 +97,8 @@ function AddressFields({address, onChange}) {
         </Col>
 
         <Col sm={3}>
-          <FormLabel column={true} htmlFor="Zip">{address.Country === 'US' ? 'Zip' : 'Postcode'}</FormLabel>
-          <FormControl
+          <Form.Label column={true} htmlFor="Zip">{address.Country === 'US' ? 'Zip' : 'Postcode'}</Form.Label>
+          <Form.Control
             id="Zip"
             value={address?.Zip}
             onChange={e => {

@@ -1,5 +1,5 @@
 import EditableField from "../editor/EditableField";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useEdit} from "../editor/EditProvider";
 import {BsPencil} from "react-icons/bs";
@@ -249,7 +249,9 @@ function PageSection({pageSectionData}) {
   }
 
   return (
-    <>
+    <PageSectionContext value={{
+      pageSectionData: pageSectionData
+    }}>
       <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
         <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
         <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
@@ -312,8 +314,10 @@ function PageSection({pageSectionData}) {
               aria-expanded="false"
             ><BsPencil/></Button>
             <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
-              <span className="dropdown-item" onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
-              <span className="dropdown-item" onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Section Text`}</span>
+              <span className="dropdown-item"
+                    onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
+              <span className="dropdown-item"
+                    onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Section Text`}</span>
               {pageSectionData.PageSectionSeq > 1 && (
                 <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
               )}
@@ -327,8 +331,15 @@ function PageSection({pageSectionData}) {
           </div>
         )}
       </div>
-    </>
-  );
+    </PageSectionContext>
+  )
+    ;
+}
+
+const PageSectionContext = createContext({});
+
+export function usePageSectionContext() {
+  return useContext(PageSectionContext);
 }
 
 export default PageSection;

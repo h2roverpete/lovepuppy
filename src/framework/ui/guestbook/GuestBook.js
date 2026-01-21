@@ -59,8 +59,6 @@ function GuestBook(props) {
   // has form been submitted?
   const [submitted, setSubmitted] = useState(false);
 
-  const submitButtonRef = useRef(null);
-
   // load guest book configuration when initialized
   useEffect(() => {
     if (props.guestBookId) {
@@ -114,10 +112,6 @@ function GuestBook(props) {
         ...prevValue,
         [name]: value
       }
-      if (typeof value === 'string' && value.trim().length === 0) {
-        // remove empty string properties
-        delete newValue[name];
-      }
       console.log(`Guest data updated: ${JSON.stringify(newValue)}`);
       return newValue;
     });
@@ -153,8 +147,8 @@ function GuestBook(props) {
     console.debug(`Updating guest. data=${JSON.stringify(guestData)}`);
     insertOrUpdateGuest(props.guestBookId, guestData).then(data => {
       console.debug(`Guest update result: ${JSON.stringify(data)}`);
-      setSubmitted(true)
-      props.onChange?.({name: 'guestId', value: data.GuestID});
+      setSubmitted(true);
+      setGuestData(data);
       insertOrUpdateGuestFeedback(data.GuestID, guestFeedbackData).then(data => {
         console.debug(`Guest feedback update result: ${JSON.stringify(data)}`);
       })
@@ -177,8 +171,8 @@ function GuestBook(props) {
   }
 
   function areCustomFieldsValid() {
-    for (let i=1; i<=8; i++) {
-      if (guestBookConfig?.[`Custom${i}Type`].length > 0
+    for (let i = 1; i <= 8; i++) {
+      if (guestBookConfig?.[`Custom${i}Type`]?.length > 0
         && guestBookConfig?.[`Custom${i}Required`] === true
         && !guestFeedbackData?.[`Custom${i}`]?.length
       ) {
@@ -187,6 +181,8 @@ function GuestBook(props) {
     }
     return true;
   }
+
+  const labelCols = 2;
 
   return (
     <GuestBookContext value={
@@ -200,7 +196,8 @@ function GuestBook(props) {
           <GuestBookConfig/>
           {submitted ? (
             <>
-              <p dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage}}/>
+              <p
+                dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage ? guestBookConfig.DoneMessage : 'Your information has been submitted.'}}/>
               <Button
                 variant="primary"
                 onClick={() => {
@@ -208,12 +205,13 @@ function GuestBook(props) {
                   setSubmitted(false);
                   props.onChange?.({guestFeedbackId: 0});
                 }}>
-                {guestBookConfig.AgainMessage}
+                {guestBookConfig.AgainMessage ? guestBookConfig.AgainMessage : 'Submit Again'}
               </Button>
             </>
           ) : (
             <>
-              <p dangerouslySetInnerHTML={{__html: guestBookConfig.GuestBookMessage}}/>
+              <p
+                dangerouslySetInnerHTML={{__html: guestBookConfig.GuestBookMessage ? guestBookConfig.GuestBookMessage : 'Please enter your information below.'}}/>
               <form
                 encType="multipart/form-data"
                 className="needs-validation"
@@ -223,6 +221,7 @@ function GuestBook(props) {
                   guestBookConfig={guestBookConfig}
                   guestData={guestData}
                   onChange={handleGuestChange}
+                  labelCols={labelCols}
                 />
                 <GuestFeedbackFields
                   guestBookConfig={guestBookConfig}
@@ -235,9 +234,8 @@ function GuestBook(props) {
                     variant={'primary'}
                     disabled={!isDataValid()}
                     onClick={(e) => handleSubmit(e)}
-                    ref={submitButtonRef}
                   >
-                    {guestBookConfig.SubmitButtonName}
+                    {guestBookConfig.SubmitButtonName ? guestBookConfig.SubmitButtonName : 'Submit'}
                   </Button>
                 </div>
               </form>

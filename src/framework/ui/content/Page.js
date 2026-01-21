@@ -3,17 +3,8 @@ import {SiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
 
 export const PageContext = createContext(
-  {
-    pageId: null,
-    pageData: null,
-    sectionData: null,
-    breadcrumbs: null,
-    error: null,
-    login: false,
-    setPageData: (data) => console.error(`setPageData() not defined.`),
-    setSectionData: (data) => console.error(`setSectionData() not defined.`),
-    updatePageSection: (data) => console.error(`updatePageSection() not defined.`),
-  });
+  {}
+);
 
 /**
  * @typedef PageProps
@@ -120,6 +111,11 @@ export default function Page(props) {
     setError(null);
   }
 
+  function refreshPage() {
+    console.debug(`Refresh page.`);
+    setPageData({...pageData})
+  }
+
   // provide context to children
   return (
     <div className="Page" data-testid="Page">
@@ -133,7 +129,8 @@ export default function Page(props) {
           error: errorData,
           setPageData: setPageData,
           setSectionData: setSectionData,
-          updatePageSection: updatePageSection
+          updatePageSection: updatePageSection,
+          refreshPage: refreshPage
         }}
       >
         {props.children}

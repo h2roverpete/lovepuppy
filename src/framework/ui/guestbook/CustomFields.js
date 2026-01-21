@@ -1,40 +1,43 @@
 import DatePicker from "react-datepicker";
-import {Col, FormCheck, FormControl, FormLabel, FormSelect, Row} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 
 /**
  * Guest Book custom fields.
  *
- * @param guestBookConfig{GuestBookConfig}
- * @param feedbackData{GuestFeedbackData}
- * @param onChange{DataCallback}
+ * @param guestBookConfig {GuestBookConfig}
+ * @param feedbackData {GuestFeedbackData}
+ * @param onChange {DataCallback}
+ * @param labelCols {Number}
  * @returns {JSX.Element}
  * @constructor
  */
-function CustomFields({guestBookConfig, feedbackData, onChange}) {
-
+function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
+  if (!labelCols) {
+    labelCols = 2;
+  }
   const customFields = [];
   if (guestBookConfig) {
     for (let i = 1; i <= 8; i++) {
       if (guestBookConfig[`Custom${i}Type`]?.length > 0) {
         customFields.push((
-          <Row className="mt-2">
-            <Col sm={3}>
-              <FormLabel
+          <Row className="mt-2" key={`${i}`}>
+            <Col sm={labelCols}>
+              <Form.Label
                 htmlFor={`Custom${i}`}
                 className={guestBookConfig[`Custom${i}Required`] === true ? 'required' : ''}
                 column={true}
               >
                 {guestBookConfig[`Custom${i}Label`]}
-              </FormLabel>
+              </Form.Label>
             </Col>
             <Col sm={'auto'}>
               {((guestBookConfig[`Custom${i}Type`] === "text" && guestBookConfig[`Custom${i}Options`]?.length > 0) || guestBookConfig[`Custom${i}Type`] === "popup") && (
-                <FormSelect
+                <Form.Select
                   id={`Custom${i}`}
                   onChange={(e) => {
                     onChange({name: `Custom${i}`, value: e.target.value})
                   }}
-                  value={feedbackData?.[`Custom${i}`]}
+                  value={feedbackData?.[`Custom${i}`] || ''}
                 >
                   {guestBookConfig[`Custom${i}EmptyLabel`]?.length > 0 && (
                     <option value={''}>{guestBookConfig[`Custom${i}EmptyLabel`]}</option>
@@ -42,15 +45,15 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
                   {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
                     <option key={option}>{option}</option>
                   ))}
-                </FormSelect>
+                </Form.Select>
               )}
-              {(guestBookConfig[`Custom${i}Type`] === 'text' && guestBookConfig[`Custom${i}Options`]?.length === 0) && (
-                <FormControl
+              {(guestBookConfig[`Custom${i}Type`] === 'text' && !guestBookConfig[`Custom${i}Options`]) && (
+                <Form.Control
                   name={`Custom${i}`}
                   onChange={(e) => {
                     onChange({name: `Custom${i}`, value: e.target.value})
                   }}
-                  value={feedbackData?.[`Custom${i}`]}
+                  value={feedbackData?.[`Custom${i}`] || ''}
                 />
               )}
               {guestBookConfig[`Custom${i}Type`] === 'date' && (
@@ -72,13 +75,13 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
               )}
               {guestBookConfig[`Custom${i}Type`] === 'radio' && (<>
                 {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
-                  <FormCheck
+                  <Form.Check
                     type={'radio'}
                     name={`Custom${i}`}
                     label={option.trim()}
                     value={option.trim()}
                     checked={feedbackData?.[`Custom${i}`] === option.trim()}
-                    onChange={(e) => {
+                    onChange={() => {
                       onChange({name: `Custom${i}`, value: option.trim()})
                     }}
                     inline
@@ -87,7 +90,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
               </>)}
               {guestBookConfig[`Custom${i}Type`] === 'check' && guestBookConfig[`Custom${i}Options`]?.length > 0 && (<>
                 {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
-                  <FormCheck
+                  <Form.Check
                     name={`Custom${i}`}
                     label={option.trim()}
                     value={option.trim()}
@@ -114,7 +117,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
 
   return (
     <>
-      {customFields?.map(field => (field))}
+      {customFields}
     </>
   )
 }
