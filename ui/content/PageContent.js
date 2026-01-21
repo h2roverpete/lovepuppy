@@ -1,4 +1,5 @@
 import PageFields from "../editor/PageFields";
+import PageExtras from "./PageExtras";
 
 /**
  * Element to show page content
@@ -14,6 +15,7 @@ export default function PageContent({children}) {
     <div className="PageContent container-fluid" data-testid="PageContent">
       <PageFields/>
       {children}
+      <PageExtras/>
     </div>
   )
 }

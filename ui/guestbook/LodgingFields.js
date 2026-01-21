@@ -2,7 +2,7 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import {useEffect} from "react";
 import SelectField from "../forms/SelectField";
-import {Col, FormLabel, Row} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 
 // number of milliseconds in one day
 const ONE_DAY = 1000 * 60 * 60 * 24;
@@ -50,9 +50,9 @@ function LodgingFields({lodgingData, onChange}) {
 
   return (
     <>
-      <Row className="mt-2">
-        <Col sm={4}>
-          <FormLabel htmlFor="arrivaldate" column={true} className={"required"}>Arrival Date</FormLabel>
+      <Row className="mt-4">
+        <Col sm={3}>
+          <Form.Label htmlFor="arrivaldate" column={true} className={"required"}>Arrival Date</Form.Label>
         </Col>
         <Col>
           <DatePicker
@@ -78,9 +78,9 @@ function LodgingFields({lodgingData, onChange}) {
           />
         </Col>
       </Row>
-      <Row>
-        <Col sm={4}>
-          <FormLabel htmlFor="departuredate" column={true} className={"required"}>Departure Date</FormLabel>
+      <Row className="mt-2">
+        <Col sm={3}>
+          <Form.Label htmlFor="departuredate" column={true} className={"required"}>Departure Date</Form.Label>
         </Col>
         <Col>
           <DatePicker
@@ -106,8 +106,8 @@ function LodgingFields({lodgingData, onChange}) {
           />
         </Col>
       </Row>
-      <Row>
-          <FormLabel column={true} sm={4} className="required" htmlFor="NumberOfGuests">Number of Guests</FormLabel>
+      <Row className="mt-2">
+        <Form.Label column={true} sm={3} className="required" htmlFor="NumberOfGuests">Number of Guests</Form.Label>
         <Col sm={2}>
           <SelectField
             name="NumberOfGuests"

@@ -1,3 +1,5 @@
+import {Form} from "react-bootstrap";
+
 /**
  * @typedef PasswordFieldProps
  *
@@ -15,24 +17,10 @@
  */
 export default function PasswordField(props) {
   return (
-    <div className="form-group col-xs-8 col-md-6 mt-4">
-      <label className="form-label" htmlFor={props.name}>{props.label}</label>
-      <input
-        type="password"
-        autoComplete="current-password"
-        className={"form-control"}
-        name={props.name}
-        id={props.name}
-        onChange={e => props.onChange({
-          name: props.name,
-          value: e.target.value !== null ? e.target.value : ""
-        })}
-        onBlur={e => props.onChange({
-          name: props.name,
-          value: e.target.value !== null ? e.target.value : ""
-        })}
-        required={props.required}
-      />
-    </div>
+    <Form.Control
+      {...props}
+      type="password"
+      autoComplete="current-password"
+    />
   )
 }

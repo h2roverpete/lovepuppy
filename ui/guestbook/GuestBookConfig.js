@@ -1,54 +1,24 @@
 import {useGuestBook} from "./GuestBook";
 import {useEdit} from "../editor/EditProvider";
-import {
-  Accordion,
-  AccordionButton, Button, Col,
-  Form,
-  Row
-} from "react-bootstrap";
-import {useEffect, useRef, useState} from "react";
-import EmailField from "../forms/EmailField";
+import {Accordion, AccordionButton, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {useEffect, useState} from "react";
+import EmailField, {isValidEmail} from "../forms/EmailField";
 import {useRestApi} from "../../api/RestApi";
 import CustomFieldsConfig from "./CustomFieldsConfig";
+import {usePageContext} from "../content/Page";
 
 export default function GuestBookConfig() {
   const {guestBookConfig, setGuestBookConfig} = useGuestBook();
   const {canEdit} = useEdit();
-  const {insertOrUpdateGuestBook} = useRestApi();
+  const {insertOrUpdateGuestBook, deleteGuestBook} = useRestApi();
+  const {refreshPage} = usePageContext();
 
-  const [edits, setEdits] = useState({
-    GuestBookName: '',
-    GuestBookEmail: '',
-    GuestBookCCEmail: '',
-    GuestBookMessage: '',
-    ShowName: false,
-    ShowEmail: false,
-    ShowCompany: false,
-    ShowAddress: false,
-    ShowDayPhone: false,
-    ShowEveningPhone: false,
-    ShowFax: false,
-    ShowContactInfo: false,
-    ShowMailingList: false,
-    MailingListDefault: false,
-    ShowFeedback: false,
-    ShowLodgingFields: false,
-    TextCaption: '',
-    DoneMessage: '',
-    AgainMessage: '',
-    SubmitButtonName: '',
-    AlwaysEmail: false,
-  });
+  const [edits, setEdits] = useState({});
   const [activeKey, setActiveKey] = useState('');
-
-  const submitButton = useRef(null);
-  const revertButton = useRef(null);
 
   useEffect(() => {
     if (guestBookConfig) {
       setEdits({...guestBookConfig});
-      if (submitButton.current) submitButton.current.disabled = true;
-      if (revertButton.current) revertButton.current.disabled = true;
     }
   }, [guestBookConfig]);
 
@@ -65,8 +35,16 @@ export default function GuestBookConfig() {
       ...edits,
       [name]: value
     })
-    submitButton.current.disabled = false;
-    revertButton.current.disabled = false;
+  }
+
+  function hasEdits() {
+    if (guestBookConfig && edits) {
+      return JSON.stringify(edits) !== JSON.stringify(guestBookConfig);
+    } else return false;
+  }
+
+  function isDataValid() {
+    return edits.GuestBookName?.length > 0 && isValidEmail(edits.GuestBookEmail)
   }
 
   function onSubmit() {
@@ -86,10 +64,10 @@ export default function GuestBookConfig() {
     console.debug(`Revert form.`);
     if (guestBookConfig) {
       setEdits({...guestBookConfig});
-      submitButton.current.disabled = true;
-      revertButton.current.disabled = true;
     }
   }
+
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   /**
    * Enable another custom field.
@@ -117,8 +95,24 @@ export default function GuestBookConfig() {
     return last;
   }
 
-  return (
-    <>{canEdit && (
+  return (<>
+    {canEdit && (<>
+      <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+        <Modal.Header><h5>Delete Guest Book</h5></Modal.Header>
+        <Modal.Body>Are you sure you want to delete the guest book? This action can't be undone.</Modal.Body>
+        <Modal.Footer>
+          <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
+          <Button size="sm" variant="danger" onClick={() => {
+            deleteGuestBook(guestBookConfig?.GuestBookID).then(() => {
+              console.debug('Guest book deleted.');
+              setShowDeleteConfirmation(false);
+              refreshPage();
+            }).catch(err => {
+              console.error('Guest book delete error.', err);
+            })
+          }}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
       <Accordion
         activeKey={activeKey}
       >
@@ -148,6 +142,7 @@ export default function GuestBookConfig() {
                   size={"sm"}
                   htmlFor={'GuestBookName'}
                   column={'sm'}
+                  className="required"
                 >
                   Guest Book Name
                 </Form.Label>
@@ -155,6 +150,8 @@ export default function GuestBookConfig() {
                   size={"sm"}
                   id={'GuestBookName'}
                   value={edits.GuestBookName}
+                  isInvalid={edits.GuestBookName?.length === 0}
+                  isValid={edits.GuestBookName?.length > 0}
                   onChange={(e) => onDataChanged({name: 'GuestBookName', value: e.target.value})}
                 />
               </Col>
@@ -164,6 +161,7 @@ export default function GuestBookConfig() {
                 <Form.Label
                   column={'sm'}
                   htmlFor={'GuestBookEmail'}
+                  className="required"
                 >
                   Send Feedback To
                 </Form.Label>
@@ -203,6 +201,7 @@ export default function GuestBookConfig() {
                   size={"sm"}
                   id={'GuestBookMessage'}
                   value={edits.GuestBookMessage}
+                  placeholder={'Please enter your information below.'}
                   onChange={(e) => onDataChanged({name: 'GuestBookMessage', value: e.target.value})}
                 />
               </Col>
@@ -221,6 +220,7 @@ export default function GuestBookConfig() {
                   size={"sm"}
                   id={'DoneMessage'}
                   value={edits.DoneMessage}
+                  placeholder={'Your information has been submitted.'}
                   onChange={(e) => onDataChanged({name: 'DoneMessage', value: e.target.value})}
                 />
               </Col>
@@ -238,6 +238,7 @@ export default function GuestBookConfig() {
                   size={"sm"}
                   id={'SubmitButtonName'}
                   value={edits.SubmitButtonName}
+                  placeholder={'Submit'}
                   onChange={(e) => onDataChanged({name: 'SubmitButtonName', value: e.target.value})}
                 />
               </Col>
@@ -253,6 +254,7 @@ export default function GuestBookConfig() {
                   size={"sm"}
                   id={'AgainMessage'}
                   value={edits.AgainMessage}
+                  placeholder={'Submit Again'}
                   onChange={(e) => onDataChanged({name: 'AgainMessage', value: e.target.value})}
                 />
               </Col>
@@ -267,10 +269,10 @@ export default function GuestBookConfig() {
                   onChange={(e) => onDataChanged({name: 'ShowName', value: e.target.checked})}
                 />
                 <Form.Check
-                  checked={edits.ShowAddress}
+                  checked={edits.ShowDayPhone}
                   className={'form-control-sm'}
-                  label={'Address'}
-                  onChange={(e) => onDataChanged({name: 'ShowAddress', value: e.target.checked})}
+                  label={'Phone'}
+                  onChange={(e) => onDataChanged({name: 'ShowDayPhone', value: e.target.checked})}
                 />
                 <Form.Check
                   checked={edits.ShowEmail}
@@ -278,25 +280,31 @@ export default function GuestBookConfig() {
                   label={'Email'}
                   onChange={(e) => onDataChanged({name: 'ShowEmail', value: e.target.checked})}
                 />
+                <Form.Check
+                  checked={edits.ShowFeedback}
+                  className={'form-control-sm'}
+                  label={'Feedback'}
+                  onChange={(e) => onDataChanged({name: 'ShowFeedback', value: e.target.checked})}
+                />
               </Col>
               <Col sm={3}>
                 <Form.Check
-                  checked={edits.ShowDayPhone}
+                  checked={edits.ShowAddress}
                   className={'form-control-sm'}
-                  label={'Phone'}
-                  onChange={(e) => onDataChanged({name: 'ShowDayPhone', value: e.target.checked})}
+                  label={'Address'}
+                  onChange={(e) => onDataChanged({name: 'ShowAddress', value: e.target.checked})}
+                />
+                <Form.Check
+                  checked={edits.ShowContactInfo}
+                  className={'form-control-sm'}
+                  label={'Contact Method'}
+                  onChange={(e) => onDataChanged({name: 'ShowContactInfo', value: e.target.checked})}
                 />
                 <Form.Check
                   checked={edits.ShowMailingList}
                   className={'form-control-sm'}
                   label={'Mailing List'}
                   onChange={(e) => onDataChanged({name: 'ShowMailingList', value: e.target.checked})}
-                />
-                <Form.Check
-                  checked={edits.ShowFeedback}
-                  className={'form-control-sm'}
-                  label={'Feedback'}
-                  onChange={(e) => onDataChanged({name: 'ShowFeedback', value: e.target.checked})}
                 />
               </Col>
               <Col>
@@ -371,7 +379,7 @@ export default function GuestBookConfig() {
                   size="sm"
                   className="me-2"
                   onClick={onSubmit}
-                  ref={submitButton}
+                  disabled={!hasEdits() || !isDataValid()}
                 >
                   Update
                 </Button>
@@ -379,25 +387,29 @@ export default function GuestBookConfig() {
                   variant="secondary"
                   size="sm"
                   onClick={onRevert}
-                  ref={revertButton}
+                  disabled={!hasEdits()}
                 >
                   Revert
                 </Button>
               </Col>
               <Col style={{textAlign: 'end'}}>
                 <Button
+                  className="me-2"
                   variant="secondary"
                   size="sm"
                   disabled={lastCustomField() >= 8}
                   onClick={addCustomField}
                 >Add a Field</Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => setShowDeleteConfirmation(true)}
+                >Delete Guest Book</Button>
               </Col>
             </Row>
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
-    )}
-    </>
-  )
-    ;
+    </>)}
+  </>);
 }

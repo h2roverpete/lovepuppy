@@ -1,6 +1,6 @@
 import LodgingFields from "./LodgingFields";
 import CustomFields from "./CustomFields";
-import {Col, FormControl, FormLabel, Row} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 
 /**
  * Fields for entering guest feedback.
@@ -24,13 +24,13 @@ function GuestFeedbackFields({guestBookConfig, guestFeedbackData, onChange}) {
     {guestBookConfig.ShowFeedback && (
       <Row className={'mt-2'}>
         <Col>
-          <FormLabel
+          <Form.Label
             htmlFor="FeedbackText"
             column={true}
           >
             {guestBookConfig.TextCaption ? guestBookConfig.TextCaption : 'Questions or Comments'}
-          </FormLabel>
-          <FormControl
+          </Form.Label>
+          <Form.Control
             as="textarea"
             name="FeedbackText"
             id="FeedbackText"

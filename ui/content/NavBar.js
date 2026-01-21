@@ -2,22 +2,13 @@ import {useRef, useState} from "react";
 import {useSiteContext} from "./Site";
 import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {
-  Button, Col, FormCheck,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Nav,
-  NavDropdown, Row
-} from "react-bootstrap";
+import {Button, Col, Form, Modal, Nav, NavDropdown, Row} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
 import {BsPlus} from "react-icons/bs";
 import {useRestApi} from "../../api/RestApi";
+import React from 'react';
 
 /**
  * @typedef NavBarProps
@@ -105,7 +96,7 @@ export default function NavBar(props) {
           data-testid={`NavItem-${props.pageData.PageID}`}
         >
           <>{children.map((item) => (
-            <>{getChildren(item.PageID).length > 0 ? (
+            <React.Fragment key={item.PageID}>{getChildren(item.PageID).length > 0 ? (
               // render further dropdown levels
               <RecursiveDropdown pageData={item}/>
             ) : (
@@ -122,7 +113,7 @@ export default function NavBar(props) {
               >
                 {item.NavTitle ? item.NavTitle : item.PageTitle}
               </NavDropdown.Item>
-            )}</>
+            )}</React.Fragment>
           ))}</>
         </NavDropdown>
       )}</>
@@ -146,6 +137,7 @@ export default function NavBar(props) {
       SiteID: siteData.SiteID,
       ParentID: 0,
       PageTitle: newPageTitle,
+      NavTitle: newPageTitle,
       PageRoute: newPageRoute,
       PageHidden: newPageHiddenRef.current.checked
     }
@@ -283,7 +275,7 @@ export default function NavBar(props) {
         <Navbar.Collapse id="MainNavigation">
           <Nav>
             {getChildren(0).map((item) => (
-              <div
+              <React.Fragment
                 key={item.PageID}
               >
                 {getChildren(item.PageID).length > 0 ? (
@@ -302,7 +294,7 @@ export default function NavBar(props) {
                     {item.NavTitle ? item.NavTitle : item.PageTitle}
                   </Nav.Link>
                 )}
-              </div>
+              </React.Fragment>
             ))}
             <>{props.showLogin === true && (
               <>{token ? (
@@ -329,18 +321,18 @@ export default function NavBar(props) {
           {canEdit && (
             <>
               <Modal show={showNewPage} onHide={() => setShowNewPage(false)}>
-                <ModalHeader><h5>New Page</h5></ModalHeader>
-                <ModalBody>
+                <Modal.Header><h5>New Page</h5></Modal.Header>
+                <Modal.Body>
                   <Row>
-                    <FormLabel
+                    <Form.Label
                       htmlFor={'PageTitle'}
                       column={'sm'}
                       sm={2}
                     >
                       Title
-                    </FormLabel>
+                    </Form.Label>
                     <Col>
-                      <FormControl
+                      <Form.Control
                         size={'sm'}
                         ref={newTitleRef}
                         isValid={newPageTitle?.length > 0}
@@ -357,15 +349,15 @@ export default function NavBar(props) {
                     </Col>
                   </Row>
                   <Row className={'mt-2'}>
-                    <FormLabel
+                    <Form.Label
                       htmlFor={'PageRoute'}
                       column={'sm'}
                       sm={2}
                     >
                       Route
-                    </FormLabel>
+                    </Form.Label>
                     <Col>
-                      <FormControl
+                      <Form.Control
                         size={'sm'}
                         ref={newRouteRef}
                         isValid={newPageRoute?.length > 0 && isValidRoute(newPageRoute)}
@@ -383,13 +375,13 @@ export default function NavBar(props) {
                     </Col>
                   </Row>
                   <Row>
-                    <FormLabel
+                    <Form.Label
                       column={'sm'}
                       sm={2}
                       htmlFor='PageHidden'
                     />
                     <Col>
-                      <FormCheck
+                      <Form.Check
                         className={'form-control-sm'}
                         id={'PageHidden'}
                         ref={newPageHiddenRef}
@@ -397,8 +389,8 @@ export default function NavBar(props) {
                       />
                     </Col>
                   </Row>
-                </ModalBody>
-                <ModalFooter>
+                </Modal.Body>
+                <Modal.Footer>
                   <Button
                     size={'sm'}
                     variant={"secondary"} o
@@ -417,7 +409,7 @@ export default function NavBar(props) {
                   >
                     Create New Page
                   </Button>
-                </ModalFooter>
+                </Modal.Footer>
               </Modal>
               <Button
                 style={{border: 'none', boxShadow: 'none', margin: '0 0 0 10px', padding: '0 3px', zIndex: 200}}

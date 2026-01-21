@@ -1,5 +1,5 @@
 import DatePicker from "react-datepicker";
-import {Col, FormCheck, FormControl, FormLabel, FormSelect, Row} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 
 /**
  * Guest Book custom fields.
@@ -17,19 +17,19 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
     for (let i = 1; i <= 8; i++) {
       if (guestBookConfig[`Custom${i}Type`]?.length > 0) {
         customFields.push((
-          <Row className="mt-2">
+          <Row className="mt-2" id={`${i}`}>
             <Col sm={3}>
-              <FormLabel
+              <Form.Label
                 htmlFor={`Custom${i}`}
                 className={guestBookConfig[`Custom${i}Required`] === true ? 'required' : ''}
                 column={true}
               >
                 {guestBookConfig[`Custom${i}Label`]}
-              </FormLabel>
+              </Form.Label>
             </Col>
             <Col sm={'auto'}>
               {((guestBookConfig[`Custom${i}Type`] === "text" && guestBookConfig[`Custom${i}Options`]?.length > 0) || guestBookConfig[`Custom${i}Type`] === "popup") && (
-                <FormSelect
+                <Form.Select
                   id={`Custom${i}`}
                   onChange={(e) => {
                     onChange({name: `Custom${i}`, value: e.target.value})
@@ -42,10 +42,10 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
                   {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
                     <option key={option}>{option}</option>
                   ))}
-                </FormSelect>
+                </Form.Select>
               )}
               {(guestBookConfig[`Custom${i}Type`] === 'text' && guestBookConfig[`Custom${i}Options`]?.length === 0) && (
-                <FormControl
+                <Form.Control
                   name={`Custom${i}`}
                   onChange={(e) => {
                     onChange({name: `Custom${i}`, value: e.target.value})
@@ -72,13 +72,13 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
               )}
               {guestBookConfig[`Custom${i}Type`] === 'radio' && (<>
                 {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
-                  <FormCheck
+                  <Form.Check
                     type={'radio'}
                     name={`Custom${i}`}
                     label={option.trim()}
                     value={option.trim()}
                     checked={feedbackData?.[`Custom${i}`] === option.trim()}
-                    onChange={(e) => {
+                    onChange={() => {
                       onChange({name: `Custom${i}`, value: option.trim()})
                     }}
                     inline
@@ -87,7 +87,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
               </>)}
               {guestBookConfig[`Custom${i}Type`] === 'check' && guestBookConfig[`Custom${i}Options`]?.length > 0 && (<>
                 {guestBookConfig[`Custom${i}Options`].split(',').map((option) => (
-                  <FormCheck
+                  <Form.Check
                     name={`Custom${i}`}
                     label={option.trim()}
                     value={option.trim()}

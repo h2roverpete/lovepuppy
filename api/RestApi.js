@@ -1,8 +1,7 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {useCookies} from "react-cookie";
 import {useContext, useMemo} from "react";
 import axios from "axios";
-import {useAuth} from "../auth/AuthProvider";
 
 export const RestApiContext = React.createContext({});
 
@@ -12,7 +11,6 @@ export default function RestApi(props) {
   const host = useMemo(() => process.env.REACT_APP_BACKEND_HOST, []);
   const apiKey = useMemo(() => process.env.REACT_APP_API_KEY, []);
   const [cookies] = useCookies(); // can't use auth context, access directly
-  const {refreshAuthToken} = useAuth();
 
   axios.defaults.headers.common["x-api-key"] = apiKey;
   if (cookies.token) {
@@ -128,6 +126,11 @@ export default function RestApi(props) {
     return response.data;
   }
 
+  async function getGuestBooks() {
+    const response = await axios.get(`${host}/api/v1/guestbooks`);
+    return response.data;
+  }
+
   async function getGuestBook(guestBookId) {
     const response = await axios.get(`${host}/api/v1/guestbook/${guestBookId}`);
     return response.data;
@@ -140,6 +143,11 @@ export default function RestApi(props) {
         return response.data;
       }
     });
+  }
+
+  async function deleteGuestBook(guestBookId) {
+    const response = await axios.delete(`${host}/api/v1/guestbook/${guestBookId}`);
+    return response.data;
   }
 
   async function getGuest(guestId) {
@@ -164,6 +172,11 @@ export default function RestApi(props) {
 
   async function getGallery(galleryId) {
     const response = await axios.get(`${host}/api/v1/gallery/${galleryId}`);
+    return response.data;
+  }
+
+  async function getGalleries() {
+    const response = await axios.get(`${host}/api/v1/galleries`);
     return response.data;
   }
 
@@ -211,15 +224,24 @@ export default function RestApi(props) {
    */
   async function restApiCall(callFactory) {
     try {
+      // try the original call
       return await (callFactory())();
     } catch (error) {
       if (error.status === 401) {
-        try {
-          console.warn(`Auth token invalid. Refreshing...`);
-          await refreshAuthToken();
+        // auth error occurred
+        if (refreshAuthTokenRef.current) {
+          try {
+            console.warn(`Auth token invalid. Refreshing...`);
+            await refreshAuthTokenRef.current.refreshAuthToken();
+          } catch (err2) {
+            console.error(`Error refreshing auth token.`, err2);
+            // throw original error
+            throw error;
+          }
+          // don't surround retry with try/catch, caller can catch the error
           console.debug(`Retrying REST API call.`);
           return await (callFactory())();
-        } catch (err2) {
+        } else {
           throw error;
         }
       } else {
@@ -227,6 +249,9 @@ export default function RestApi(props) {
       }
     }
   }
+
+  // receives refresh function from Auth module
+  const refreshAuthTokenRef = useRef(null);
 
   return (
     <RestApiContext value={{
@@ -245,16 +270,20 @@ export default function RestApi(props) {
       getSiteOutline: getSiteOutline,
       getSitemap: getSitemap,
       getGuestBook: getGuestBook,
+      getGuestBooks: getGuestBooks,
       insertOrUpdateGuestBook: insertOrUpdateGuestBook,
+      deleteGuestBook: deleteGuestBook,
       getGuest: getGuest,
       insertOrUpdateGuest: insertOrUpdateGuest,
       getGuestFeedback: getGuestFeedback,
       insertOrUpdateGuestFeedback: insertOrUpdateGuestFeedback,
       getGallery: getGallery,
+      getGalleries: getGalleries,
       getPhotos: getPhotos,
       getAuthToken: getAuthToken,
       refreshToken: refreshToken,
       checkToken: checkToken,
+      refreshAuthTokenRef: refreshAuthTokenRef,
     }}>
       {props.children}
     </RestApiContext>

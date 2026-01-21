@@ -1,6 +1,7 @@
 import AddressFields from "../forms/AddressFields";
 import PhoneNumberField from "../forms/PhoneNumberField";
-import {Col, Row, Form, FormControl, FormLabel, FormSelect} from "react-bootstrap";
+import EmailField from "../forms/EmailField";
+import {Col, Row, Form} from "react-bootstrap";
 
 /**
  * Display guest fields from the guest book database.
@@ -15,9 +16,10 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
     <>
       {guestBookConfig?.ShowName && (<>
         <Row>
-          <FormLabel htmlFor="FirstName" className={'required text-nowrap'} column={true} sm={2}>First Name</FormLabel>
+          <Form.Label htmlFor="FirstName" className={'required text-nowrap'} column={true} sm={2}>First
+            Name</Form.Label>
           <Col sm={6}>
-            <FormControl
+            <Form.Control
               isValid={guestData.FirstName != null && guestData.FirstName?.length > 0}
               isInvalid={guestData.FirstName?.length === 0}
               id="FirstName"
@@ -25,19 +27,19 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
               value={guestData.FirstName}
               onChange={e => onChange({
                 name: 'FirstName',
-                value: e.target.value !== null ? e.target.value : ""
+                value: e.target.value
               })}
               onBlur={e => onChange({
                 name: 'FirstName',
-                value: e.target.value !== null ? e.target.value : ""
+                value: e.target.value
               })}
             />
           </Col>
         </Row>
         <Row className={'mt-2'}>
-          <FormLabel htmlFor="LastName" className={'required text-nowrap'} sm={2} column={true}>Last Name</FormLabel>
+          <Form.Label htmlFor="LastName" className={'required text-nowrap'} sm={2} column={true}>Last Name</Form.Label>
           <Col sm={6}>
-            <FormControl
+            <Form.Control
               isValid={guestData.LastName != null && guestData.LastName?.length > 0}
               isInvalid={guestData.LastName?.length === 0}
               id="LastName"
@@ -45,22 +47,27 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
               value={guestData.LastName}
               onChange={e => onChange({
                 name: 'LastName',
-                value: e.target.value !== null ? e.target.value : ""
+                value: e.target.value
               })}
               onBlur={e => onChange({
                 name: 'LastName',
-                value: e.target.value !== null ? e.target.value : ""
+                value: e.target.value
               })}
             />
           </Col>
         </Row>
       </>)}
       {guestBookConfig?.ShowAddress && (
-        <AddressFields address={guestData} onChange={(data) => onChange(data)}/>
+        <Row>
+          <Form.Label column={true} sm={2} htmlFor={'Address1'}>Address</Form.Label>
+          <Col sm={9}>
+            <AddressFields address={guestData} onChange={(data) => onChange(data)}/>
+          </Col>
+        </Row>
       )}
       {guestBookConfig?.ShowDayPhone && (
         <Row className={"mt-2"}>
-          <FormLabel htmlFor="DayPhone" column={true} sm={2}>Phone</FormLabel>
+          <Form.Label htmlFor="DayPhone" column={true} sm={2}>Phone</Form.Label>
           <Col sm={6}>
             <PhoneNumberField
               name="DayPhone"
@@ -73,7 +80,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowEveningPhone && (
         <Row className={"mt-2"}>
-          <FormLabel htmlFor="EveningPhone" column={true} sm={2}>Mobile Phone</FormLabel>
+          <Form.Label htmlFor="EveningPhone" column={true} sm={2}>Mobile Phone</Form.Label>
           <Col sm={6}>
             <PhoneNumberField
               name="EveningPhone"
@@ -86,7 +93,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowFax && (
         <Row className={"mt-2"}>
-          <FormLabel htmlFor="Fax" column={true} sm={2}>Alternate</FormLabel>
+          <Form.Label htmlFor="Fax" column={true} sm={2}>Alternate</Form.Label>
           <Col sm={6}>
             <PhoneNumberField
               name="Fax"
@@ -99,35 +106,26 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowEmail && (
         <Row className={"mt-2"}>
-          <FormLabel className="required" column={true} sm={'2'}>Email</FormLabel>
+          <Form.Label className="required" column={true} sm={'2'}>Email</Form.Label>
           <Col sm={6}>
-            <FormControl
-              type="email"
-              isInvalid={guestData.Email && !isValidEmail(guestData.Email)}
-              isValid={guestData.Email && isValidEmail(guestData.Email)}
+            <EmailField
               name="Email"
               id="Email"
               size="30"
               value={guestData.Email}
-              onChange={e => onChange({
-                name: 'Email',
-                value: e.target.value !== null ? e.target.value : ""
-              })}
-              onBlur={e => onChange({
-                name: 'Email',
-                value: e.target.value !== null ? e.target.value : ""
-              })}
+              onChange={(e) => onChange({name: 'Email', value: e.target.value})}
+              onBlur={(e) => onChange({name: 'Email', value: e.target.value})}
               maxLength="50"
               required={true}
             />
           </Col>
         </Row>
       )}
-      {(guestBookConfig?.ShowDayPhone || guestBookConfig?.ShowEveningPhone || guestBookConfig?.ShowFax || guestBookConfig?.ShowEmail) && (<>
+      {guestBookConfig?.ShowContactInfo && (<>
         <Row className={"mt-2"}>
-          <FormLabel htmlFor="ContactMethod" column={true} sm={'2'}>Contact By</FormLabel>
+          <Form.Label htmlFor="ContactMethod" column={true} sm={'2'}>Contact By</Form.Label>
           <Col sm={'auto'}>
-            <FormSelect
+            <Form.Select
               id="ContactMethod"
               value={guestData?.ContactMethod}
               onChange={(e) => onChange({name: 'ContactMethod', value: e.target.value})}
@@ -136,12 +134,13 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
               {guestBookConfig?.ShowDayPhone && (<option>Phone</option>)}
               {guestBookConfig?.ShowEveningPhone && (<option>Mobile</option>)}
               {guestBookConfig?.ShowFax && (<option>Alternate</option>)}
-            </FormSelect>
+            </Form.Select>
           </Col>
         </Row>
       </>)}
       {guestBookConfig?.ShowMailingList && (
         <Row className={"mt-2"}>
+          <Col sm={2}></Col>
           <Col>
             <Form.Check
               name="MailingList"
@@ -156,12 +155,6 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
     </>
   )
-}
-
-function isValidEmail(email) {
-  // A common regex pattern for email validation
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return emailRegex.test(email);
 }
 
 export default GuestFields;

@@ -1,6 +1,5 @@
-import {useContext, useEffect, useRef} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import '../ui/forms/Forms.css'
-import EmailField from "../ui/forms/EmailField";
 import PasswordField from "../ui/forms/PasswordField";
 import {useSearchParams} from 'react-router';
 import {SiteContext} from "../ui/content/Site";
@@ -8,7 +7,7 @@ import {useNavigate} from "react-router";
 import {Permission, useAuth} from "./AuthProvider";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
-import {Button,Form} from "react-bootstrap";
+import {Button, Col, Form, Row} from "react-bootstrap";
 
 /**
  * @typedef LoginProps
@@ -23,6 +22,9 @@ import {Button,Form} from "react-bootstrap";
  * @constructor
  */
 const Login = (props) => {
+
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
   const permissions = [];
   if (!props.permission) {
@@ -94,10 +96,6 @@ const Login = (props) => {
     }
   });
 
-  function onChange(name, value) {
-    // receive username/password changes
-  }
-
   return (
     <>{loginResponse ? (
       // process login response
@@ -113,32 +111,45 @@ const Login = (props) => {
                  value={`${window.location.protocol}//${window.location.host}/login`}/>
           <input type="hidden" name="state" value={cookies.loginState}/>
           <input type="hidden" name="scope" value={scope}/>
-          <Form.Group>
-            <Form.Label htmlFor="username">
+          <Row className="mt-4">
+            <Form.Label className={'required'} htmlFor="username" column={true} sm={2}>
               Login
             </Form.Label>
-            <EmailField
-              onChange={onChange}
-              name={"username"}
-              id="username"
-              required={true}
-              defaultValue={"me@me.com"}
-            />
-          </Form.Group>
-          <PasswordField
-            onChange={onChange}
-            name={"password"}
-            label="Password"
-            value={""}
-            required={true}
-          />
+            <Col sm={4}>
+              <Form.Control
+                name="username"
+                id="username"
+                autoComplete="username"
+                isValid={email?.length > 0}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Col>
+          </Row>
+          <Row className={'mt-2'}>
+            <Form.Label className={'required'} htmlFor="password" column={true} sm={2}>
+              Password
+            </Form.Label>
+            <Col sm={4}>
+              <PasswordField
+                name={"password"}
+                id={"password"}
+                value={password}
+                isValid={password?.length > 0}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Col>
+          </Row>
+
           <div className="form-group mt-4">
-            <Button type="submit" variant="primary">Log In</Button>
+            <Button type="submit" variant="primary" disabled={!email || !password}>Log In</Button>
           </div>
         </form>
       </div>
-    )}</>
-  );
+    )}
+    </>
+  )
+    ;
 }
 
 export default Login;
