@@ -2,6 +2,7 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import {useEffect} from "react";
 import SelectField from "../forms/SelectField";
+import {Col, FormLabel, Row} from "react-bootstrap";
 
 // number of milliseconds in one day
 const ONE_DAY = 1000 * 60 * 60 * 24;
@@ -49,64 +50,74 @@ function LodgingFields({lodgingData, onChange}) {
 
   return (
     <>
-      <div className="form-group mt-4">
-        <label htmlFor="arrivaldate" className="form-label required">Arrival Date</label>
-        <DatePicker
-          selected={lodgingData.ArrivalDate}
-          onChange={(date) => {
-            onChange?.(
-              {
-                value: date.toISOString(),
-                name: 'ArrivalDate'
-              }
-            );
-          }}
-          showMonthYearDropdown
-          id="arrivaldate"
-          className="form-control ms-2"
-          style={{marginLeft: '10px'}}
-          selectsStart={true}
-          minDate={new Date() + ONE_DAY}
-          startDate={lodgingData.ArrivalDate}
-          endDate={lodgingData.DepartureDate}
-          placeholderText={`Select a date.`}
-          required={true}
-        />
-      </div>
-      <div className="form-group required mt-2">
-        <label htmlFor="departuredate" className="form-label required mt-2">Departure Date</label>
-        <DatePicker
-          selected={lodgingData.DepartureDate}
-          onChange={(date) => {
-            onChange?.(
-              {
-                value: date.toISOString(),
-                name: 'DepartureDate'
-              }
-            );
-          }}
-          showMonthYearDropdown
-          id="departuredate"
-          className="form-control ms-2"
-          style={{marginLeft: '10px'}}
-          selectsEnd={true}
-          minDate={lodgingData.ArrivalDate + ONE_DAY}
-          startDate={lodgingData.ArrivalDate}
-          endDate={lodgingData.DepartureDate}
-          placeholderText={`Select a date.`}
-          required={true}
-        />
-      </div>
-      <div className="form-group col-8 mt-2">
-        <label className="control-label required" htmlFor="NumberOfGuests">Number of Guests</label>
-        <SelectField
-          name="NumberOfGuests"
-          required={true}
-          onChange={onChange}
-          value={lodgingData.NumberOfGuests}
-          options={options}
-        />
-      </div>
+      <Row className="mt-2">
+        <Col sm={4}>
+          <FormLabel htmlFor="arrivaldate" column={true} className={"required"}>Arrival Date</FormLabel>
+        </Col>
+        <Col>
+          <DatePicker
+            selected={lodgingData.ArrivalDate}
+            onChange={(date) => {
+              onChange?.(
+                {
+                  value: date.toISOString(),
+                  name: 'ArrivalDate'
+                }
+              );
+            }}
+            showMonthYearDropdown
+            id="arrivaldate"
+            className="form-control"
+            style={{marginLeft: '10px'}}
+            selectsStart={true}
+            minDate={new Date() + ONE_DAY}
+            startDate={lodgingData.ArrivalDate}
+            endDate={lodgingData.DepartureDate}
+            placeholderText={`Select a date.`}
+            required={true}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col sm={4}>
+          <FormLabel htmlFor="departuredate" column={true} className={"required"}>Departure Date</FormLabel>
+        </Col>
+        <Col>
+          <DatePicker
+            selected={lodgingData.DepartureDate}
+            onChange={(date) => {
+              onChange?.(
+                {
+                  value: date.toISOString(),
+                  name: 'DepartureDate'
+                }
+              );
+            }}
+            showMonthYearDropdown
+            id="departuredate"
+            className="form-control"
+            style={{marginLeft: '10px'}}
+            selectsEnd={true}
+            minDate={lodgingData.ArrivalDate + ONE_DAY}
+            startDate={lodgingData.ArrivalDate}
+            endDate={lodgingData.DepartureDate}
+            placeholderText={`Select a date.`}
+            required={true}
+          />
+        </Col>
+      </Row>
+      <Row>
+          <FormLabel column={true} sm={4} className="required" htmlFor="NumberOfGuests">Number of Guests</FormLabel>
+        <Col sm={2}>
+          <SelectField
+            name="NumberOfGuests"
+            required={true}
+            onChange={onChange}
+            value={lodgingData.NumberOfGuests}
+            options={options}
+          />
+        </Col>
+      </Row>
     </>
   )
 }

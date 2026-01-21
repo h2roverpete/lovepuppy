@@ -254,9 +254,9 @@ function PageSection({pageSectionData}) {
         <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
         <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
         <ModalFooter>
-          <Button variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel
+          <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel
           </Button>
-          <Button variant="danger" onClick={() => {
+          <Button size="sm" variant="danger" onClick={() => {
             deleteSection();
             setShowDeleteConfirmation(false)
           }}>Delete Section

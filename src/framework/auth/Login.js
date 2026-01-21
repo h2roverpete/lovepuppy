@@ -8,7 +8,7 @@ import {useNavigate} from "react-router";
 import {Permission, useAuth} from "./AuthProvider";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
-import {Button} from "react-bootstrap";
+import {Button,Form} from "react-bootstrap";
 
 /**
  * @typedef LoginProps
@@ -113,13 +113,18 @@ const Login = (props) => {
                  value={`${window.location.protocol}//${window.location.host}/login`}/>
           <input type="hidden" name="state" value={cookies.loginState}/>
           <input type="hidden" name="scope" value={scope}/>
-          <EmailField
-            onChange={onChange}
-            name={"username"}
-            label="Email"
-            required={true}
-            defaultValue={"me@me.com"}
-          />
+          <Form.Group>
+            <Form.Label htmlFor="username">
+              Login
+            </Form.Label>
+            <EmailField
+              onChange={onChange}
+              name={"username"}
+              id="username"
+              required={true}
+              defaultValue={"me@me.com"}
+            />
+          </Form.Group>
           <PasswordField
             onChange={onChange}
             name={"password"}

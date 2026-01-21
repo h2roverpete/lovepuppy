@@ -1,5 +1,15 @@
 import {useEdit} from "./EditProvider";
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
+import {
+  Accordion,
+  AccordionButton,
+  Button,
+  Col, FormCheck, FormControl, FormLabel,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row
+} from "react-bootstrap";
 import {useEffect, useRef, useState} from "react";
 import {usePageContext} from "../content/Page";
 import {useRestApi} from "../../api/RestApi";
@@ -17,21 +27,21 @@ export default function PageFields() {
   const {canEdit} = useEdit();
   const {pageData, setPageData, setSectionData} = usePageContext();
   const {outline} = useSiteContext()
-  const [edits, setEdits] = useState(null);
-  const [collapsed, setCollapsed] = useState(true);
+  const [edits, setEdits] = useState({
+    NavTitle: '',
+    PageMetaTitle: '',
+    PageMetaDescription: '',
+    PageMetaKeywords: '',
+    PageHidden: '',
+    PageRoute: '',
+  });
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const navigate = useNavigate();
+  const [activeKey, setActiveKey] = useState(null);
 
   useEffect(() => {
     if (pageData) {
-      setEdits({
-        NavTitle: pageData.NavTitle ? pageData.NavTitle : "",
-        PageMetaTitle: pageData.PageMetaTitle ? pageData.PageMetaTitle : "",
-        PageMetaDescription: pageData.PageMetaDescription ? pageData.PageMetaDescription : "",
-        PageMetaKeywords: pageData.PageMetaKeywords ? pageData.PageMetaKeywords : "",
-        PageHidden: pageData.PageHidden,
-        PageRoute: pageData.PageRoute,
-      });
+      setEdits({...pageData});
     }
   }, [pageData]);
 
@@ -42,6 +52,10 @@ export default function PageFields() {
     })
     submitButton.current.classList.remove('disabled');
     revertButton.current.classList.remove('disabled');
+  }
+
+  function collapsePanel() {
+    setActiveKey(null);
   }
 
   function onSubmit() {
@@ -60,7 +74,7 @@ export default function PageFields() {
     });
     submitButton.current.classList.add('disabled');
     revertButton.current.classList.add('disabled');
-    setCollapsed(true);
+    collapsePanel();
   }
 
   function onRevert() {
@@ -79,7 +93,7 @@ export default function PageFields() {
       insertOrUpdatePageSection(data)
         .then(() => {
           setSectionData(null)
-          setCollapsed(true);
+          collapsePanel();
         }).catch((error) => {
         console.error(`Error adding page section.`, error);
       })
@@ -93,9 +107,13 @@ export default function PageFields() {
         console.debug(`Deleted page.`);
         navigate('/');
         outline.deletePage(pageData.PageID);
-        setCollapsed(true);
+        collapsePanel();
       })
       .catch(e => console.error(`Error deleting page.`, e));
+  }
+
+  function isValidRoute(route) {
+    return route?.match(/^\/[a-z0-9]+/);
   }
 
   const submitButton = useRef(null);
@@ -108,124 +126,134 @@ export default function PageFields() {
           <ModalHeader><h5>Delete Page</h5></ModalHeader>
           <ModalBody>Are you sure you want to delete this page? This action can't be undone.</ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
-            <Button variant="danger" onClick={() => {
+            <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
+            <Button size="sm" variant="danger" onClick={() => {
               setShowDeleteConfirmation(false);
               onDeletePage();
             }}>Delete</Button>
           </ModalFooter>
         </Modal>
-        <div className="accordion" style={{width: "100%", position: "relative", minHeight: '20px'}}>
-          <Button
-            className="accordion-button collapsed bg-transparent border-none shadow-none"
-            data-bs-toggle="collapse"
-            data-bs-target="#PageFields"
-            style={{padding: '2px 8px 0 0', position: 'absolute', top: 0, right: 0}}
-            onClick={() => setCollapsed(!collapsed)}
-          />
-          <div
-            className={`accordion-collapse${collapsed ? ' collapse' : ''}`}
-            id={"PageFields"}
-            style={{background: '#00000011', marginBottom: '20px'}}
+        <Accordion
+          style={{width: "100%", position: "relative", minHeight: '20px'}}
+          activeKey={activeKey}
+        >
+          <Accordion.Item
+            style={{width: "100%", position: "relative", background: 'transparent', border: 'none'}}
+            eventKey={'0'}
           >
-            <div className="accordion-body">
-              <div className={'row'}>
-                <div className="form-group col-12 col-sm-6">
-                  <label
+            <AccordionButton
+              style={{
+                position: 'absolute',
+                padding: '0 8px 0 0',
+                top: '0',
+                left: '0',
+                border: 'none',
+                background: 'transparent',
+                boxShadow: 'none'
+              }}
+              onClick={() => setActiveKey(activeKey ? null : '0')}
+            />
+            <Accordion.Body
+              style={{background: '#00000022', marginBottom: '20px'}}
+            >
+              <Row><Col><h5>Page Properties</h5></Col></Row>
+              <Row>
+                <Col sm={6}>
+                  <FormLabel
                     htmlFor={'NavTitle'}
-                    className="form-control-sm pb-0"
+                    column={'sm'}
                   >
                     Navigation Title
-                  </label>
-                  <input
-                    className={'form-control form-control-sm'}
+                  </FormLabel>
+                  <FormControl
+                    size={'sm'}
                     id={'NavTitle'}
                     name={'NavTitle'}
                     value={edits?.NavTitle}
                     onChange={(e) => onDataChanged({name: 'NavTitle', value: e.target.value})}
-                    type="text"
-                    style={{fontSize: '10pt'}}
                   />
-                </div>
+                </Col>
 
-                <div className="form-group col-12 col-sm-6">
-                  <label
+                <Col sm={6}>
+                  <FormLabel
                     htmlFor={'PageRoute'}
-                    className="form-control-sm pb-0"
+                    column={'sm'}
                   >
                     Page Route
-                  </label>
-                  <input
-                    className={'form-control form-control-sm'}
+                  </FormLabel>
+                  <FormControl
+                    size={'sm'}
                     id={'PageRoute'}
                     name={'PageRoute'}
+                    required={true}
+                    isValid={edits?.PageRoute?.length > 0 && isValidRoute(edits.PageRoute)}
+                    isInvalid={edits?.PageRoute?.length > 0 && !isValidRoute(edits.PageRoute)}
                     value={edits?.PageRoute}
                     onChange={(e) => onDataChanged({name: 'PageRoute', value: e.target.value})}
-                    type="text"
-                    style={{fontSize: '10pt'}}
                   />
-                </div>
-
-              </div>
-              <div className="form-group col-12">
-                <label
-                  htmlFor={'PageMetaTitle'}
-                  className="form-control-sm  pb-0"
-                >
-                  Meta Title
-                </label>
-                <input
-                  className={'form-control form-control-sm'}
-                  id={'PageMetaTitle'}
-                  value={edits?.PageMetaTitle}
-                  onChange={(e) => onDataChanged({name: 'PageMetaTitle', value: e.target.value})}
-                  type="text"
-                  style={{fontSize: '10pt'}}
-                />
-              </div>
-              <div className="form-group">
-                <label
-                  htmlFor={'PageMetaDescription'}
-                  className="form-control-sm pb-0"
-                >
-                  Meta Description
-                </label>
-                <input
-                  className={'form-control form-control-sm'}
-                  id={'PageMetaDescription'}
-                  value={edits?.PageMetaDescription}
-                  onChange={(e) => onDataChanged({name: 'PageMetaDescription', value: e.target.value})}
-                  type="text"
-                  style={{fontSize: '10pt'}}
-                />
-              </div>
-              <div className="form-group">
-                <label
-                  htmlFor={'PageMetaKeywords'}
-                  className="form-control-sm pb-0"
-                >
-                  Meta Keywords
-                </label>
-                <input
-                  className={'form-control form-control-sm'}
-                  id={'PageMetaKeywords'}
-                  value={edits?.PageMetaKeywords}
-                  onChange={(e) => onDataChanged({name: 'PageMetaKeywords', value: e.target.value})}
-                  type="text"
-                  style={{fontSize: '10pt'}}
-                />
-              </div>
-              <div className="form-group mt-2">
-                <input
-                  type="checkbox"
-                  checked={edits?.PageHidden}
-                  id={'PageHidden'}
-                  onChange={(e) => onDataChanged({name: 'PageHidden', value: e.target.checked})}
-                />
-                <label className={'form-control-sm'} htmlFor={'PageHidden'}>Hide page from site navigation</label>
-              </div>
-              <div className={'row mt-2'}>
-                <div className="form-group col-6">
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={6}>
+                  <FormLabel
+                    column={'sm'}
+                    htmlFor={'PageMetaTitle'}
+                  >
+                    Meta Title
+                  </FormLabel>
+                  <FormControl
+                    size={'sm'}
+                    id={'PageMetaTitle'}
+                    value={edits?.PageMetaTitle}
+                    onChange={(e) => onDataChanged({name: 'PageMetaTitle', value: e.target.value})}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormLabel
+                    column={'sm'}
+                    htmlFor={'PageMetaDescription'}
+                  >
+                    Meta Description
+                  </FormLabel>
+                  <FormControl
+                    size={'sm'}
+                    id={'PageMetaDescription'}
+                    value={edits?.PageMetaDescription}
+                    onChange={(e) => onDataChanged({name: 'PageMetaDescription', value: e.target.value})}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormLabel
+                    column={'sm'}
+                    htmlFor={'PageMetaKeywords'}
+                  >
+                    Meta Keywords
+                  </FormLabel>
+                  <FormControl
+                    size={'sm'}
+                    id={'PageMetaKeywords'}
+                    value={edits?.PageMetaKeywords}
+                    onChange={(e) => onDataChanged({name: 'PageMetaKeywords', value: e.target.value})}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormCheck
+                    className={'form-control-sm mt-2'}
+                    checked={edits?.PageHidden}
+                    id={'PageHidden'}
+                    label={'Hide page from site navigation'}
+                    onChange={(e) => onDataChanged({name: 'PageHidden', value: e.target.checked})}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={6}>
                   <Button
                     variant="primary"
                     size="sm"
@@ -244,8 +272,8 @@ export default function PageFields() {
                   >
                     Revert
                   </Button>
-                </div>
-                <div className="form-group col-6 text-end">
+                </Col>
+                <Col sm={6} align="end">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -262,11 +290,11 @@ export default function PageFields() {
                   >
                     Delete Page
                   </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                </Col>
+              </Row>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
       </>
     )}
     </>

@@ -2,7 +2,17 @@ import {useRef, useState} from "react";
 import {useSiteContext} from "./Site";
 import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavDropdown} from "react-bootstrap";
+import {
+  Button, Col, FormCheck,
+  FormControl,
+  FormLabel,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Nav,
+  NavDropdown, Row
+} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
@@ -321,68 +331,83 @@ export default function NavBar(props) {
               <Modal show={showNewPage} onHide={() => setShowNewPage(false)}>
                 <ModalHeader><h5>New Page</h5></ModalHeader>
                 <ModalBody>
-                  <div className="d-flex flex-column">
-                    <div className="d-flex align-items-center text-start mb-2">
-                      <label
-                        htmlFor={'PageTitle'}
-                        className='col-3 col-sm-2 text-nowrap'
-                      >
-                        Title
-                      </label>
-                      <input
+                  <Row>
+                    <FormLabel
+                      htmlFor={'PageTitle'}
+                      column={'sm'}
+                      sm={2}
+                    >
+                      Title
+                    </FormLabel>
+                    <Col>
+                      <FormControl
+                        size={'sm'}
                         ref={newTitleRef}
-                        className={'form-control' + (newPageTitle?.length > 0 ? isValidTitle(newPageTitle) ? ' is-valid' : ' is-invalid' : '')}
+                        isValid={newPageTitle?.length > 0}
+                        isInvalid={newPageTitle?.length === 0}
                         id={'PageTitle'}
                         name={'PageTitle'}
                         value={newPageTitle}
                         required={true}
                         placeholder={'My Page'}
-                        type="text"
-                        style={{fontSize: '12pt'}}
                         onChange={(e) => {
                           setNewPageTitle(e.target.value)
                         }}
                       />
-                    </div>
-
-                    <div className="d-flex align-items-center text-start">
-                      <label
-                        htmlFor={'PageRoute'}
-                        className='col-3 col-sm-2 text-nowrap'
-                      >
-                        Route
-                      </label>
-                      <input
+                    </Col>
+                  </Row>
+                  <Row className={'mt-2'}>
+                    <FormLabel
+                      htmlFor={'PageRoute'}
+                      column={'sm'}
+                      sm={2}
+                    >
+                      Route
+                    </FormLabel>
+                    <Col>
+                      <FormControl
+                        size={'sm'}
                         ref={newRouteRef}
-                        className={'form-control' + (newPageRoute?.length > 0 ? isValidRoute(newPageRoute) ? ' is-valid' : ' is-invalid' : '')}
+                        isValid={newPageRoute?.length > 0 && isValidRoute(newPageRoute)}
+                        isInvalid={newPageRoute?.length > 0 && !isValidRoute(newPageRoute)}
                         id={'PageRoute'}
                         name={'PageRoute'}
                         placeholder={'/mypage'}
                         required={true}
                         type="text"
                         value={newPageRoute}
-                        style={{fontSize: '12pt'}}
                         onChange={(e) => {
                           setNewPageRoute(e.target.value)
                         }}
                       />
-                    </div>
-                    <div className="d-flex align-items-center text-start">
-                      <label className={'col-2'} htmlFor={'PageHidden'}></label>
-                      <input
-                        type="checkbox"
+                    </Col>
+                  </Row>
+                  <Row>
+                    <FormLabel
+                      column={'sm'}
+                      sm={2}
+                      htmlFor='PageHidden'
+                    />
+                    <Col>
+                      <FormCheck
+                        className={'form-control-sm'}
                         id={'PageHidden'}
                         ref={newPageHiddenRef}
-                        className={'me-1'}
+                        label={'Hide page from site navigation'}
                       />
-                      <label className={'col-form-label'} htmlFor={'PageHidden'}>Hide page from site navigation</label>
-                    </div>
-                  </div>
+                    </Col>
+                  </Row>
                 </ModalBody>
                 <ModalFooter>
-                  <Button variant={"secondary"} onClick={() => setShowNewPage(false)}>Cancel
+                  <Button
+                    size={'sm'}
+                    variant={"secondary"} o
+                    onClick={() => setShowNewPage(false)}
+                  >
+                    Cancel
                   </Button>
                   <Button
+                    size={'sm'}
                     variant="primary"
                     disabled={!(isValidRoute(newPageRoute) && isValidTitle(newPageTitle))}
                     onClick={() => {

@@ -152,7 +152,6 @@ export default function EditableField(props) {
     if (!isEditing) {
       // undo edit modifications to field
       props.fieldRef.current.classList.remove('border');
-      props.fieldRef.current.classList.remove('border-secondary');
       props.fieldRef.current.classList.remove('rounded-2');
       props.fieldRef.current.onkeydown = undefined;
       if (!props.fieldRef.current.textContent) {
@@ -163,7 +162,6 @@ export default function EditableField(props) {
     } else {
       // show border around editable item while editing
       props.fieldRef.current.classList.add('border');
-      props.fieldRef.current.classList.add('border-secondary');
       props.fieldRef.current.classList.add('rounded-2');
       props.fieldRef.current.onkeydown = (evt) => onKeyDown(evt);
       props.fieldRef.current.style.minHeight = '39px';
@@ -177,8 +175,8 @@ export default function EditableField(props) {
         <Modal show={showConfirmation} onHide={onHideConfirmation}>
           <ModalBody>Do you want to save your changes?</ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
-            <Button variant="primary" onClick={() => commitEdits()}>Save</Button>
+            <Button size={'sm'} variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
+            <Button size={'sm'} variant="primary" onClick={() => commitEdits()}>Save</Button>
           </ModalFooter>
         </Modal>
 
