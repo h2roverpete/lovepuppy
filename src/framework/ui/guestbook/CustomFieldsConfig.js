@@ -110,14 +110,12 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
             })}/>
         </Col>
       </>)}
-    </Row>
-    <Row>
-      <Col sm={4}>
+      <Col sm={4} className="d-flex align-items-end">
         <FormCheck
           className="form-control-sm"
           id={`Custom${fieldNum}Required`}
           checked={guestBookConfig[`Custom${fieldNum}Required`] === true}
-          label={'Required Field'}
+          label={'Required'}
           onChange={(e) => onChange({
             name: `Custom${fieldNum}Required`,
             value: e.target.checked

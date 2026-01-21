@@ -17,8 +17,8 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
     for (let i = 1; i <= 8; i++) {
       if (guestBookConfig[`Custom${i}Type`]?.length > 0) {
         customFields.push((
-          <Row>
-            <Col sm={12}>
+          <Row className="mt-2">
+            <Col sm={3}>
               <FormLabel
                 htmlFor={`Custom${i}`}
                 className={guestBookConfig[`Custom${i}Required`] === true ? 'required' : ''}
@@ -67,7 +67,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
                   name={`Custom${i}`}
                   className="form-control"
                   minDate={new Date()}
-                  placeholderText={`Select a date.`}
+                  placeholderText={`(select a date)`}
                 />
               )}
               {guestBookConfig[`Custom${i}Type`] === 'radio' && (<>
