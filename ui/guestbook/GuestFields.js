@@ -9,14 +9,18 @@ import {Col, Row, Form} from "react-bootstrap";
  * @param guestBookConfig {GuestBookConfig}
  * @param guestData {GuestData}
  * @param onChange {DataCallback}
+ * @param labelCols {Number}
  * @constructor
  */
-function GuestFields({guestBookConfig, guestData, onChange}) {
+function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
+  if (!labelCols) {
+    labelCols = 2;
+  }
   return (
     <>
       {guestBookConfig?.ShowName && (<>
         <Row>
-          <Form.Label htmlFor="FirstName" className={'required text-nowrap'} column={true} sm={2}>First
+          <Form.Label htmlFor="FirstName" className={'required text-nowrap'} column={true} sm={labelCols}>First
             Name</Form.Label>
           <Col sm={6}>
             <Form.Control
@@ -24,7 +28,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
               isInvalid={guestData.FirstName?.length === 0}
               id="FirstName"
               size="20"
-              value={guestData.FirstName}
+              value={guestData.FirstName || ''}
               onChange={e => onChange({
                 name: 'FirstName',
                 value: e.target.value
@@ -37,14 +41,14 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
           </Col>
         </Row>
         <Row className={'mt-2'}>
-          <Form.Label htmlFor="LastName" className={'required text-nowrap'} sm={2} column={true}>Last Name</Form.Label>
+          <Form.Label htmlFor="LastName" className={'required text-nowrap'} sm={labelCols} column={true}>Last Name</Form.Label>
           <Col sm={6}>
             <Form.Control
               isValid={guestData.LastName != null && guestData.LastName?.length > 0}
               isInvalid={guestData.LastName?.length === 0}
               id="LastName"
               size="20"
-              value={guestData.LastName}
+              value={guestData.LastName || ''}
               onChange={e => onChange({
                 name: 'LastName',
                 value: e.target.value
@@ -59,7 +63,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       </>)}
       {guestBookConfig?.ShowAddress && (
         <Row>
-          <Form.Label column={true} sm={2} htmlFor={'Address1'}>Address</Form.Label>
+          <Form.Label column={true} sm={labelCols} htmlFor={'Address1'}>Address</Form.Label>
           <Col sm={9}>
             <AddressFields address={guestData} onChange={(data) => onChange(data)}/>
           </Col>
@@ -67,12 +71,12 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowDayPhone && (
         <Row className={"mt-2"}>
-          <Form.Label htmlFor="DayPhone" column={true} sm={2}>Phone</Form.Label>
+          <Form.Label htmlFor="DayPhone" column={true} sm={labelCols}>Phone</Form.Label>
           <Col sm={6}>
             <PhoneNumberField
               name="DayPhone"
               id="DayPhone"
-              value={guestData.DayPhone}
+              value={guestData.DayPhone || ''}
               onChange={onChange}
             />
           </Col>
@@ -80,12 +84,12 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowEveningPhone && (
         <Row className={"mt-2"}>
-          <Form.Label htmlFor="EveningPhone" column={true} sm={2}>Mobile Phone</Form.Label>
+          <Form.Label htmlFor="EveningPhone" column={true} sm={labelCols}>Mobile Phone</Form.Label>
           <Col sm={6}>
             <PhoneNumberField
               name="EveningPhone"
               id="EveningPhone"
-              value={guestData.EveningPhone}
+              value={guestData.EveningPhone || ''}
               onChange={onChange}
             />
           </Col>
@@ -93,12 +97,12 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowFax && (
         <Row className={"mt-2"}>
-          <Form.Label htmlFor="Fax" column={true} sm={2}>Alternate</Form.Label>
+          <Form.Label htmlFor="Fax" column={true} sm={labelCols}>Alternate</Form.Label>
           <Col sm={6}>
             <PhoneNumberField
               name="Fax"
               id="Fax"
-              value={guestData.Fax}
+              value={guestData.Fax || ''}
               onChange={onChange}
             />
           </Col>
@@ -106,7 +110,7 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowEmail && (
         <Row className={"mt-2"}>
-          <Form.Label className="required" column={true} sm={'2'}>Email</Form.Label>
+          <Form.Label className="required" column={true} sm={labelCols}>Email</Form.Label>
           <Col sm={6}>
             <EmailField
               name="Email"
@@ -123,11 +127,11 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       )}
       {guestBookConfig?.ShowContactInfo && (<>
         <Row className={"mt-2"}>
-          <Form.Label htmlFor="ContactMethod" column={true} sm={'2'}>Contact By</Form.Label>
+          <Form.Label htmlFor="ContactMethod" column={true} sm={labelCols}>Contact By</Form.Label>
           <Col sm={'auto'}>
             <Form.Select
               id="ContactMethod"
-              value={guestData?.ContactMethod}
+              value={guestData?.ContactMethod || ''}
               onChange={(e) => onChange({name: 'ContactMethod', value: e.target.value})}
             >
               {guestBookConfig?.ShowEmail && (<option>Email</option>)}
@@ -140,14 +144,14 @@ function GuestFields({guestBookConfig, guestData, onChange}) {
       </>)}
       {guestBookConfig?.ShowMailingList && (
         <Row className={"mt-2"}>
-          <Col sm={2}></Col>
+          <Col sm={labelCols}></Col>
           <Col>
             <Form.Check
               name="MailingList"
               id="mailinglist"
               value="1"
               label={"Add me to the mailing list"}
-              defaultChecked={guestData.MailingList ? guestData.MailingList : guestBookConfig.MailingListDefault}
+              checked={guestData.MailingList ? guestData.MailingList : guestBookConfig.MailingListDefault}
               onChange={e => onChange({name: 'MailingList', value: e.target.checked})}
             />
           </Col>

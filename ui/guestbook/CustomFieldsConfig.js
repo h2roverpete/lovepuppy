@@ -53,7 +53,7 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
           size="sm"
           id={`Custom${fieldNum}Label`}
           required={true}
-          value={guestBookConfig[`Custom${fieldNum}Label`]}
+          value={guestBookConfig[`Custom${fieldNum}Label`] || ''}
           onChange={(e) => onChange({
             name: `Custom${fieldNum}Label`,
             value: e.target.value
@@ -64,7 +64,7 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
         <Form.Select
           size="sm"
           id={`Custom${fieldNum}Type`}
-          value={guestBookConfig[`Custom${fieldNum}Type`]}
+          value={guestBookConfig[`Custom${fieldNum}Type`] || ''}
           onChange={(e) => {
             onChange({
               name: `Custom${fieldNum}Type`,
@@ -86,7 +86,7 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
             size="sm"
             id={`Custom${fieldNum}EmptyLabel`}
             placeholder={'(select)'}
-            value={guestBookConfig[`Custom${fieldNum}EmptyLabel`]}
+            value={guestBookConfig[`Custom${fieldNum}EmptyLabel`] || ''}
             onChange={(e) => onChange({
               name: `Custom${fieldNum}EmptyLabel`,
               value: e.target.value
@@ -103,7 +103,7 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
             size="sm"
             id={`Custom${fieldNum}Options`}
             placeholder={'option 1, option 2'}
-            value={guestBookConfig[`Custom${fieldNum}Options`]}
+            value={guestBookConfig[`Custom${fieldNum}Options`] || ''}
             onChange={(e) => onChange({
               name: `Custom${fieldNum}Options`,
               value: e.target.value
@@ -114,7 +114,7 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
         <Form.Check
           className="form-control-sm"
           id={`Custom${fieldNum}Required`}
-          checked={guestBookConfig[`Custom${fieldNum}Required`] === true}
+          checked={guestBookConfig[`Custom${fieldNum}Required`] || false}
           label={'Required'}
           onChange={(e) => onChange({
             name: `Custom${fieldNum}Required`,

@@ -93,7 +93,7 @@ export default function AuthProvider(props) {
     console.debug(`Refreshing auth token...`);
     const newToken = await refreshToken(cookies.token.refresh_token, window.location.host);
     setToken(newToken);
-    return true;
+    return newToken;
   }
 
   return (

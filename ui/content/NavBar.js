@@ -328,6 +328,7 @@ export default function NavBar(props) {
                       htmlFor={'PageTitle'}
                       column={'sm'}
                       sm={2}
+                      className={'required'}
                     >
                       Title
                     </Form.Label>
@@ -339,8 +340,7 @@ export default function NavBar(props) {
                         isInvalid={newPageTitle?.length === 0}
                         id={'PageTitle'}
                         name={'PageTitle'}
-                        value={newPageTitle}
-                        required={true}
+                        value={newPageTitle || ''}
                         placeholder={'My Page'}
                         onChange={(e) => {
                           setNewPageTitle(e.target.value)
@@ -353,6 +353,7 @@ export default function NavBar(props) {
                       htmlFor={'PageRoute'}
                       column={'sm'}
                       sm={2}
+                      className={`required`}
                     >
                       Route
                     </Form.Label>
@@ -365,9 +366,8 @@ export default function NavBar(props) {
                         id={'PageRoute'}
                         name={'PageRoute'}
                         placeholder={'/mypage'}
-                        required={true}
                         type="text"
-                        value={newPageRoute}
+                        value={newPageRoute || ''}
                         onChange={(e) => {
                           setNewPageRoute(e.target.value)
                         }}

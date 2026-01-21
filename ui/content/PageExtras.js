@@ -14,50 +14,43 @@ import {usePageSectionContext} from "./PageSection";
 export default function PageExtras() {
 
   // extras to show
-  const [guestBooks, setGuestBooks] = useState([]);
-  const [galleries, setGalleries] = useState([]);
-
+  const [extras, setExtras] = useState([]);
   const {pageData} = usePageContext();
   const {getGuestBooks, getGalleries} = useRestApi();
 
   useEffect(() => {
-    if (pageData && getGuestBooks) {
+    if (pageData && getGuestBooks && getGalleries) {
       getGuestBooks().then((result) => {
-        const display = [];
+        const newExtras = [];
         for (const guestBook of result) {
           if (guestBook.PageID === pageData.PageID) {
-            display.push((<GuestBook guestBookId={guestBook.GuestBookID} pageId={guestBook.PageID}/>));
+            newExtras.push((
+              <React.Fragment key={guestBook.GuestBookID}>
+                <GuestBook guestBookId={guestBook.GuestBookID} pageId={guestBook.PageID}/>
+              </React.Fragment>));
           }
         }
-        setGuestBooks(display);
+        getGalleries().then((result) => {
+          for (const gallery of result) {
+            if (gallery.PageID === pageData.PageID) {
+              newExtras.push(
+                <React.Fragment key={gallery.GalleryID}>
+                  <Gallery galleryId={gallery.GuestBookID} pageId={gallery.PageID}/>)
+                </React.Fragment>
+              );
+            }
+          }
+          setExtras(newExtras);
+        }).catch((err) => {
+          console.error(`Error getting gallery list.`, err);
+        })
       }).catch((err) => {
         console.error(`Error getting guest book list.`, err);
       })
     }
-  }, [getGuestBooks, pageData]);
-
-  useEffect(() => {
-    if (pageData && getGalleries) {
-      getGalleries().then((result) => {
-        const display = [];
-        for (const gallery of result) {
-          if (gallery.PageID === pageData.PageID) {
-            display.push((<Gallery galleryId={gallery.GuestBookID} pageId={gallery.PageID}/>));
-          }
-        }
-        setGalleries(display);
-      }).catch((err) => {
-        console.error(`Error getting gallery list.`, err);
-      })
-    }
-  }, [getGalleries, pageData]);
+  }, [getGuestBooks, getGalleries, pageData]);
 
   return (<>
-    {guestBooks.map((guestBook) => (<React.Fragment key={guestBook.GuestBookID}>
-      {guestBook}
-    </React.Fragment>))}
-    {galleries.map((gallery) => (<React.Fragment key={gallery.GalleryID}>
-      {gallery}
-    </React.Fragment>))}
+    {extras}
   </>)
 }

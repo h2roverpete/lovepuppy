@@ -24,11 +24,14 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
  *
  * @param lodgingData {LodgingData|GuestFeedbackData}
  * @param onChange {DataCallback}
+ * @param labelCols {Number}
  * @returns {JSX.Element}
  * @constructor
  */
-function LodgingFields({lodgingData, onChange}) {
-
+function LodgingFields({lodgingData, onChange, labelCols}) {
+  if (!labelCols) {
+    labelCols = 2
+  }
   // update departure date when arrival date changes
   useEffect(() => {
     if ((lodgingData.ArrivalDate && !lodgingData.DepartureDate) || (lodgingData.ArrivalDate && lodgingData.DepartureDate && lodgingData.DepartureDate <= lodgingData.ArrivalDate)) {
@@ -51,8 +54,8 @@ function LodgingFields({lodgingData, onChange}) {
   return (
     <>
       <Row className="mt-4">
-        <Col sm={3}>
-          <Form.Label htmlFor="arrivaldate" column={true} className={"required"}>Arrival Date</Form.Label>
+        <Col sm={labelCols}>
+          <Form.Label htmlFor="arrivaldate" column={true} className={"required"}>Arrival</Form.Label>
         </Col>
         <Col>
           <DatePicker
@@ -79,8 +82,8 @@ function LodgingFields({lodgingData, onChange}) {
         </Col>
       </Row>
       <Row className="mt-2">
-        <Col sm={3}>
-          <Form.Label htmlFor="departuredate" column={true} className={"required"}>Departure Date</Form.Label>
+        <Col sm={labelCols}>
+          <Form.Label htmlFor="departuredate" column={true} className={"required"}>Departure</Form.Label>
         </Col>
         <Col>
           <DatePicker
@@ -107,7 +110,7 @@ function LodgingFields({lodgingData, onChange}) {
         </Col>
       </Row>
       <Row className="mt-2">
-        <Form.Label column={true} sm={3} className="required" htmlFor="NumberOfGuests">Number of Guests</Form.Label>
+        <Form.Label column={true} sm={labelCols} className="required" htmlFor="NumberOfGuests">Guests</Form.Label>
         <Col sm={2}>
           <SelectField
             name="NumberOfGuests"

@@ -120,7 +120,7 @@ export default function PageFields() {
         case 'gallery':
         case 'guestbook':
           insertOrUpdateGuestBook({
-              GuestBookName: `${siteData.SiteName} Guest Book`,
+              GuestBookName: `${siteData.SiteName}`,
               GuestBookEmail: guestBookEmail,
               PageID: pageData.PageID,
               ShowName: true,
@@ -193,7 +193,7 @@ export default function PageFields() {
                     name="GuestBookEmail"
                     size="sm"
                     onChange={(e) => setGuestBookEmail(e.target.value)}
-                    value={guestBookEmail}
+                    value={guestBookEmail || ''}
                   />
                 </Col>
               </Row>
@@ -249,7 +249,7 @@ export default function PageFields() {
                     size={'sm'}
                     id={'NavTitle'}
                     name={'NavTitle'}
-                    value={edits.NavTitle ? edits.NavTitle : ''}
+                    value={edits.NavTitle || ''}
                     onChange={(e) => onDataChanged({name: 'NavTitle', value: e.target.value})}
                   />
                 </Col>
@@ -267,7 +267,7 @@ export default function PageFields() {
                     name={'PageRoute'}
                     isValid={edits.PageRoute?.length > 0 && isValidRoute(edits.PageRoute)}
                     isInvalid={edits.PageRoute?.length > 0 && !isValidRoute(edits.PageRoute)}
-                    value={edits.PageRoute ? edits.PageRoute : ''}
+                    value={edits.PageRoute || ''}
                     onChange={(e) => onDataChanged({name: 'PageRoute', value: e.target.value})}
                   />
                 </Col>
@@ -283,7 +283,7 @@ export default function PageFields() {
                   <Form.Control
                     size={'sm'}
                     id={'PageMetaTitle'}
-                    value={edits.PageMetaTitle ? edits.PageMetaTitle : ''}
+                    value={edits.PageMetaTitle || ''}
                     onChange={(e) => onDataChanged({name: 'PageMetaTitle', value: e.target.value})}
                   />
                 </Col>
@@ -299,7 +299,7 @@ export default function PageFields() {
                   <Form.Control
                     size={'sm'}
                     id={'PageMetaDescription'}
-                    value={edits.PageMetaDescription ? edits.PageMetaDescription : ''}
+                    value={edits.PageMetaDescription || ''}
                     onChange={(e) => onDataChanged({name: 'PageMetaDescription', value: e.target.value})}
                   />
                 </Col>
@@ -315,7 +315,7 @@ export default function PageFields() {
                   <Form.Control
                     size={'sm'}
                     id={'PageMetaKeywords'}
-                    value={edits.PageMetaKeywords ? edits.PageMetaKeywords : ''}
+                    value={edits.PageMetaKeywords || ''}
                     onChange={(e) => onDataChanged({name: 'PageMetaKeywords', value: e.target.value})}
                   />
                 </Col>
@@ -324,7 +324,7 @@ export default function PageFields() {
                 <Col>
                   <Form.Check
                     className={'form-control-sm mt-2'}
-                    checked={edits.PageHidden}
+                    checked={edits.PageHidden || false}
                     id={'PageHidden'}
                     label={'Hide page from site navigation'}
                     onChange={(e) => onDataChanged({name: 'PageHidden', value: e.target.checked})}

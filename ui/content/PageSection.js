@@ -252,7 +252,7 @@ function PageSection({pageSectionData}) {
     <PageSectionContext value={{
       pageSectionData: pageSectionData
     }}>
-      < Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+      <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
         <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
         <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
         <ModalFooter>

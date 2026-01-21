@@ -68,7 +68,7 @@ export default function RestApi(props) {
   async function insertOrUpdatePage(data) {
     return await restApiCall(() => {
       return async () => {
-        console.debug("InsertOrUpdatePage");
+        console.debug("Insert or update Page...");
         const response = await axios.post(`${host}/api/v1/content/pages`, data);
         return response.data;
       }
@@ -224,7 +224,6 @@ export default function RestApi(props) {
    */
   async function restApiCall(callFactory) {
     try {
-      // try the original call
       return await (callFactory())();
     } catch (error) {
       if (error.status === 401) {
@@ -232,7 +231,8 @@ export default function RestApi(props) {
         if (refreshAuthTokenRef.current) {
           try {
             console.warn(`Auth token invalid. Refreshing...`);
-            await refreshAuthTokenRef.current.refreshAuthToken();
+            const newToken = await refreshAuthTokenRef.current.refreshAuthToken();
+            axios.defaults.headers.common["Authorization"] = `Bearer ${newToken.access_token}`;
           } catch (err2) {
             console.error(`Error refreshing auth token.`, err2);
             // throw original error

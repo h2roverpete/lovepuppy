@@ -59,8 +59,6 @@ function GuestBook(props) {
   // has form been submitted?
   const [submitted, setSubmitted] = useState(false);
 
-  const submitButtonRef = useRef(null);
-
   // load guest book configuration when initialized
   useEffect(() => {
     if (props.guestBookId) {
@@ -184,6 +182,8 @@ function GuestBook(props) {
     return true;
   }
 
+  const labelCols = 2;
+
   return (
     <GuestBookContext value={
       {
@@ -196,7 +196,8 @@ function GuestBook(props) {
           <GuestBookConfig/>
           {submitted ? (
             <>
-              <p dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage ? guestBookConfig.DoneMessage : 'Your information has been submitted.'}}/>
+              <p
+                dangerouslySetInnerHTML={{__html: guestBookConfig.DoneMessage ? guestBookConfig.DoneMessage : 'Your information has been submitted.'}}/>
               <Button
                 variant="primary"
                 onClick={() => {
@@ -209,7 +210,8 @@ function GuestBook(props) {
             </>
           ) : (
             <>
-              <p dangerouslySetInnerHTML={{__html: guestBookConfig.GuestBookMessage ? guestBookConfig.GuestBookMessage : 'Please enter your information below.'}}/>
+              <p
+                dangerouslySetInnerHTML={{__html: guestBookConfig.GuestBookMessage ? guestBookConfig.GuestBookMessage : 'Please enter your information below.'}}/>
               <form
                 encType="multipart/form-data"
                 className="needs-validation"
@@ -219,6 +221,7 @@ function GuestBook(props) {
                   guestBookConfig={guestBookConfig}
                   guestData={guestData}
                   onChange={handleGuestChange}
+                  labelCols={labelCols}
                 />
                 <GuestFeedbackFields
                   guestBookConfig={guestBookConfig}
@@ -231,7 +234,6 @@ function GuestBook(props) {
                     variant={'primary'}
                     disabled={!isDataValid()}
                     onClick={(e) => handleSubmit(e)}
-                    ref={submitButtonRef}
                   >
                     {guestBookConfig.SubmitButtonName ? guestBookConfig.SubmitButtonName : 'Submit'}
                   </Button>

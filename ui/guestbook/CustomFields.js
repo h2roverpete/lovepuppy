@@ -4,21 +4,24 @@ import {Col, Form, Row} from "react-bootstrap";
 /**
  * Guest Book custom fields.
  *
- * @param guestBookConfig{GuestBookConfig}
- * @param feedbackData{GuestFeedbackData}
- * @param onChange{DataCallback}
+ * @param guestBookConfig {GuestBookConfig}
+ * @param feedbackData {GuestFeedbackData}
+ * @param onChange {DataCallback}
+ * @param labelCols {Number}
  * @returns {JSX.Element}
  * @constructor
  */
-function CustomFields({guestBookConfig, feedbackData, onChange}) {
-
+function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
+  if (!labelCols) {
+    labelCols = 2;
+  }
   const customFields = [];
   if (guestBookConfig) {
     for (let i = 1; i <= 8; i++) {
       if (guestBookConfig[`Custom${i}Type`]?.length > 0) {
         customFields.push((
-          <Row className="mt-2" id={`${i}`}>
-            <Col sm={3}>
+          <Row className="mt-2" key={`${i}`}>
+            <Col sm={labelCols}>
               <Form.Label
                 htmlFor={`Custom${i}`}
                 className={guestBookConfig[`Custom${i}Required`] === true ? 'required' : ''}
@@ -34,7 +37,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
                   onChange={(e) => {
                     onChange({name: `Custom${i}`, value: e.target.value})
                   }}
-                  value={feedbackData?.[`Custom${i}`]}
+                  value={feedbackData?.[`Custom${i}`] || ''}
                 >
                   {guestBookConfig[`Custom${i}EmptyLabel`]?.length > 0 && (
                     <option value={''}>{guestBookConfig[`Custom${i}EmptyLabel`]}</option>
@@ -44,13 +47,13 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
                   ))}
                 </Form.Select>
               )}
-              {(guestBookConfig[`Custom${i}Type`] === 'text' && guestBookConfig[`Custom${i}Options`]?.length === 0) && (
+              {(guestBookConfig[`Custom${i}Type`] === 'text' && !guestBookConfig[`Custom${i}Options`]) && (
                 <Form.Control
                   name={`Custom${i}`}
                   onChange={(e) => {
                     onChange({name: `Custom${i}`, value: e.target.value})
                   }}
-                  value={feedbackData?.[`Custom${i}`]}
+                  value={feedbackData?.[`Custom${i}`] || ''}
                 />
               )}
               {guestBookConfig[`Custom${i}Type`] === 'date' && (
@@ -114,7 +117,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange}) {
 
   return (
     <>
-      {customFields?.map(field => (field))}
+      {customFields}
     </>
   )
 }

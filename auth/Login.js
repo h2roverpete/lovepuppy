@@ -121,7 +121,7 @@ const Login = (props) => {
                 id="username"
                 autoComplete="username"
                 isValid={email?.length > 0}
-                value={email}
+                value={email || ''}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Col>
@@ -134,7 +134,7 @@ const Login = (props) => {
               <PasswordField
                 name={"password"}
                 id={"password"}
-                value={password}
+                value={password || ''}
                 isValid={password?.length > 0}
                 onChange={(e) => setPassword(e.target.value)}
               />

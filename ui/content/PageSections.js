@@ -23,7 +23,6 @@ export default function PageSections(props) {
   useEffect(() => {
     if (canEdit) {
       // attach drag and drop related window scripts
-      console.log("Setting window drop handler...");
       window.addEventListener("drop", windowDropHandler);
     }
   }, [canEdit]);
