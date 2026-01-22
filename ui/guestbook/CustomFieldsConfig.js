@@ -1,6 +1,6 @@
 import {Col, Form, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
-
+import React from 'react'
 
 /**
  * Edit configuration of custom fields
@@ -17,8 +17,9 @@ export default function CustomFieldsConfig({guestBookConfig, onChange}) {
       const newConfig = [];
       for (let i = 1; i <= 8; i++) {
         if (guestBookConfig[`Custom${i}Type`]?.length) {
-          newConfig[i] = (
-            <CustomFieldConfig guestBookConfig={guestBookConfig} fieldNum={i} onChange={onChange}/>
+          newConfig[i] = (<React.Fragment key={i}>
+              <CustomFieldConfig guestBookConfig={guestBookConfig} fieldNum={i} onChange={onChange}/>
+            </React.Fragment>
           );
         }
       }
@@ -47,7 +48,7 @@ export default function CustomFieldsConfig({guestBookConfig, onChange}) {
 function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
   return (<>
     <Row className="mb-2">
-      <Col sm={2}>
+      <Col sm={3}>
         <Form.Label htmlFor={`Custom${fieldNum}Label`} column={'sm'}>Label</Form.Label>
         <Form.Control
           size="sm"
@@ -80,7 +81,7 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
         </Form.Select>
       </Col>
       {guestBookConfig[`Custom${fieldNum}Type`] === 'popup' && (<>
-        <Col sm={2}>
+        <Col sm={3}>
           <Form.Label htmlFor={`Custom${fieldNum}EmptyLabel`} column={'sm'}>Prompt</Form.Label>
           <Form.Control
             size="sm"
@@ -94,23 +95,23 @@ function CustomFieldConfig({guestBookConfig, fieldNum, onChange}) {
         </Col>
       </>)}
       {(guestBookConfig[`Custom${fieldNum}Type`] === 'popup'
-        ||  guestBookConfig[`Custom${fieldNum}Type`] === 'check'
-        ||  guestBookConfig[`Custom${fieldNum}Type`] === 'radio')
+          || guestBookConfig[`Custom${fieldNum}Type`] === 'check'
+          || guestBookConfig[`Custom${fieldNum}Type`] === 'radio')
         && (<>
-        <Col sm={5}>
-          <Form.Label htmlFor={`Custom${fieldNum}Options`} column={'sm'}>Options</Form.Label>
-          <Form.Control
-            size="sm"
-            id={`Custom${fieldNum}Options`}
-            placeholder={'option 1, option 2'}
-            value={guestBookConfig[`Custom${fieldNum}Options`] || ''}
-            onChange={(e) => onChange({
-              name: `Custom${fieldNum}Options`,
-              value: e.target.value
-            })}/>
-        </Col>
-      </>)}
-      <Col sm={4} className="d-flex align-items-end">
+          <Col sm={9}>
+            <Form.Label htmlFor={`Custom${fieldNum}Options`} column={'sm'}>Options</Form.Label>
+            <Form.Control
+              size="sm"
+              id={`Custom${fieldNum}Options`}
+              placeholder={'option 1, option 2'}
+              value={guestBookConfig[`Custom${fieldNum}Options`] || ''}
+              onChange={(e) => onChange({
+                name: `Custom${fieldNum}Options`,
+                value: e.target.value
+              })}/>
+          </Col>
+        </>)}
+      <Col sm={2} className="d-flex align-items-end">
         <Form.Check
           className="form-control-sm"
           id={`Custom${fieldNum}Required`}

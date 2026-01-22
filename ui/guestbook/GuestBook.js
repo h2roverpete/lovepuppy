@@ -63,6 +63,9 @@ function GuestBook(props) {
   useEffect(() => {
     if (props.guestBookId) {
       getGuestBook(props.guestBookId).then(data => {
+        if (!data.LabelCols) {
+          data.LabelCols = 2;
+        }
         setGuestBookConfig(data);
       }).catch(error => {
         console.error(`Error loading guest book: ${error}`);
@@ -182,8 +185,6 @@ function GuestBook(props) {
     return true;
   }
 
-  const labelCols = 2;
-
   return (
     <GuestBookContext value={
       {
@@ -193,7 +194,6 @@ function GuestBook(props) {
     }>
       {props.pageId === pageData?.PageID && guestBookConfig && (
         <div className="guestbook">
-          <GuestBookConfig/>
           {submitted ? (
             <>
               <p
@@ -221,12 +221,13 @@ function GuestBook(props) {
                   guestBookConfig={guestBookConfig}
                   guestData={guestData}
                   onChange={handleGuestChange}
-                  labelCols={labelCols}
+                  labelCols={guestBookConfig.LabelCols}
                 />
                 <GuestFeedbackFields
                   guestBookConfig={guestBookConfig}
                   guestFeedbackData={guestFeedbackData}
                   onChange={handleFeedbackChange}
+                  labelCols={guestBookConfig.LabelCols}
                 />
                 <div className="form-errors" id="FormErrors"></div>
                 <div className="form-group mt-4">
@@ -241,6 +242,7 @@ function GuestBook(props) {
               </form>
             </>
           )}
+          <GuestBookConfig/>
         </div>
       )} </GuestBookContext>
   )
