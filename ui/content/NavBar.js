@@ -73,8 +73,10 @@ export default function NavBar(props) {
         // no children to render
         <NavDropdown.Item
           draggable={canEdit}
+          onMouseMove={(e) => mouseMoveHandler(e)}
           onDragStart={(e) => dragStartHandler(e, props.pageData)}
-          onDragOver={(e) => dragOverHandler(e)}
+          onDragOver={(e) => dragOverHandler(e, props.pageData, 'vertical')}
+          onDragLeave={(e) => dragLeaveHandler(e)}
           onDrop={(e) => dropHandler(e, props.pageData, 'vertical')}
           key={props.pageData.PageID}
           onClick={() => navigateTo(props.pageData.PageRoute)}
@@ -87,8 +89,10 @@ export default function NavBar(props) {
         // at least one child, render a dropdown
         <NavDropdown
           draggable={canEdit}
+          onMouseMove={(e) => mouseMoveHandler(e)}
           onDragStart={(e) => dragStartHandler(e, props.pageData)}
-          onDragOver={(e) => dragOverHandler(e)}
+          onDragOver={(e) => dragOverHandler(e, props.pageData, 'horizontal')}
+          onDragLeave={(e) => dragLeaveHandler(e)}
           onDrop={(e) => dropHandler(e, props.pageData, 'horizontal')}
           key={props.pageData.PageID}
           title={props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
@@ -103,8 +107,10 @@ export default function NavBar(props) {
               // render this dropdown level
               <NavDropdown.Item
                 draggable={canEdit}
+                onMouseMove={(e) => mouseMoveHandler(e)}
                 onDragStart={(e) => dragStartHandler(e, item)}
-                onDragOver={(e) => dragOverHandler(e)}
+                onDragOver={(e) => dragOverHandler(e, item, 'vertical')}
+                onDragLeave={(e) => dragLeaveHandler(e)}
                 onDrop={(e) => dropHandler(e, item, 'vertical')}
                 className={`text-nowrap${pageData?.PageID === item.PageID ? ' active' : ''}`}
                 key={item.PageID}
@@ -153,18 +159,63 @@ export default function NavBar(props) {
       });
   }
 
+  function mouseMoveHandler(e) {
+    if (canEdit) {
+      const percent = getCursorPercent(e, 'horizontal')
+      e.target.style.cursor = percent < 0.25 ? 'move' : 'pointer';
+    }
+  }
+
   function dragStartHandler(e, data) {
     if (canEdit) {
-      console.debug(`Drag start. data = ${JSON.stringify(data)}`);
       if (!e.dataTransfer.getData('application/json')) {
+        e.target.style.cursor = 'move';
         e.dataTransfer.setData('application/json', JSON.stringify(data));
         e.stopPropagation()
       }
     }
   }
 
-  function dragOverHandler(e) {
+  function getCursorPercent(e, direction) {
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
+    const width = e.nativeEvent.target.offsetWidth;
+    const height = e.nativeEvent.target.offsetHeight;
+    return direction === 'vertical' ? y / height : x / width;
+  }
+
+  function dragOverHandler(e, dropData, direction) {
+    if (togglerRef.current?.checkVisibility()) {
+      // navbar is collapsed, all items are vertical
+      direction = 'vertical';
+    }
+    const percent = getCursorPercent(e, direction);
+    if (direction === 'vertical') {
+      e.target.style.borderStyle = 'solid';
+      if (percent < 0.40) {
+        e.target.style.borderWidth = '2px 0 0 0';
+      } else if (percent < 0.60) {
+        e.target.style.borderWidth = '0 2px 0 0';
+      } else {
+        e.target.style.borderWidth = '0 0 2px 0';
+
+      }
+    } else if (direction === 'horizontal') {
+      e.target.style.borderStyle = 'solid';
+      if (percent < 0.40) {
+        e.target.style.borderWidth = '0 0 0 2px';
+      } else if (percent < 0.60) {
+        e.target.style.borderWidth = '0 0 2px 0';
+      } else {
+        e.target.style.borderWidth = '0 2px 0 0';
+      }
+    }
     e.preventDefault();
+  }
+
+  function dragLeaveHandler(e) {
+    e.target.style.borderStyle = 'none';
+    e.target.style.borderWidth = '0 0 0 0';
   }
 
   /**
@@ -176,33 +227,35 @@ export default function NavBar(props) {
    */
   function dropHandler(e, dropData, direction) {
     if (canEdit) {
-      const x = e.nativeEvent.offsetX;
-      const y = e.nativeEvent.offsetY;
-      const width = e.nativeEvent.target.offsetWidth;
-      const height = e.nativeEvent.target.offsetHeight;
-      const percent = direction === 'vertical' ? y / height : x / width;
+      if (togglerRef.current?.checkVisibility()) {
+        // navbar is collapsed, all items are vertical
+        direction = 'vertical';
+      }
+      e.target.style.borderStyle = 'none';
+      e.target.style.borderWidth = '0 0 0 0';
+      const percent = getCursorPercent(e, direction);
       const dragData = JSON.parse(e.dataTransfer.getData('application/json'));
-      if (dragData.PageID ===  dropData.PageID) {
+      if (dragData.PageID === dropData.PageID) {
         // dropped on same item
         return;
       }
-      if (percent < 0.33) {
+      if (percent < 0.40) {
         console.debug(`Move page '${dragData.PageTitle}' before page '${dropData.PageTitle}'`);
         // move outline first for UI responsiveness
         outline.movePageBefore(dragData, dropData);
         movePageBefore(dragData.PageID, dropData.PageID)
-          .then((result) => {
+          .then(() => {
             console.debug(`Page moved.`);
           })
           .catch((err) => {
             console.error(`Error moving page.`, err);
           });
-      } else if (percent < 0.66) {
+      } else if (percent < 0.60) {
         console.debug(`Make page '${dragData.PageTitle}' child of page '${dropData.PageTitle}'`);
         // move outline first for UI responsiveness
         outline.makeChildOf(dragData, dropData);
         makePageChildOf(dragData.PageID, dropData.PageID)
-          .then((result) => {
+          .then(() => {
             console.debug(`Page moved.`);
           })
           .catch((err) => {
@@ -287,8 +340,11 @@ export default function NavBar(props) {
                 ) : (
                   <Nav.Link
                     draggable={canEdit}
+                    style={{cursor: canEdit ? 'move' : 'pointer'}}
+                    onMouseMove={(e) => mouseMoveHandler(e)}
                     onDragStart={(e) => dragStartHandler(e, item)}
-                    onDragOver={(e) => dragOverHandler(e)}
+                    onDragOver={(e) => dragOverHandler(e, item, 'horizontal')}
+                    onDragLeave={(e) => dragLeaveHandler(e)}
                     onDrop={(e) => dropHandler(e, item, 'horizontal')}
                     onClick={() => navigateTo(item.PageRoute)}
                     className={`NavItem text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
@@ -345,7 +401,7 @@ export default function NavBar(props) {
                         id={'PageTitle'}
                         name={'PageTitle'}
                         value={newPageTitle || ''}
-                        placeholder={'My Page'}
+                        placeholder={'Title'}
                         onChange={(e) => {
                           setNewPageTitle(e.target.value)
                         }}
@@ -369,7 +425,7 @@ export default function NavBar(props) {
                         isInvalid={newPageRoute?.length > 0 && !isValidRoute(newPageRoute)}
                         id={'PageRoute'}
                         name={'PageRoute'}
-                        placeholder={'/mypage'}
+                        placeholder={'/page'}
                         type="text"
                         value={newPageRoute || ''}
                         onChange={(e) => {
