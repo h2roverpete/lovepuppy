@@ -8,18 +8,20 @@ import {Col, Form, Row} from "react-bootstrap";
  * @param guestBookConfig {GuestBookConfig}
  * @param guestFeedbackData {GuestFeedbackData}
  * @param onChange {DataCallback}
+ * @param labelCols {Number}
  * @returns {JSX.Element}
  * @constructor
  */
-function GuestFeedbackFields({guestBookConfig, guestFeedbackData, onChange}) {
+function GuestFeedbackFields({guestBookConfig, guestFeedbackData, onChange, labelCols}) {
   return (<>
     {guestBookConfig.ShowLodgingFields && (
-      <LodgingFields lodgingData={guestFeedbackData} onChange={onChange}/>
+      <LodgingFields lodgingData={guestFeedbackData} onChange={onChange} labelCols={labelCols}/>
     )}
     <CustomFields
       guestBookConfig={guestBookConfig}
       feedbackData={guestFeedbackData}
       onChange={onChange}
+      labelCols={labelCols}
     />
     {guestBookConfig.ShowFeedback && (
       <Row className={'mt-2'}>

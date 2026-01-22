@@ -48,7 +48,7 @@ export default function GuestBookConfig() {
   }
 
   function areCustomFieldsValid() {
-    for (let i = 0; i <=8; i++) {
+    for (let i = 0; i <= 8; i++) {
       if (edits[`Custom${i}Type`]?.length > 0 && !edits[`Custom${i}Label`]) {
         return false;
       }
@@ -85,7 +85,7 @@ export default function GuestBookConfig() {
     for (let i = 1; i <= 8; i++) {
       if (!edits[`Custom${i}Type`]) {
         console.debug(`Adding custom field at position ${i}`);
-        setEdits ({
+        setEdits({
           ...edits,
           [`Custom${i}Label`]: '',
           [`Custom${i}Type`]: 'text',
@@ -138,7 +138,6 @@ export default function GuestBookConfig() {
         >
           <AccordionButton
             style={{
-              position: 'absolute',
               padding: '0 8px 0 0',
               top: '0',
               left: '0',
@@ -302,6 +301,25 @@ export default function GuestBookConfig() {
                   disabled={!edits.ShowFeedback}
                   onChange={(e) => onDataChanged({name: 'TextCaption', value: e.target.value})}
                 />
+              </Col>
+              <Col sm={6}>
+                <Form.Label
+                  size={"sm"}
+                  htmlFor={"LabelCols"}
+                  column={'sm'}
+                >
+                  Label Width
+                </Form.Label>
+                <Form.Select
+                  id={'LabelCols'}
+                  value={edits.LabelCols || '2'}
+                  size={"sm"}
+                  onChange={(e) => onDataChanged({name: 'LabelCols', value: parseInt(e.target.value)})}
+                >
+                  <option value={'2'}>2 Columns</option>
+                  <option value={'3'}>3 Columns</option>
+                  <option value={'4'}>4 Columns</option>
+                </Form.Select>
               </Col>
             </Row>
             <Row className="mt-2">
