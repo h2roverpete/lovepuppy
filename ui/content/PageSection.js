@@ -6,7 +6,8 @@ import {BsPencil} from "react-icons/bs";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
-import {DropState} from "../editor/FileDropTarget";
+import {DropState, FileDropTarget} from "../editor/FileDropTarget";
+import UploadFileModal from "../editor/UploadFileModal";
 
 /**
  * Generate a page section
@@ -169,14 +170,11 @@ function PageSection({pageSectionData}) {
     }
   }, [sectionImageRef, dropFileRef, canEdit, pageSectionData]);
 
-  useEffect(() => {
+  function selectImageFile() {
     if (fileInputRef.current && canEdit) {
       fileInputRef.current.addEventListener('change', fileSelectedHandler);
+      fileInputRef.current.click();
     }
-  }, [fileInputRef, canEdit]);
-
-  function selectImageFile() {
-    fileInputRef.current.click();
   }
 
   function fileSelectedHandler(e) {
@@ -266,6 +264,7 @@ function PageSection({pageSectionData}) {
 
         </ModalFooter>
       </Modal>
+      <UploadFileModal ref={dropFileRef} show={uploadPrompt === DropState.UPLOADING}/>
       <div
         className={`PageSection`}
         style={{position: 'relative'}}
@@ -294,11 +293,9 @@ function PageSection({pageSectionData}) {
           allowEnterKey={true}
           editing={editingText}
         />
-        {canEdit && (
-          <>
-            <input type="file" ref={fileInputRef} hidden={true}/>
-          </>
-        )}
+        {canEdit && (<>
+          <input type="file" ref={fileInputRef} hidden={true}/>
+        </>)}
         {(canEdit && !editingText && !editingTitle) && (
           <div
             className="dropdown"
@@ -332,8 +329,7 @@ function PageSection({pageSectionData}) {
         )}
       </div>
     </PageSectionContext>
-  )
-    ;
+  );
 }
 
 const PageSectionContext = createContext({});
