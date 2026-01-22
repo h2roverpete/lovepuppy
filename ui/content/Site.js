@@ -5,6 +5,20 @@ import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useNavigate} from "react-router";
 import {useRestApi} from "../../api/RestApi";
 import Logout from '../../auth/Logout';
+import {useEdit} from "../editor/EditProvider";
+import {Accordion, Button, Collapse} from "react-bootstrap";
+import {
+  BsArrowLeft,
+  BsArrowRight,
+  BsArrowsMove,
+  BsCaretLeft,
+  BsCaretRight,
+  BsChevronBarExpand, BsChevronLeft,
+  BsChevronRight
+} from "react-icons/bs";
+import SiteFields from "../editor/SiteFields";
+import SiteOutline from "../editor/SiteOutline";
+import SiteEditor from "../editor/SiteEditor";
 
 /**
  * @typedef ErrorData
@@ -55,6 +69,8 @@ export default function Site(props) {
   const [error, __setError__] = useState(null); // use public setter, not __setError__
   const navigate = useNavigate();
   const {getSite, getSiteOutline} = useRestApi();
+  const {canEdit} = useEdit();
+  const [activeKey, setActiveKey] = useState('');
 
   /**
    * Display the site in an error state.
@@ -195,6 +211,7 @@ export default function Site(props) {
         const changedItem = {...item};
         changedItem.OutlineSeq = beforePageData.OutlineSeq;
         changedItem.ParentID = beforePageData.ParentID;
+        changedItem.OutlineLevel = beforePageData.OutlineLevel;
         return changedItem;
       } else if (item.ParentID === beforePageData.ParentID && item.OutlineSeq >= beforePageData.OutlineSeq) {
         // increment outline sequence
@@ -206,8 +223,7 @@ export default function Site(props) {
         return item;
       }
     });
-    newOutlineData.sort((a, b) => a.OutlineSeq - b.OutlineSeq);
-    setOutlineData(newOutlineData);
+    setOutlineData(buildOutline(newOutlineData));
   }
 
   function movePageAfter(pageData, afterPageData) {
@@ -217,6 +233,7 @@ export default function Site(props) {
         const changedItem = {...item};
         changedItem.OutlineSeq = afterPageData.OutlineSeq + 1;
         changedItem.ParentID = afterPageData.ParentID;
+        changedItem.OutlineLevel = afterPageData.OutlineLevel;
         return changedItem;
       } else if (item.ParentID === afterPageData.ParentID && item.OutlineSeq > afterPageData.OutlineSeq) {
         // increment outline sequence
@@ -228,8 +245,7 @@ export default function Site(props) {
         return item;
       }
     });
-    newOutlineData.sort((a, b) => a.OutlineSeq - b.OutlineSeq);
-    setOutlineData(newOutlineData);
+    setOutlineData(buildOutline(newOutlineData));
   }
 
   function makeChildOf(pageData, parentPageData) {
@@ -239,8 +255,9 @@ export default function Site(props) {
         const changedItem = {...item};
         changedItem.OutlineSeq = 1;
         changedItem.ParentID = parentPageData.PageID;
+        changedItem.OutlineLevel = parentPageData.OutlineLevel + 1;
         return changedItem;
-      } else if (item.ParentID === parentPageData.ParentID) {
+      } else if (item.ParentID === parentPageData.PageID) {
         // increment outline sequence
         const changedItem = {...item};
         changedItem.OutlineSeq++;
@@ -250,94 +267,159 @@ export default function Site(props) {
         return item;
       }
     });
-    newOutlineData.sort((a, b) => a.OutlineSeq - b.OutlineSeq);
-    setOutlineData(newOutlineData);
+    setOutlineData(buildOutline(newOutlineData));
   }
 
-  // provide context to children
-  return (
-    <div className="Site" data-testid="Site">
-      <SiteContext
-        value={{
-          siteData: siteData,
-          outlineData: outlineData,
-          outline: {
-            deletePage: deletePageFromOutline,
-            addPage: addPageToOutline,
-            movePageBefore: movePageBefore,
-            movePageAfter: movePageAfter,
-            makeChildOf: makeChildOf,
-            updatePage: updateOutlineData,
-          },
-          error: error,
-          setError: setError,
-          getChildren: getChildren
-        }}
-      >
-        <Routes>
-          <Route
-            path="/login"
-            element={<props.pageElement login={true}/>
-            }
-          />
-          <Route
-            path="/logout"
-            element={<Logout/>}
-          />
-          <>{error && (
-            // error page display
+  /**
+   * Build an outline from an array of page data.
+   * The result is sorted using the OutlineSeq field.
+   *
+   * @param pages {[OutlineData]}      Array of page data (arbitrary sort order)
+   * @param [parentId] {number}     Parent page ID.
+   * @param [level] {number}        Level number, also a trigger to recurse through all children.
+   * @param [parent] {OutlineData}  Parent's sort string
+   * @returns {[OutlineData]}       Outline built from page data
+   */
+  function buildOutline(pages, parentId, level, parent) {
+    parentId = parentId ? parentId : 0;
+    level = level ? level : 0;
+    let result = [];
+    pages.map((page) => {
+      if (page.ParentID === parentId) {
+        // copy outline data fields
+        const child = {
+          PageID: page.PageID,
+          SiteID: page.SiteID,
+          ParentID: page.ParentID,
+          PageTitle: page.PageTitle,
+          DisplayTitle: page.DisplayTitle,
+          PageHidden: page.PageHidden,
+          NavTitle: page.NavTitle,
+          OutlineSeq: page.OutlineSeq,
+          LinkToURL: page.LinkToURL,
+          HasChildren: page.HasChildren,
+          PageRoute: page.PageRoute,
+          Modified: page.Modified,
+          OutlineLevel: level,
+          OutlineSort: setCharAt(parent ? parent.OutlineSort : '0'.repeat(20), level*2, page.OutlineSeq.toString().padStart(2,"0"))
+        }
+        result.push(child);
+        result = result.concat(buildOutline(pages, child.PageID, level + 1, child));
+      }
+    })
+    result.sort((a, b) => a.OutlineSort.localeCompare(b.OutlineSort));
+    return result;
+  }
+
+  function setCharAt(str, index, chr) {
+    if (index > str.length - 1) return str;
+    return str.substring(0, index) + chr + str.substring(index + 1);
+  }
+
+  const siteElements = (
+    <Routes>
+      <Route
+        path="/login"
+        element={<props.pageElement login={true}/>
+        }
+      />
+      <Route
+        path="/logout"
+        element={<Logout/>}
+      />
+      <>{error && (
+        // error page display
+        <Route
+          path="/error"
+          element={<props.pageElement error={error}/>
+          }
+        />
+      )}</>
+      <>{outlineData && (
+        <>
+          <>{cfmPageId && (
+            // legacy coldfusion page
             <Route
-              path="/error"
-              element={<props.pageElement error={error}/>
-              }
+              path="/page.cfm"
+              element={<props.pageElement pageId={cfmPageId}/>}
             />
           )}</>
-          <>{outlineData && (
-            <>
-              <>{cfmPageId && (
-                // legacy coldfusion page
-                <Route
-                  path="/page.cfm"
-                  element={<props.pageElement pageId={cfmPageId}/>}
-                />
-              )}</>
-              <>{redirect ? (
-                // redirect root for an alternate domain
-                <Route
-                  path="/"
-                  element={<props.pageElement pageId={redirect.pageId}/>}
-                />
-              ) : (
-                // normal root, first item in outline
-                <Route
-                  path="/"
-                  element={<props.pageElement pageId={outlineData[0].PageID}/>}
-                />
-              )}</>
-              {outlineData.map((page) => (
-                // all pages in site outline
-                <Route
-                  path={page.PageRoute}
-                  element={<props.pageElement pageId={page.PageID}
-                  />}
-                />
-              ))}
-              {/* catchall to display 404 errors when route not matched */}
-              <Route
-                path="*"
-                element={<props.pageElement
-                  error={{
-                    title: "404 Not Found",
-                    description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."
-                  }}/>}
-              />
-            </>
+          <>{redirect ? (
+            // redirect root for an alternate domain
+            <Route
+              path="/"
+              element={<props.pageElement pageId={redirect.pageId}/>}
+            />
+          ) : (
+            // normal root, first item in outline
+            <Route
+              path="/"
+              element={<props.pageElement pageId={outlineData[0].PageID}/>}
+            />
           )}</>
-          {props.children}
-        </Routes>
-      </SiteContext>
-    </div>
+          {outlineData.map((page) => (
+            // all pages in site outline
+            <Route
+              path={page.PageRoute}
+              element={<props.pageElement pageId={page.PageID}
+              />}
+            />
+          ))}
+          {/* catchall to display 404 errors when route not matched */}
+          <Route
+            path="*"
+            element={<props.pageElement
+              error={{
+                title: "404 Not Found",
+                description: "The content you are looking for was not found. Please select a topic on the navigation bar to browse the site."
+              }}/>}
+          />
+        </>
+      )}</>
+      {props.children}
+    </Routes>
+
   )
+
+  const [expanded, setExpanded] = useState(false)
+
+  const siteContext = {
+    siteData: siteData,
+    setSiteData: setSiteData,
+    outlineData: outlineData,
+    outline: {
+      deletePage: deletePageFromOutline,
+      addPage: addPageToOutline,
+      movePageBefore: movePageBefore,
+      movePageAfter: movePageAfter,
+      makeChildOf: makeChildOf,
+      updatePage: updateOutlineData,
+    },
+    error: error,
+    setError: setError,
+    getChildren: getChildren
+  };
+
+  if (canEdit) {
+    return (
+      <SiteContext value={siteContext}>
+        <SiteEditor>
+          <div className="Site" data-testid="Site">
+            {siteElements}
+          </div>
+        </SiteEditor>
+      </SiteContext>
+    )
+      ;
+  } else {
+    return (
+      <SiteContext value={siteContext}>
+        <div className="Site" data-testid="Site">
+          {siteElements}
+        </div>
+      </SiteContext>
+    );
+  }
 }
 
 export function useSiteContext() {

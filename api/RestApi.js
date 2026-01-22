@@ -17,6 +17,15 @@ export default function RestApi(props) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${cookies.token.access_token}`;
   }
 
+  async function insertOrUpdateSite(data) {
+    return await restApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/content/sites`, data);
+        return response.data;
+      }
+    });
+  }
+
   async function getPage(pageId) {
     const response = await axios.get(`${host}/api/v1/content/pages/${pageId}`);
     return response.data;
@@ -255,6 +264,7 @@ export default function RestApi(props) {
 
   return (
     <RestApiContext value={{
+      insertOrUpdateSite: insertOrUpdateSite,
       getPage: getPage,
       deletePage: deletePage,
       movePageAfter: movePageAfter,

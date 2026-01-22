@@ -214,7 +214,6 @@ export default function NavBar(props) {
   }
 
   function dragLeaveHandler(e) {
-    e.target.style.borderStyle = 'none';
     e.target.style.borderWidth = '0 0 0 0';
   }
 

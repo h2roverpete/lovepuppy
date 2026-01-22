@@ -13,7 +13,6 @@ export default function PageContent({children}) {
 
   return (
     <div className="PageContent container-fluid" data-testid="PageContent">
-      <PageFields/>
       {children}
       <PageExtras/>
     </div>
