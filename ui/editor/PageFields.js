@@ -22,7 +22,6 @@ export default function PageFields() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState(null);
-  const [touchedFields, setTouchedFields] = useState([]);
 
   useEffect(() => {
     if (pageData) {
@@ -35,17 +34,12 @@ export default function PageFields() {
       ...edits,
       [name]: value
     })
-    setTouchedFields([...touchedFields, name]);
   }
 
   function hasEdits() {
     if (pageData && edits) {
       return JSON.stringify(edits) !== JSON.stringify(pageData);
     } else return false;
-  }
-
-  function isTouched(name) {
-    return touchedFields.includes(name);
   }
 
   function isDataValid() {

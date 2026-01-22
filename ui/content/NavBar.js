@@ -182,6 +182,10 @@ export default function NavBar(props) {
       const height = e.nativeEvent.target.offsetHeight;
       const percent = direction === 'vertical' ? y / height : x / width;
       const dragData = JSON.parse(e.dataTransfer.getData('application/json'));
+      if (dragData.PageID ===  dropData.PageID) {
+        // dropped on same item
+        return;
+      }
       if (percent < 0.33) {
         console.debug(`Move page '${dragData.PageTitle}' before page '${dropData.PageTitle}'`);
         // move outline first for UI responsiveness
