@@ -6,18 +6,6 @@ import {Route, Routes, useNavigate} from "react-router";
 import {useRestApi} from "../../api/RestApi";
 import Logout from '../../auth/Logout';
 import {useEdit} from "../editor/EditProvider";
-import {Accordion, Button, Collapse} from "react-bootstrap";
-import {
-  BsArrowLeft,
-  BsArrowRight,
-  BsArrowsMove,
-  BsCaretLeft,
-  BsCaretRight,
-  BsChevronBarExpand, BsChevronLeft,
-  BsChevronRight
-} from "react-icons/bs";
-import SiteFields from "../editor/SiteFields";
-import SiteOutline from "../editor/SiteOutline";
 import SiteEditor from "../editor/SiteEditor";
 
 /**
@@ -28,13 +16,6 @@ import SiteEditor from "../editor/SiteEditor";
  */
 
 export const SiteContext = createContext({
-  siteData: null,
-  outlineData: null,
-  error: null,
-  setError: null,
-  login: false,
-  getChildren: (pageId, showHidden) => console.error(`getChildren() not defined.`),
-  updateOutlineData: (data) => console.error(`updateOutlineData() not defined.`),
 });
 
 /**
@@ -70,7 +51,6 @@ export default function Site(props) {
   const navigate = useNavigate();
   const {getSite, getSiteOutline} = useRestApi();
   const {canEdit} = useEdit();
-  const [activeKey, setActiveKey] = useState('');
 
   /**
    * Display the site in an error state.
@@ -380,8 +360,6 @@ export default function Site(props) {
     </Routes>
 
   )
-
-  const [expanded, setExpanded] = useState(false)
 
   const siteContext = {
     siteData: siteData,
