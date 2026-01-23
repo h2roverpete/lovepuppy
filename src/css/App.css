@@ -235,6 +235,19 @@ div.SectionImage img {
   background-repeat: repeat-x;
 }
 
+.btn.EditorToggle {
+  color: white;
+}
+.btn.EditorToggle:hover {
+  color: #f26222;
+}
+.btn.EditorToggle.expanded {
+  color: black;
+}
+.btn.EditorToggle.expanded:hover{
+  color: black;
+}
+
 /* bootstrap xs-sm width */
 @media (max-width: 768px) {
   .NavBarWrapper {
