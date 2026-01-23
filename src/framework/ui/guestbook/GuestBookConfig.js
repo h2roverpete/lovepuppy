@@ -148,7 +148,7 @@ export default function GuestBookConfig() {
             onClick={() => togglePanel('config')}
           />
           <Accordion.Body
-            style={{background: '#00000022', marginBottom: '20px'}}
+            style={{background: '#e0e0e0f0', marginBottom: '20px'}}
           >
             <Row><Col><h5>Guest Book Properties</h5></Col></Row>
             <Row>

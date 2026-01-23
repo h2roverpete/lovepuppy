@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
+import PageFields from "../editor/PageFields";
 
 export const PageContext = createContext(
   {}
@@ -133,6 +134,7 @@ export default function Page(props) {
           refreshPage: refreshPage
         }}
       >
+        <PageFields/>
         {props.children}
       </PageContext>
     </div>

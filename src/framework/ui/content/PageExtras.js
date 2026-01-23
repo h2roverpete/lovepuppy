@@ -17,13 +17,14 @@ export default function PageExtras() {
   const [extras, setExtras] = useState([]);
   const {pageData} = usePageContext();
   const {getGuestBooks, getGalleries} = useRestApi();
+  const {pageSectionData} = usePageSectionContext();
 
   useEffect(() => {
     if (pageData && getGuestBooks && getGalleries) {
       getGuestBooks().then((result) => {
         const newExtras = [];
         for (const guestBook of result) {
-          if (guestBook.PageID === pageData.PageID) {
+          if ((pageData && pageData.PageID === guestBook.PageID) || (pageSectionData && pageSectionData.PageSectionID === guestBook.PageSectionID)) {
             newExtras.push((
               <React.Fragment key={guestBook.GuestBookID}>
                 <GuestBook guestBookId={guestBook.GuestBookID} pageId={guestBook.PageID}/>
@@ -32,7 +33,7 @@ export default function PageExtras() {
         }
         getGalleries().then((result) => {
           for (const gallery of result) {
-            if (gallery.PageID === pageData.PageID) {
+            if ((pageData && pageData.PageID === gallery.PageID) || (pageSectionData && pageSectionData.PageSectionID === gallery.PageSectionID)) {
               newExtras.push(
                 <React.Fragment key={gallery.GalleryID}>
                   <Gallery galleryId={gallery.GuestBookID} pageId={gallery.PageID}/>)
@@ -48,7 +49,7 @@ export default function PageExtras() {
         console.error(`Error getting guest book list.`, err);
       })
     }
-  }, [getGuestBooks, getGalleries, pageData]);
+  }, [getGuestBooks, getGalleries, pageData, pageSectionData]);
 
   return (<>
     {extras}

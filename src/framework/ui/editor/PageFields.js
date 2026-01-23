@@ -22,7 +22,6 @@ export default function PageFields() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState(null);
-  const [touchedFields, setTouchedFields] = useState([]);
 
   useEffect(() => {
     if (pageData) {
@@ -35,17 +34,12 @@ export default function PageFields() {
       ...edits,
       [name]: value
     })
-    setTouchedFields([...touchedFields, name]);
   }
 
   function hasEdits() {
     if (pageData && edits) {
       return JSON.stringify(edits) !== JSON.stringify(pageData);
     } else return false;
-  }
-
-  function isTouched(name) {
-    return touchedFields.includes(name);
   }
 
   function isDataValid() {
@@ -214,7 +208,7 @@ export default function PageFields() {
           </Modal.Footer>
         </Modal>
         <Accordion
-          style={{width: "100%", position: "relative", minHeight: '20px'}}
+          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 800}}
           activeKey={activeKey}
         >
           <Accordion.Item
@@ -234,7 +228,11 @@ export default function PageFields() {
               onClick={() => setActiveKey(activeKey ? null : '0')}
             />
             <Accordion.Body
-              style={{background: '#00000022', marginBottom: '20px'}}
+              style={{
+                background: '#e0e0e0f0',
+                marginBottom: '20px',
+                borderBottom: '1px solid #00000040'
+            }}
             >
               <Row><Col><h5>Page Properties</h5></Col></Row>
               <Row>
@@ -332,7 +330,7 @@ export default function PageFields() {
                 </Col>
               </Row>
               <Row>
-                <Col sm={6}>
+                <Col xs={'auto'} className={"d-flex flex-nowrap flex-grow-1"}>
                   <Button
                     variant="primary"
                     size="sm"
@@ -351,15 +349,15 @@ export default function PageFields() {
                   >
                     Revert
                   </Button>
-                </Col>
-                <Col sm={6} align="end">
+                  <div style={{flexGrow: 1}}/>
                   <Button
                     variant="secondary"
                     size="sm"
                     className="me-2 mt-2"
                     onClick={onAddSection}
                   >
-                    Add Section
+                    <span className={'d-none d-sm-block'}>Add Section</span>
+                    <span className={'d-sm-none'}>+Section</span>
                   </Button>
                   <Button
                     variant="secondary"
@@ -367,7 +365,8 @@ export default function PageFields() {
                     className="me-2 mt-2"
                     onClick={() => setShowAddExtras(true)}
                   >
-                    Add Extra
+                    <span className={'d-none d-sm-block'}>Add Extra</span>
+                    <span className={'d-sm-none'}>+Extra</span>
                   </Button>
                   <Button
                     variant="danger"
@@ -375,7 +374,8 @@ export default function PageFields() {
                     className="mt-2"
                     onClick={() => setShowDeleteConfirmation(true)}
                   >
-                    Delete Page
+                    <span className={'d-none d-sm-block'}>Delete Page</span>
+                    <span className={'d-sm-none'}>Delete</span>
                   </Button>
                 </Col>
               </Row>
