@@ -190,27 +190,29 @@ export default function NavBar(props) {
       direction = 'vertical';
     }
     const percent = getCursorPercent(e, direction);
-    if (direction === 'vertical') {
-      e.target.style.borderStyle = 'solid';
-      if (percent < 0.40) {
-        e.target.style.borderWidth = '2px 0 0 0';
-      } else if (percent < 0.60) {
-        e.target.style.borderWidth = '0 2px 0 0';
-      } else {
-        e.target.style.borderWidth = '0 0 2px 0';
+    if (canEdit) {
+      if (direction === 'vertical') {
+        e.target.style.borderStyle = 'solid';
+        if (percent < 0.40) {
+          e.target.style.borderWidth = '2px 0 0 0';
+        } else if (percent < 0.60) {
+          e.target.style.borderWidth = '0 2px 0 0';
+        } else {
+          e.target.style.borderWidth = '0 0 2px 0';
 
+        }
+      } else if (direction === 'horizontal') {
+        e.target.style.borderStyle = 'solid';
+        if (percent < 0.40) {
+          e.target.style.borderWidth = '0 0 0 2px';
+        } else if (percent < 0.60) {
+          e.target.style.borderWidth = '0 0 2px 0';
+        } else {
+          e.target.style.borderWidth = '0 2px 0 0';
+        }
       }
-    } else if (direction === 'horizontal') {
-      e.target.style.borderStyle = 'solid';
-      if (percent < 0.40) {
-        e.target.style.borderWidth = '0 0 0 2px';
-      } else if (percent < 0.60) {
-        e.target.style.borderWidth = '0 0 2px 0';
-      } else {
-        e.target.style.borderWidth = '0 2px 0 0';
-      }
+      e.preventDefault();
     }
-    e.preventDefault();
   }
 
   function dragLeaveHandler(e) {

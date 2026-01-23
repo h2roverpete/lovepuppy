@@ -1,9 +1,9 @@
 import {useSiteContext} from "../content/Site";
-import {Col, Form, Row, Button} from "react-bootstrap";
+import {Col, Form, Row, Button, Container} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useEffect, useState} from "react";
 
-export default function SiteFields() {
+export default function SiteFields(props) {
   const {siteData, setSiteData} = useSiteContext();
   const {insertOrUpdateSite} = useRestApi();
   const [edits, setEdits] = useState({});
@@ -63,7 +63,7 @@ export default function SiteFields() {
 
   return (<>
     {siteData && (
-      <div>
+      <div {...props}>
         <Row>
           <Col>
             <Form.Label column={'sm'} htmlFor={'SiteName'}>Site Name</Form.Label>

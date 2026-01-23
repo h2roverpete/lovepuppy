@@ -2,8 +2,9 @@ import {useSiteContext} from "../content/Site";
 import {useLocation, useNavigate} from "react-router";
 import {onMouseMove, onDragOver, onDragStart, onDragLeave, getCursorPercent} from "./DragUtils";
 import {useRestApi} from "../../api/RestApi";
+import {Container, Row} from "react-bootstrap";
 
-export default function SiteOutline() {
+export default function SiteOutline(props) {
   const {outlineData, outline} = useSiteContext();
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,7 +58,7 @@ export default function SiteOutline() {
 
   console.debug(`Show outline. location=${JSON.stringify(location)}`);
   return (
-    <div>
+    <div {...props}>
       {outlineData?.map((page) => (
         <div
           key={page.PageID}
