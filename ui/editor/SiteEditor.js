@@ -32,7 +32,7 @@ export default function SiteEditor({children}) {
             zIndex: '100',
           }}>
             <div style={{
-              padding: '18px 20px 20px 20px',
+              padding: '7px 10px 10px 20px',
               display: 'flex',
               flexDirection: 'column',
               height: '100vh',
@@ -52,12 +52,12 @@ export default function SiteEditor({children}) {
         onClick={() => setExpanded(!expanded)}
         className={'bg-transparent btn-light border-0'}
         style={{
-          padding: '21px 0 0 2px',
+          padding: '10px 0 0 2px',
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           position: 'fixed',
-          zIndex: '100',
+          zIndex: '900',
         }}
       >
         {expanded ? (<BsChevronLeft size={'18'}/>) : ((<BsChevronRight/>))}

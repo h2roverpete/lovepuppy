@@ -208,7 +208,7 @@ export default function PageFields() {
           </Modal.Footer>
         </Modal>
         <Accordion
-          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 900}}
+          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 800}}
           activeKey={activeKey}
         >
           <Accordion.Item
@@ -330,7 +330,7 @@ export default function PageFields() {
                 </Col>
               </Row>
               <Row>
-                <Col xs={'auto'} className={'pe-0'}>
+                <Col xs={'auto'} className={"d-flex flex-nowrap flex-grow-1"}>
                   <Button
                     variant="primary"
                     size="sm"
@@ -349,6 +349,7 @@ export default function PageFields() {
                   >
                     Revert
                   </Button>
+                  <div style={{flexGrow: 1}}/>
                   <Button
                     variant="secondary"
                     size="sm"
