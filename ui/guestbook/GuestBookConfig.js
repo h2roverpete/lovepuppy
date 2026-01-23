@@ -131,6 +131,7 @@ export default function GuestBookConfig() {
       </Modal>
       <Accordion
         activeKey={activeKey}
+        className="SiteEditor"
       >
         <Accordion.Item
           style={{width: "100%", position: "relative", background: 'transparent', border: 'none'}}

@@ -12,7 +12,6 @@ export default function PageContent({children}) {
   return (
     <div className="PageContent container-fluid" data-testid="PageContent">
       {children}
-      <PageExtras/>
     </div>
   )
 }

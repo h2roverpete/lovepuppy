@@ -213,6 +213,7 @@ export default function PageFields() {
         <Accordion
           style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 2010, top: 0}}
           activeKey={activeKey}
+          className={'SiteEditor'}
         >
           <Accordion.Item
             style={{

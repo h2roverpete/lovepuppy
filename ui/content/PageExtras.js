@@ -36,7 +36,7 @@ export default function PageExtras() {
             if ((pageData && pageData.PageID === gallery.PageID) || (pageSectionData && pageSectionData.PageSectionID === gallery.PageSectionID)) {
               newExtras.push(
                 <React.Fragment key={gallery.GalleryID}>
-                  <Gallery galleryId={gallery.GuestBookID} pageId={gallery.PageID}/>)
+                  <Gallery galleryId={gallery.GalleryID} pageId={gallery.PageID}/>
                 </React.Fragment>
               );
             }
