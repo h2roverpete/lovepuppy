@@ -1,11 +1,12 @@
 import {useEdit} from "./EditProvider";
-import {Accordion, AccordionButton, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Accordion, Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {usePageContext} from "../content/Page";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {useNavigate} from "react-router";
 import EmailField, {isValidEmail} from "../forms/EmailField";
+import {BsChevronDown, BsChevronUp} from "react-icons/bs";
 
 /**
  * Edit page metadata fields.
@@ -148,7 +149,7 @@ export default function PageFields() {
   return (
     <>{canEdit && pageData && (
       <>
-        <Modal show={showDeleteConfirmation}>
+        <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)} style={{zIndex: 2020}}>
           <Modal.Header><h5>Delete Page</h5></Modal.Header>
           <Modal.Body>Are you sure you want to delete this page? This action can't be undone.</Modal.Body>
           <Modal.Footer>
@@ -159,7 +160,7 @@ export default function PageFields() {
             }}>Delete</Button>
           </Modal.Footer>
         </Modal>
-        <Modal show={showAddExtras} onHide={() => setShowAddExtras(false)}>
+        <Modal show={showAddExtras} onHide={() => setShowAddExtras(false)} style={{zIndex: 2020}}>
           <Modal.Header><h5>Add an Extra to '{pageData.PageTitle}'</h5></Modal.Header>
           <Modal.Body>
             <Row>
@@ -174,6 +175,8 @@ export default function PageFields() {
                   <option value={''}>(Select)</option>
                   <option value='gallery'>Photo Gallery</option>
                   <option value='guestbook'>Guest Book</option>
+                  <option value='instagram'>Instagram Gallery</option>
+                  <option value='html'>HTML File</option>
                 </Form.Select>
               </Col>
             </Row>
@@ -208,31 +211,42 @@ export default function PageFields() {
           </Modal.Footer>
         </Modal>
         <Accordion
-          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 800}}
+          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 2010, top: 0}}
           activeKey={activeKey}
         >
           <Accordion.Item
-            style={{width: "100%", position: "relative", background: 'transparent', border: 'none'}}
+            style={{
+              width: "100%",
+              position: "relative",
+              background: 'transparent',
+              border: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
             eventKey={'0'}
           >
-            <AccordionButton
+            <Button
+              className={`EditorToggle ${activeKey ? 'expanded' : ''}`}
               style={{
                 position: 'absolute',
                 padding: '0 8px 0 0',
                 top: '0',
-                left: '0',
+                left: '20',
+                alignSelf: 'end',
                 border: 'none',
                 background: 'transparent',
-                boxShadow: 'none'
+                boxShadow: 'none',
+                marginRight: '20px',
               }}
               onClick={() => setActiveKey(activeKey ? null : '0')}
-            />
+            >{activeKey ? <BsChevronUp size={20}/> : <BsChevronDown size={20}/>}</Button>
             <Accordion.Body
               style={{
                 background: '#e0e0e0f0',
                 marginBottom: '20px',
-                borderBottom: '1px solid #00000040'
-            }}
+                borderBottom: '1px solid #00000040',
+                flexGrow: 1,
+              }}
             >
               <Row><Col><h5>Page Properties</h5></Col></Row>
               <Row>

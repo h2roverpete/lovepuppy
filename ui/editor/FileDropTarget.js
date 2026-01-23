@@ -9,7 +9,7 @@ import './FileDropTarget.css';
  * @returns {JSX.Element}
  * @constructor
  */
-export function FileDropTarget({ref, state}) {
+export function FileDropTarget({ref, state, hidden}) {
 
   function renderContent() {
     switch (state) {

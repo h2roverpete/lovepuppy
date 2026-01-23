@@ -17,22 +17,35 @@ export default function SiteEditor({children}) {
         height: '100%'
       }}
     >
+      <Button
+        onClick={() => setExpanded(!expanded)}
+        className={`EditorToggle ${expanded ? 'expanded':''} bg-transparent btn-light border-0`}
+        style={{
+          padding: '21px 0 0 2px',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'fixed',
+          zIndex: '2001',
+        }}
+      >
+        {expanded ? (<BsChevronLeft size={'20'}/>) : ((<BsChevronRight size={'20'}/>))}
+      </Button>
         <Collapse
           in={expanded}
           dimension={'width'}
         >
           <div style={{
-            width: '250px',
-            minWidth: '250px',
             height: '100vh',
             borderRight: '1px solid #00000040',
             backgroundColor: '#e0e0e0f0',
             position: 'fixed',
             left: '0px',
-            zIndex: '100',
+            zIndex: '2000',
           }}>
             <div style={{
-              padding: '7px 10px 10px 20px',
+              width: '300px',
+              padding: '20px 10px 10px 23px',
               display: 'flex',
               flexDirection: 'column',
               height: '100vh',
@@ -48,20 +61,7 @@ export default function SiteEditor({children}) {
             </div>
           </div>
         </Collapse>
-      <Button
-        onClick={() => setExpanded(!expanded)}
-        className={'bg-transparent btn-light border-0'}
-        style={{
-          padding: '10px 0 0 2px',
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'fixed',
-          zIndex: '900',
-        }}
-      >
-        {expanded ? (<BsChevronLeft size={'18'}/>) : ((<BsChevronRight/>))}
-      </Button>
+
       {
         children
       }

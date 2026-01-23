@@ -1,4 +1,3 @@
-import PageFields from "../editor/PageFields";
 import PageExtras from "./PageExtras";
 
 /**
@@ -10,7 +9,6 @@ import PageExtras from "./PageExtras";
  * @constructor
  */
 export default function PageContent({children}) {
-
   return (
     <div className="PageContent container-fluid" data-testid="PageContent">
       {children}

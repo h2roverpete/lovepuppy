@@ -6,7 +6,7 @@ import {BsPencil} from "react-icons/bs";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
-import {DropState} from "../editor/FileDropTarget";
+import {DropState, FileDropTarget} from "../editor/FileDropTarget";
 import UploadFileModal from "../editor/UploadFileModal";
 import PageExtras from "./PageExtras";
 
@@ -161,6 +161,7 @@ function PageSection({pageSectionData}) {
   const dropFileRef = useRef(null);
   const fileInputRef = useRef(null);
   const sectionImageRef = useRef(null);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     if (sectionImageRef.current && canEdit) {
@@ -168,6 +169,11 @@ function PageSection({pageSectionData}) {
       sectionImageRef.current.addEventListener('dragleave', dragLeaveHandler);
       sectionImageRef.current.addEventListener('dragover', dragOverHandler);
       sectionImageRef.current.addEventListener('drop', dropHandler);
+    } else if (canEdit) {
+      sectionRef.current.addEventListener('dragenter', dragEnterHandler);
+      sectionRef.current.addEventListener('dragleave', dragLeaveHandler);
+      sectionRef.current.addEventListener('dragover', dragOverHandler);
+      sectionRef.current.addEventListener('drop', dropHandler);
     }
   }, [sectionImageRef, dropFileRef, canEdit, pageSectionData]);
 
@@ -251,25 +257,27 @@ function PageSection({pageSectionData}) {
     <PageSectionContext value={{
       pageSectionData: pageSectionData
     }}>
-      <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
-        <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
-        <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
-        <ModalFooter>
-          <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel
-          </Button>
-          <Button size="sm" variant="danger" onClick={() => {
-            deleteSection();
-            setShowDeleteConfirmation(false)
-          }}>Delete Section
-          </Button>
+      {canEdit && (<>
+        <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+          <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
+          <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
+          <ModalFooter>
+            <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel
+            </Button>
+            <Button size="sm" variant="danger" onClick={() => {
+              deleteSection();
+              setShowDeleteConfirmation(false)
+            }}>Delete Section
+            </Button>
 
-        </ModalFooter>
-      </Modal>
-      <UploadFileModal ref={dropFileRef} show={uploadPrompt === DropState.UPLOADING}/>
+          </ModalFooter>
+        </Modal>
+      </>)}
       <div
         className={`PageSection`}
         style={{position: 'relative'}}
         data-testid={`PageSection-${pageSectionData.PageSectionID}`}
+        ref={sectionRef}
       >
         <EditableField
           field={sectionTitle}
@@ -327,6 +335,9 @@ function PageSection({pageSectionData}) {
               <span className="dropdown-item" onClick={() => setShowDeleteConfirmation(true)}> Delete Section</span>
             </div>
           </div>
+        )}
+        {!pageSectionData.SectionImage && (
+          <FileDropTarget state={uploadPrompt} ref={dropFileRef}/>
         )}
         <PageExtras/>
       </div>
