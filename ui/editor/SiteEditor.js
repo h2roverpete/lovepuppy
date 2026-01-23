@@ -39,9 +39,9 @@ export default function SiteEditor({children}) {
             }}>
               <div style={{flexGrow: 1}}>
                 <h5>Site Outline</h5>
-                <SiteOutline/>
+                <SiteOutline style={{maxHeight: '60vh'}} className={'overflow-auto'} />
               </div>
-              <div style={{flexGrow: 0}}>
+              <div style={{flexShrink: 0}}>
                 <h5 className={'mt-4'}>Site Properties</h5>
                 <SiteFields/>
               </div>
