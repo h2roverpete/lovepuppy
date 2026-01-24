@@ -1,25 +1,17 @@
-/**
- * @typedef InstagramProps
- * @property {number} pageId
- * @property {string} url
- * @property {string} token
- */
-
-import {useContext} from "react";
-import {PageContext} from "../content/Page";
 import {InstagramEmbed} from "react-social-media-embed";
+import InstagramConfig from "./InstagramConfig";
 
 /**
+ * Embed an Instagram feed.
  *
- * @param props {InstagramProps}
+ * @param extraData   {ExtraData}
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Instagram(props) {
-  const {pageData} = useContext(PageContext);
-  return (
-    <>{props.pageId === pageData?.PageID && (
-        <InstagramEmbed url={props.url} width={'100%'}/>
-    )}</>
-  );
+export default function Instagram({extraData}) {
+  const cleanHandle = extraData.InstagramHandle.replaceAll(/[^a-zA-Z0-9-\-.]/g, '');
+  return (<div className={'Instagram'}>
+    <InstagramEmbed url={`https://www.instagram.com/${cleanHandle}`} width={'100%'}/>
+    <InstagramConfig extraData={extraData}/>
+  </div>);
 }

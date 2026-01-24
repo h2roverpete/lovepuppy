@@ -165,7 +165,6 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
             GuestBookID: extraData.GuestBookID
           }).then((result) => {
             console.debug(`Extra added.`);
-            setExtraData(result);
             onHide?.();
             onSubmit?.();
             setExtraData({});
@@ -173,6 +172,21 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
             console.error(`Error adding extra.`, err);
           });
         }
+        break;
+      case 'instagram':
+        console.debug(`Adding Instagram extra.`);
+        Extras.insertOrUpdateExtra({
+          ExtraType: extraData.ExtraType,
+          SiteID: extraData.SiteID,
+          PageID: extraData.PageID,
+          PageSectionID: extraData.PageSectionID,
+          InstagramHandle: extraData.InstagramHandle
+        }).then(() => {
+          console.debug(`Extra added.`);
+          onHide?.();
+          onSubmit?.();
+          setExtraData({});
+        }).catch((err) => console.error(`Error adding instagram.`, err));
         break;
       default:
         console.error(`Unsupported extra type ${extraData.ExtraType}`)
