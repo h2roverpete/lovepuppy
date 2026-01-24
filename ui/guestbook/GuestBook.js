@@ -1,22 +1,12 @@
 import {useEffect, useState, memo, useContext, createContext} from "react";
 import GuestFields from "./GuestFields";
 import GuestFeedbackFields from "./GuestFeedbackFields";
-import {PageContext} from "../content/Page";
 import '../forms/Forms.css'
 import {useRestApi} from "../../api/RestApi";
 import {Button} from "react-bootstrap";
 import GuestBookConfig from "./GuestBookConfig";
 import {isValidEmail} from "../forms/EmailField";
 
-/**
- * @typedef GuestBookProps
- *
- * @property {number} guestBookId         Guest book ID.
- * @property {number} pageId              Page ID to display the guest book on.
- * @property {number} guestId             Guest ID to populate fields with.
- * @property {number} guestFeedbackId     Guest Feedback ID to populate fields with.
- * @property {DataCallback} [onChange]    Receives notification that guest ID or guest feedback ID was updated
- */
 
 export const GuestBookContext = createContext({
   guestBookConfig: null
@@ -40,14 +30,17 @@ export function useGuestBook() {
 
 /**
  * Guest Book component
- * @param props {GuestBookProps}
+ * @property {number} guestBookId         Guest book ID.
+ * @property {number} extraId             Extra that this guest book is linked to.
+ * @property {number} guestId             Guest ID to populate fields with.
+ * @property {number} guestFeedbackId     Guest Feedback ID to populate fields with.
+ * @property {DataCallback} [onChange]    Receives notification that guest ID or guest feedback ID was updated
  * @returns {JSX.Element}
  * @constructor
  */
-function GuestBook(props) {
+function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
 
-  const {pageData} = useContext(PageContext);
-  const {getGuestBook, getGuest, getGuestFeedback, insertOrUpdateGuest, insertOrUpdateGuestFeedback} = useRestApi();
+  const {GuestBooks} = useRestApi();
 
   // guest book configuration
   const [guestBookConfig, setGuestBookConfig] = useState(null);
@@ -61,8 +54,8 @@ function GuestBook(props) {
 
   // load guest book configuration when initialized
   useEffect(() => {
-    if (props.guestBookId) {
-      getGuestBook(props.guestBookId).then(data => {
+    if (guestBookId) {
+      GuestBooks.getGuestBook(guestBookId).then(data => {
         if (!data.LabelCols) {
           data.LabelCols = 2;
         }
@@ -71,11 +64,11 @@ function GuestBook(props) {
         console.error(`Error loading guest book: ${error}`);
       });
     }
-  }, [props.guestBookId, getGuestBook]);
+  }, [guestBookId, GuestBooks.getGuestBook]);
 
   useEffect(() => {
-    if (props.guestId) {
-      getGuest(props.guestId).then(data => {
+    if (guestId) {
+      GuestBooks.getGuest(guestId).then(data => {
         setGuestData(prevData => {
           return {
             ...prevData,
@@ -86,11 +79,11 @@ function GuestBook(props) {
         console.error(`Error getting guest data: ${error}`);
       });
     }
-  }, [props.guestId, props.guestBookId, getGuest])
+  }, [guestId, guestBookId, GuestBooks.getGuest])
 
   useEffect(() => {
-    if (props.guestFeedbackId) {
-      getGuestFeedback(props.guestFeedbackId).then(data => {
+    if (guestFeedbackId) {
+      GuestBooks.getGuestFeedback(guestFeedbackId).then(data => {
         setGuestFeedbackData(prevData => {
           return {
             ...prevData,
@@ -101,7 +94,7 @@ function GuestBook(props) {
         console.error(`Error getting feedback data: ${error}`);
       });
     }
-  }, [props.guestFeedbackId, getGuestFeedback])
+  }, [guestFeedbackId, GuestBooks.getGuestFeedback])
 
   /**
    * Handle changes in response to data entry.
@@ -148,11 +141,11 @@ function GuestBook(props) {
   function handleSubmit(e) {
     e.preventDefault();
     console.debug(`Updating guest. data=${JSON.stringify(guestData)}`);
-    insertOrUpdateGuest(props.guestBookId, guestData).then(data => {
+    GuestBooks.insertOrUpdateGuest(guestBookId, guestData).then(data => {
       console.debug(`Guest update result: ${JSON.stringify(data)}`);
       setSubmitted(true);
       setGuestData(data);
-      insertOrUpdateGuestFeedback(data.GuestID, guestFeedbackData).then(data => {
+      GuestBooks.insertOrUpdateGuestFeedback(data.GuestID, guestFeedbackData).then(data => {
         console.debug(`Guest feedback update result: ${JSON.stringify(data)}`);
       })
     })
@@ -192,8 +185,8 @@ function GuestBook(props) {
         setGuestBookConfig: setGuestBookConfig,
       }
     }>
-      {props.pageId === pageData?.PageID && guestBookConfig && (
-        <div className="guestbook">
+      {guestBookConfig && (
+        <div className="guestbook" key={guestBookId}>
           {submitted ? (
             <>
               <p
@@ -203,7 +196,7 @@ function GuestBook(props) {
                 onClick={() => {
                   // clear submit flag and feedback ID to submit again
                   setSubmitted(false);
-                  props.onChange?.({guestFeedbackId: 0});
+                  onChange?.({guestFeedbackId: 0});
                 }}>
                 {guestBookConfig.AgainMessage ? guestBookConfig.AgainMessage : 'Submit Again'}
               </Button>
@@ -242,7 +235,7 @@ function GuestBook(props) {
               </form>
             </>
           )}
-          <GuestBookConfig/>
+          <GuestBookConfig extraId={extraId}/>
         </div>
       )} </GuestBookContext>
   )

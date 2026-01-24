@@ -7,10 +7,10 @@ import {useRestApi} from "../../api/RestApi";
 import CustomFieldsConfig from "./CustomFieldsConfig";
 import {usePageContext} from "../content/Page";
 
-export default function GuestBookConfig() {
+export default function GuestBookConfig({extraId}) {
   const {guestBookConfig, setGuestBookConfig} = useGuestBook();
   const {canEdit} = useEdit();
-  const {insertOrUpdateGuestBook, deleteGuestBook} = useRestApi();
+  const {GuestBooks, Extras} = useRestApi();
   const {refreshPage} = usePageContext();
 
   const [edits, setEdits] = useState({});
@@ -58,7 +58,7 @@ export default function GuestBookConfig() {
 
   function onSubmit() {
     console.debug(`Updating guest book config...`);
-    insertOrUpdateGuestBook(edits)
+    GuestBooks.insertOrUpdateGuestBook(edits)
       .then(response => {
         console.debug(`Guest book config updated.`);
         setGuestBookConfig(response);
@@ -73,6 +73,18 @@ export default function GuestBookConfig() {
     console.debug(`Revert form.`);
     if (guestBookConfig) {
       setEdits({...guestBookConfig});
+    }
+  }
+
+  function onDeleteExtra() {
+    if (extraId) {
+      console.debug(`Deleting extra ${extraId} from page.`);
+      Extras.deleteExtra(extraId).then(() => {
+        console.debug(`Extra deleted.`);
+        refreshPage();
+      }).catch(error => {
+        console.error(`Error deleting extra.`, error);
+      })
     }
   }
 
@@ -119,10 +131,15 @@ export default function GuestBookConfig() {
         <Modal.Footer>
           <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
           <Button size="sm" variant="danger" onClick={() => {
-            deleteGuestBook(guestBookConfig?.GuestBookID).then(() => {
+            GuestBooks.deleteGuestBook(guestBookConfig?.GuestBookID).then(() => {
               console.debug('Guest book deleted.');
-              setShowDeleteConfirmation(false);
-              refreshPage();
+              if (extraId) {
+                Extras.deleteExtra(extraId).then(() => {
+                  console.debug('Guest book extra deleted.');
+                  setShowDeleteConfirmation(false);
+                  refreshPage();
+                }).catch(err => console.error('Guest book extra delete error.', err));
+              }
             }).catch(err => {
               console.error('Guest book delete error.', err);
             })
@@ -433,6 +450,14 @@ export default function GuestBookConfig() {
                   disabled={lastCustomField() >= 8}
                   onClick={addCustomField}
                 >Add a Field</Button>
+                {extraId && (
+                  <Button
+                    className="me-2"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => onDeleteExtra()}
+                  >Remove from Page</Button>
+                )}
                 <Button
                   variant="danger"
                   size="sm"
