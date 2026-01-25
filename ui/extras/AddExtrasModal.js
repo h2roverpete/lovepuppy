@@ -6,6 +6,7 @@ import {useEffect, useMemo, useState} from "react";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {usePageSectionContext} from "../content/PageSection";
 import EditUtil from "../editor/EditUtil";
+import {useEdit} from "../editor/EditProvider";
 
 /**
  * @callback Callback
@@ -27,6 +28,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
   const {pageData} = usePageContext();
   const {pageSectionData} = usePageSectionContext();
   const {GuestBooks, Galleries, Extras} = useRestApi();
+  const {canEdit} = useEdit();
 
   // data for extras
   const [edits, setEdits] = useState({});
@@ -81,6 +83,10 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
       })
     }
   }, [GuestBooks]);
+
+  if (!canEdit) {
+    return <></>;
+  }
 
   function onAddExtra() {
     if (edits.ExtraID) {

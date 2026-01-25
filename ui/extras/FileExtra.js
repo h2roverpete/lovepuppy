@@ -1,6 +1,7 @@
 import {useSiteContext} from "../content/Site";
 import {useEffect, useState} from "react";
 import ExtraConfig from "./ExtraConfig";
+import {Col, Container, Row} from "react-bootstrap";
 
 export default function FileExtra({extraData}) {
 
@@ -13,6 +14,23 @@ export default function FileExtra({extraData}) {
       const fileUrl = `${siteData?.SiteRootUrl}/${extraData.ExtraFile}`;
       const fileName = parts[parts.length - 1];
       switch (extraData.ExtraFileMimeType) {
+        case 'audio/mpeg':
+          setContent(<>
+            <Container className={'Extra'}>
+              <Row className="ExtraAudio">
+                <Col xs={'auto'} className={'ExtraAudioLabel d-flex align-items-center'}>
+                  {extraData.ExtraFilePrompt}
+                </Col>
+                <Col xs='auto' className={'ExtraAudioPlayer d-flex align-items-center'}>
+                  <audio controls>
+                    <source src={fileUrl}/>
+                  </audio>
+                </Col>
+              </Row>
+            </Container>
+            <ExtraConfig extraData={extraData}/>
+          </>);
+          break;
         case 'text/plain':
           // embed HTML on the page
           fetch(fileUrl)
