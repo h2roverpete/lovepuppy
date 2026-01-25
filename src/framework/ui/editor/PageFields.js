@@ -7,6 +7,7 @@ import {useSiteContext} from "../content/Site";
 import {useNavigate} from "react-router";
 import EmailField, {isValidEmail} from "../forms/EmailField";
 import {BsChevronDown, BsChevronUp} from "react-icons/bs";
+import AddExtrasModal from "../extras/AddExtrasModal";
 
 /**
  * Edit page metadata fields.
@@ -160,58 +161,16 @@ export default function PageFields() {
             }}>Delete</Button>
           </Modal.Footer>
         </Modal>
-        <Modal show={showAddExtras} onHide={() => setShowAddExtras(false)} style={{zIndex: 2020}}>
-          <Modal.Header><h5>Add an Extra to '{pageData.PageTitle}'</h5></Modal.Header>
-          <Modal.Body>
-            <Row>
-              <Form.Label className='required' column={'sm'} htmlFor={'ExtraType'} sm={'auto'}>Extra to Add</Form.Label>
-              <Col>
-                <Form.Select
-                  id="ExtraType"
-                  size={'sm'}
-                  value={extraType}
-                  onChange={(e) => setExtraType(e.target.value)}
-                >
-                  <option value={''}>(Select)</option>
-                  <option value='gallery'>Photo Gallery</option>
-                  <option value='guestbook'>Guest Book</option>
-                  <option value='instagram'>Instagram Gallery</option>
-                  <option value='html'>HTML File</option>
-                </Form.Select>
-              </Col>
-            </Row>
-            {extraType === 'guestbook' && (
-              <Row className="mt-2">
-                <Form.Label className='required' column={'sm'} htmlFor={'GuestBookEmail'} sm={'auto'}>Admin
-                  Email</Form.Label>
-                <Col>
-                  <EmailField
-                    id="GuestBookEmail"
-                    name="GuestBookEmail"
-                    size="sm"
-                    onChange={(e) => setGuestBookEmail(e.target.value)}
-                    value={guestBookEmail || ''}
-                  />
-                </Col>
-              </Row>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button size="sm" variant="secondary" onClick={() => setShowAddExtras(false)}>Cancel</Button>
-            <Button
-              size="sm"
-              variant="primary"
-              disabled={!extraDataValid()}
-              onClick={() => {
-                onAddExtra();
-                setShowAddExtras(false);
-                setActiveKey('');
-              }}
-            >Add Extra</Button>
-          </Modal.Footer>
-        </Modal>
+        <AddExtrasModal
+          show={showAddExtras}
+          onHide={() => setShowAddExtras(false)}
+          onSubmit={() => {
+            setActiveKey(null);
+            refreshPage();
+          }}
+        />
         <Accordion
-          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 2010, top: 0}}
+          style={{width: "100%", position: "fixed", minHeight: '20px', zIndex: 1032, top: 0}}
           activeKey={activeKey}
         >
           <Accordion.Item

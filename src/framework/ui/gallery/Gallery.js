@@ -1,50 +1,44 @@
-import {useContext, useEffect, useState} from "react";
-import {PageContext} from "../content/Page";
+import {useEffect, useState} from "react";
 import "react-image-gallery/styles/css/image-gallery.css";
 import ImageGallery from "react-image-gallery";
 import {useRestApi} from "../../api/RestApi";
-
-/**
- * @typedef GalleryProps
- * @property {number} galleryId
- * @property {number} pageId
- */
+import GalleryConfig from "./GalleryConfig";
 
 /**
  * Display a photo gallery
  *
- * @param props {GalleryProps}
+ * @property {number} galleryId
+ * @property {number} extraId
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Gallery(props) {
+export default function Gallery({galleryId, extraId}) {
 
-  const {pageData} = useContext(PageContext);
   const [galleryConfig, setGalleryConfig] = useState(null);
   const [galleryPhotos, setGalleryPhotos] = useState(null);
-  const {getGallery, getPhotos} = useRestApi();
+  const {Galleries} = useRestApi();
 
   useEffect(() => {
-    if (props.galleryId && pageData?.PageID === props.pageId && !galleryConfig) {
-      getGallery(props.galleryId).then((data) => {
-        console.debug(`Loaded gallery ${props.galleryId}.`);
+    if (galleryId && !galleryConfig) {
+      Galleries.getGallery(galleryId).then((data) => {
+        console.debug(`Loaded gallery ${galleryId}.`);
         setGalleryConfig(data);
       }).catch(error => {
-        console.error(`Error loading gallery ${props.galleryId}: ${error}`);
+        console.error(`Error loading gallery ${galleryId}: ${error}`);
       })
     }
-  }, [getGallery, props.galleryId, props.pageId, pageData?.PageID, galleryConfig]);
+  }, [Galleries, galleryId, galleryConfig]);
 
   useEffect(() => {
-    if (props.galleryId && pageData?.PageID === props.pageId && !galleryPhotos) {
-      getPhotos(props.galleryId).then((data) => {
-        console.debug(`Loaded ${data.length} photos for gallery ${props.galleryId}.`);
+    if (galleryId && !galleryPhotos) {
+      Galleries.getPhotos(galleryId).then((data) => {
+        console.debug(`Loaded ${data.length} photos for gallery ${galleryId}.`);
         setGalleryPhotos(data);
       }).catch(error => {
-        console.error(`Error loading photos for gallery ${props.galleryId}: ${error}`);
+        console.error(`Error loading photos for gallery ${galleryId}: ${error}`);
       })
     }
-  }, [getPhotos, props.galleryId, props.pageId, pageData?.PageID, galleryPhotos]);
+  }, [Galleries, galleryId, galleryPhotos]);
 
   const images = [];
   if (galleryPhotos) {
@@ -56,11 +50,12 @@ export default function Gallery(props) {
     }
   }
 
-  return (
-    <>{pageData?.PageID === props.pageId && images.length > 0 && (
-      <div className="Gallery">
-        <ImageGallery items={images}/>
-      </div>
-    )}</>
-  )
+  return (<>
+    <div>
+    <div className="Gallery overflow-hidden">
+      <ImageGallery items={images}/>
+    </div>
+    <GalleryConfig galleryConfig={galleryConfig} extraId={extraId}/>
+    </div>
+  </>)
 }

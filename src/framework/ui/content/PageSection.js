@@ -7,8 +7,6 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstra
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
 import {DropState, FileDropTarget} from "../editor/FileDropTarget";
-import UploadFileModal from "../editor/UploadFileModal";
-import PageExtras from "./PageExtras";
 
 /**
  * Generate a page section
@@ -339,7 +337,6 @@ function PageSection({pageSectionData}) {
         {!pageSectionData.SectionImage && (
           <FileDropTarget state={uploadPrompt} ref={dropFileRef}/>
         )}
-        <PageExtras/>
       </div>
     </PageSectionContext>
   );
