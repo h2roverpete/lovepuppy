@@ -7,8 +7,6 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstra
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
 import {DropState, FileDropTarget} from "../editor/FileDropTarget";
-import UploadFileModal from "../editor/UploadFileModal";
-import Extras from "../extras/Extras";
 
 /**
  * Generate a page section

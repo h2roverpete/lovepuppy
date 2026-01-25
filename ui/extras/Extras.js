@@ -4,7 +4,8 @@ import GuestBook from "../guestbook/GuestBook";
 import {usePageContext} from "../content/Page";
 import Gallery from "../gallery/Gallery";
 import React from 'react'
-import Instagram from "../embed/Instagram";
+import Instagram from "../instagram/Instagram";
+import FileExtra from "./FileExtra";
 
 /**
  * Display any page extras.
@@ -26,22 +27,19 @@ export default function Extras() {
     }
   }, [pageData])
   return (<>
-    {extras.map((extra) => (<>
+    {extras.map((extra) => (<React.Fragment key={extra.ExtraID}>
       {extra.ExtraType === 'guestbook' && (
-        <React.Fragment key={extra.ExtraID}>
-          <GuestBook guestBookId={extra.GuestBookID} extraId={extra.ExtraID}/>
-        </React.Fragment>
+        <GuestBook guestBookId={extra.GuestBookID} extraId={extra.ExtraID}/>
       )}
       {extra.ExtraType === 'gallery' && (
-        <React.Fragment key={extra.ExtraID}>
-          <Gallery galleryId={extra.GalleryID} extraId={extra.ExtraID}/>
-        </React.Fragment>
+        <Gallery galleryId={extra.GalleryID} extraId={extra.ExtraID}/>
       )}
       {extra.ExtraType === 'instagram' && (
-        <React.Fragment key={extra.ExtraID}>
-          <Instagram extraData={extra}/>
-        </React.Fragment>
+        <Instagram extraData={extra}/>
       )}
-    </>))}
+      {extra.ExtraType === 'file' && (
+        <FileExtra extraData={extra}/>
+      )}
+    </React.Fragment>))}
   </>)
 }

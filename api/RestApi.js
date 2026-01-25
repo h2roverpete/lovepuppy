@@ -222,10 +222,16 @@ export default function RestApi(props) {
     return response.data;
   }
 
-  async function insertOrUpdateExtra(data) {
+  async function insertOrUpdateExtra(data, file) {
     return await adminApiCall(() => {
       return async () => {
-        const response = await axios.post(`${host}/api/v1/content/extras`, data);
+        const formData = new FormData();
+        for (const fieldName in data) {
+          if (data[fieldName] !== undefined && data[fieldName] !== null) {
+            formData.append(fieldName, data[fieldName]);
+          }
+        }
+        const response = await axios.post(`${host}/api/v1/content/extras`, formData);
         return response.data;
       }
     });

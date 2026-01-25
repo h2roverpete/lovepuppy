@@ -292,6 +292,7 @@ import axios from "axios";
  * @property {Number} [PageSectionID]   Page section to insert the extra into.
  * @property {String} ExtraType         Type of extra, i.e. "gallery" or "guestbook" or "instagram" or "html"
  * @property {String} [InstagramHandle] Handle for Instagram when ExtraType == 'instagram'
+ * @property {String} [ExtraFile]       S3 path to file attached to the Extra
  * @property {String} [GalleryID]       Gallery ID when ExtraType == 'gallery'
  * @property {String} [GuestBookID]     Guest book ID when ExtraType == 'guestbook'
  * @property {String} Created           Creation date in ISO format.
