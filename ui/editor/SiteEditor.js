@@ -26,7 +26,7 @@ export default function SiteEditor({children}) {
           display: 'flex',
           flexDirection: 'column',
           position: 'fixed',
-          zIndex: '2001',
+          zIndex: '1032',
         }}
       >
         {expanded ? (<BsChevronLeft size={'20'}/>) : ((<BsChevronRight size={'20'}/>))}
@@ -41,10 +41,10 @@ export default function SiteEditor({children}) {
             backgroundColor: '#e0e0e0f0',
             position: 'fixed',
             left: '0px',
-            zIndex: '2000',
+            zIndex: '1031',
           }}>
             <div style={{
-              width: '300px',
+              width: '250px',
               padding: '20px 10px 10px 23px',
               display: 'flex',
               flexDirection: 'column',

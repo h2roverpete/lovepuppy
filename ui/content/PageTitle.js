@@ -28,7 +28,7 @@ export default function PageTitle(props) {
 
   const {pageData, error, login} = useContext(PageContext);
   const {updateOutlineData} = useSiteContext();
-  const {insertOrUpdatePage} = useRestApi();
+  const {Pages} = useRestApi();
   const {canEdit} = useEdit();
   const [editingTitle, setEditingTitle] = useState(false);
 
@@ -37,18 +37,18 @@ export default function PageTitle(props) {
       console.debug(`Updating page title: textContent=${textContent}, textAlign=${textAlign}`);
       pageData.PageTitle = textContent;
       pageData.PageTitleAlign = textAlign;
-      insertOrUpdatePage(pageData)
-        .then((res) => {
+      Pages.insertOrUpdatePage(pageData)
+        .then((result) => {
           console.debug(`Page title updated.`);
           // refresh outline with new title
-          updateOutlineData(pageData);
+          updateOutlineData(result);
         })
         .catch((err) => {
           console.error(`Error updating page title: ${err.message}`);
         })
     }
     setEditingTitle(false);
-  }, [pageData, insertOrUpdatePage, updateOutlineData]);
+  }, [pageData, Pages, updateOutlineData]);
 
   const titleRef = useRef(null);
   const title = (

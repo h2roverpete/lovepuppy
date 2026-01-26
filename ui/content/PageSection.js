@@ -7,8 +7,6 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstra
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
 import {DropState, FileDropTarget} from "../editor/FileDropTarget";
-import UploadFileModal from "../editor/UploadFileModal";
-import PageExtras from "./PageExtras";
 
 /**
  * Generate a page section
@@ -17,7 +15,7 @@ import PageExtras from "./PageExtras";
  */
 function PageSection({pageSectionData}) {
 
-  const {insertOrUpdatePageSection, deletePageSection, uploadSectionImage} = useRestApi();
+  const {PageSections} = useRestApi();
   const {canEdit} = useEdit();
   const {sectionData, setSectionData, updatePageSection} = usePageContext();
   const [editingTitle, setEditingTitle] = useState(false);
@@ -40,12 +38,12 @@ function PageSection({pageSectionData}) {
       console.debug(`Update section title...`);
       pageSectionData.SectionTitle = textContent;
       pageSectionData.TitleAlign = textAlign;
-      insertOrUpdatePageSection(pageSectionData)
+      PageSections.insertOrUpdatePageSection(pageSectionData)
         .then(() => console.log(`Updated section title.`))
         .catch(error => console.error(`Error updating section title.`, error));
     }
     setEditingTitle(false);
-  }, [pageSectionData, insertOrUpdatePageSection]);
+  }, [pageSectionData, PageSections.insertOrUpdatePageSection]);
 
   const sectionTextRef = useRef(null);
   const sectionText = (
@@ -62,16 +60,16 @@ function PageSection({pageSectionData}) {
       console.debug(`Update section text...`);
       pageSectionData.SectionText = textContent;
       pageSectionData.TextAlign = textAlign;
-      insertOrUpdatePageSection(pageSectionData)
+      PageSections.insertOrUpdatePageSection(pageSectionData)
         .then(() => console.log(`Updated section text.`))
         .catch(error => console.error(`Error updating section text.`, error));
     }
     setEditingText(false);
-  }, [pageSectionData, insertOrUpdatePageSection]);
+  }, [pageSectionData, PageSections.insertOrUpdatePageSection]);
 
   function deleteSection() {
     if (pageSectionData) {
-      deletePageSection(pageSectionData.PageID, pageSectionData.PageSectionID)
+      PageSections.deletePageSection(pageSectionData.PageID, pageSectionData.PageSectionID)
         .then(result => {
           console.log(`Page section deleted.`)
           let newSections = [];
@@ -107,9 +105,9 @@ function PageSection({pageSectionData}) {
         const newSectionData = [...sectionData];
         newSectionData.sort((a, b) => a.PageSectionSeq - b.PageSectionSeq);
         console.debug(`Moving section up...`);
-        insertOrUpdatePageSection(before)
+        PageSections.insertOrUpdatePageSection(before)
           .then(() => {
-            insertOrUpdatePageSection(current)
+            PageSections.insertOrUpdatePageSection(current)
               .then(() => {
                 console.debug(`Section moved up.`);
                 setSectionData(newSectionData);
@@ -142,9 +140,9 @@ function PageSection({pageSectionData}) {
         const newSectionData = [...sectionData];
         newSectionData.sort((a, b) => a.PageSectionSeq - b.PageSectionSeq);
         console.debug(`Moving section down...`);
-        insertOrUpdatePageSection(next)
+        PageSections.insertOrUpdatePageSection(next)
           .then(() => {
-            insertOrUpdatePageSection(current)
+            PageSections.insertOrUpdatePageSection(current)
               .then(() => {
                 console.debug(`Section moved down.`);
                 setSectionData(newSectionData);
@@ -230,7 +228,7 @@ function PageSection({pageSectionData}) {
       dropFileRef.current.hidden = false;
     }
     setUploadPrompt(DropState.UPLOADING);
-    uploadSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID, file)
+    PageSections.uploadSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID, file)
       .then((result) => {
         console.log(`Image uploaded successfully.`);
         if (dropFileRef.current) {
@@ -339,7 +337,6 @@ function PageSection({pageSectionData}) {
         {!pageSectionData.SectionImage && (
           <FileDropTarget state={uploadPrompt} ref={dropFileRef}/>
         )}
-        <PageExtras/>
       </div>
     </PageSectionContext>
   );

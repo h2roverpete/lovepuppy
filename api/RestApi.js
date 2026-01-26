@@ -18,7 +18,7 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdateSite(data) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/content/sites`, data);
         return response.data;
@@ -37,7 +37,7 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdatePageSection(data) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/content/pages/${data.PageID}/sections`, data);
         return response.data;
@@ -46,7 +46,7 @@ export default function RestApi(props) {
   }
 
   async function uploadSectionImage(pageId, pageSectionId, file) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const formData = new FormData();
         formData.append('SectionImage', file);
@@ -57,7 +57,7 @@ export default function RestApi(props) {
   }
 
   async function deleteSectionImage(pageId, pageSectionId) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image`);
         return response.data;
@@ -66,7 +66,7 @@ export default function RestApi(props) {
   }
 
   async function deletePageSection(pageId, pageSectionId) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}`);
         return response.data;
@@ -75,7 +75,7 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdatePage(data) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         console.debug("Insert or update Page...");
         const response = await axios.post(`${host}/api/v1/content/pages`, data);
@@ -85,7 +85,7 @@ export default function RestApi(props) {
   }
 
   async function deletePage(pageId) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.delete(`${host}/api/v1/content/pages/${pageId}`);
         return response.data;
@@ -94,7 +94,7 @@ export default function RestApi(props) {
   }
 
   async function movePageBefore(pageId, beforePageId) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/before/${beforePageId}`);
         return response.data;
@@ -103,7 +103,7 @@ export default function RestApi(props) {
   }
 
   async function movePageAfter(pageId, afterPageId) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/after/${afterPageId}`);
         return response.data;
@@ -112,7 +112,7 @@ export default function RestApi(props) {
   }
 
   async function makePageChildOf(pageId, parentId) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/childof/${parentId}`);
         return response.data;
@@ -146,7 +146,7 @@ export default function RestApi(props) {
   }
 
   async function insertOrUpdateGuestBook(data) {
-    return await restApiCall(() => {
+    return await adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/guestbook`, data);
         return response.data;
@@ -189,9 +189,61 @@ export default function RestApi(props) {
     return response.data;
   }
 
+  async function insertOrUpdateGallery(data) {
+    return adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/galleries`, data);
+        return response.data;
+      }
+    });
+  }
+
+  async function deleteGallery(galleryId) {
+    return adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/galleries/${galleryId}`);
+        return response.data;
+      }
+    });
+  }
+
   async function getPhotos(galleryId) {
     const response = await axios.get(`${host}/api/v1/gallery/${galleryId}/photos`);
     return response.data;
+  }
+
+  async function getPageExtras(pageId) {
+    const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/extras`);
+    return response.data;
+  }
+
+  async function getPageSectionExtras(pageId, pageSectionId) {
+    const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/extras`);
+    return response.data;
+  }
+
+  async function insertOrUpdateExtra(data, file) {
+    return await adminApiCall(() => {
+      return async () => {
+        const formData = new FormData();
+        for (const fieldName in data) {
+          if (data[fieldName] !== undefined && data[fieldName] !== null) {
+            formData.append(fieldName, data[fieldName]);
+          }
+        }
+        const response = await axios.post(`${host}/api/v1/content/extras`, formData);
+        return response.data;
+      }
+    });
+  }
+
+  async function deleteExtra(extraId) {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/content/extras/${extraId}`);
+        return response.data;
+      }
+    });
   }
 
   async function getAuthToken(clientId, redirectUrl, authCode) {
@@ -220,7 +272,7 @@ export default function RestApi(props) {
    */
 
   /**
-   * Execute a "protected" REST API call.
+   * Execute a "protected" admin REST API call.
    *
    * Protected calls modify site content and require a valid OAuth token and permissions
    * in addition to an API key.
@@ -231,7 +283,7 @@ export default function RestApi(props) {
    * @param callFactory {RestApiCallFactory} Factory function returns a Promise which runs the API call and returns a result.
    * @returns {any} Response from Rest API call
    */
-  async function restApiCall(callFactory) {
+  async function adminApiCall(callFactory) {
     try {
       return await (callFactory())();
     } catch (error) {
@@ -264,36 +316,57 @@ export default function RestApi(props) {
 
   return (
     <RestApiContext value={{
-      insertOrUpdateSite: insertOrUpdateSite,
-      getPage: getPage,
-      deletePage: deletePage,
-      movePageAfter: movePageAfter,
-      movePageBefore: movePageBefore,
-      makePageChildOf: makePageChildOf,
-      getPageSections: getPageSections,
-      insertOrUpdatePageSection: insertOrUpdatePageSection,
-      uploadSectionImage: uploadSectionImage,
-      deleteSectionImage: deleteSectionImage,
-      deletePageSection: deletePageSection,
-      insertOrUpdatePage: insertOrUpdatePage,
-      getSite: getSite,
-      getSiteOutline: getSiteOutline,
-      getSitemap: getSitemap,
-      getGuestBook: getGuestBook,
-      getGuestBooks: getGuestBooks,
-      insertOrUpdateGuestBook: insertOrUpdateGuestBook,
-      deleteGuestBook: deleteGuestBook,
-      getGuest: getGuest,
-      insertOrUpdateGuest: insertOrUpdateGuest,
-      getGuestFeedback: getGuestFeedback,
-      insertOrUpdateGuestFeedback: insertOrUpdateGuestFeedback,
-      getGallery: getGallery,
-      getGalleries: getGalleries,
-      getPhotos: getPhotos,
-      getAuthToken: getAuthToken,
-      refreshToken: refreshToken,
-      checkToken: checkToken,
-      refreshAuthTokenRef: refreshAuthTokenRef,
+      Sites: {
+        insertOrUpdateSite: insertOrUpdateSite,
+        getSite: getSite,
+        getSiteOutline: getSiteOutline,
+        getSitemap: getSitemap,
+      },
+      Pages: {
+        getPage: getPage,
+        deletePage: deletePage,
+        movePageAfter: movePageAfter,
+        movePageBefore: movePageBefore,
+        makePageChildOf: makePageChildOf,
+        insertOrUpdatePage: insertOrUpdatePage,
+        getPageSections: getPageSections,
+      },
+      PageSections: {
+        insertOrUpdatePageSection: insertOrUpdatePageSection,
+        uploadSectionImage: uploadSectionImage,
+        deleteSectionImage: deleteSectionImage,
+        deletePageSection: deletePageSection,
+        insertOrUpdatePage: insertOrUpdatePage,
+        getPageSectionExtras: getPageSectionExtras,
+      },
+      GuestBooks: {
+        getGuestBook: getGuestBook,
+        getGuestBooks: getGuestBooks,
+        insertOrUpdateGuestBook: insertOrUpdateGuestBook,
+        deleteGuestBook: deleteGuestBook,
+        getGuest: getGuest,
+        insertOrUpdateGuest: insertOrUpdateGuest,
+        getGuestFeedback: getGuestFeedback,
+        insertOrUpdateGuestFeedback: insertOrUpdateGuestFeedback,
+      },
+      Galleries: {
+        getGallery: getGallery,
+        getGalleries: getGalleries,
+        getPhotos: getPhotos,
+        insertOrUpdateGallery: insertOrUpdateGallery,
+        deleteGallery: deleteGallery,
+      },
+      Extras: {
+        getPageExtras: getPageExtras,
+        insertOrUpdateExtra: insertOrUpdateExtra,
+        deleteExtra: deleteExtra,
+      },
+      Auth: {
+        getAuthToken: getAuthToken,
+        refreshToken: refreshToken,
+        checkToken: checkToken,
+        refreshAuthTokenRef: refreshAuthTokenRef,
+      },
     }}>
       {props.children}
     </RestApiContext>

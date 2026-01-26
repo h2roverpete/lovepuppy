@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
-import PageFields from "../editor/PageFields";
+import PageConfig from "../editor/PageConfig";
 
 export const PageContext = createContext(
   {}
@@ -32,7 +32,7 @@ export default function Page(props) {
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
-  const {getPage, getPageSections} = useRestApi();
+  const {Pages} = useRestApi();
 
   let errorData;
   if (error) {
@@ -56,22 +56,22 @@ export default function Page(props) {
   useEffect(() => {
     if (pageId && !pageData) {
       // load page data
-      getPage(pageId).then((data) => {
+      Pages.getPage(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} data.`);
         setPageData(data); // update state
       })
     }
-  }, [getPage, pageData, pageId]);
+  }, [Pages.getPage, pageData, pageId]);
 
   useEffect(() => {
     if (pageId && !sectionData) {
       // load page sections
-      getPageSections(pageId).then((data) => {
+      Pages.getPageSections(pageId).then((data) => {
         console.debug(`Loaded page ${pageId} sections.`);
         setSectionData(data); // update state
       })
     }
-  }, [getPageSections, pageId, sectionData]);
+  }, [Pages.getPageSections, pageId, sectionData]);
 
   useEffect(() => {
     if (pageData && outlineData && !breadcrumbs) {
@@ -134,7 +134,7 @@ export default function Page(props) {
           refreshPage: refreshPage
         }}
       >
-        <PageFields/>
+        <PageConfig/>
         {props.children}
       </PageContext>
     </div>

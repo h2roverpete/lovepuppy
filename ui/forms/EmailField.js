@@ -1,4 +1,5 @@
 import {Form} from "react-bootstrap";
+import {useState} from "react";
 
 /**
  * Insert a form control that validates a user-entered email address.
@@ -11,14 +12,23 @@ import {Form} from "react-bootstrap";
  * @constructor
  */
 export default function EmailField(props) {
+  const [touched, setTouched] = useState(false);
   return (
     <Form.Control
       {...props}
       type="email"
       autoComplete="email"
       value={props.value || ''}
-      isValid={isValidEmail(props.value)}
-      isInvalid={props.value === '' || (props.value?.length > 0 && !isValidEmail(props.value))}
+      onChange={(e)=>{
+        setTouched(true);
+        props.onChange?.(e);
+      }}
+      onBlur={(e)=>{
+        setTouched(true);
+        props.onBlur?.(e);
+      }}
+      isValid={touched && isValidEmail(props.value)}
+      isInvalid={(props.value === '' && props.required) || (props.value?.length > 0 && !isValidEmail(props.value))}
     />
   )
 }
