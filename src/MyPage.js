@@ -5,11 +5,9 @@ import PageContent from "framework/ui/content/PageContent";
 import Breadcrumbs from "framework/ui/content/Breadcrumbs";
 import PageTitle from "framework/ui/content/PageTitle";
 import PageSections from "framework/ui/content/PageSections";
-import GuestBook from "framework/ui/guestbook/GuestBook";
 import Copyright from "framework/ui/content/Copyright";
 import logo from "./assets/logo.png";
 import logo_sm from "./assets/logo-sm.png";
-import Gallery from "framework/ui/gallery/Gallery";
 import Logo from "framework/ui/content/Logo";
 import './css/GuestBook.css'
 
@@ -43,11 +41,8 @@ export default function MyPage(props) {
         <Breadcrumbs/>
         <PageTitle/>
         <PageSections/>
-        <GuestBook guestBookId={220} pageId={8635}/>
-        <GuestBook guestBookId={219} pageId={8622}/>
-        <Gallery galleryId={1085} pageId={8598}/>
-        <Copyright startYear={'2010'}/>
       </PageContent>
+      <Copyright startYear={'2010'}/>
       <div className={'BottomBanner'}/>
     </Page>
   )
