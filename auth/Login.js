@@ -45,7 +45,7 @@ const Login = (props) => {
   }
   const scope = permissions.join(",")
 
-  const {getAuthToken} = useRestApi();
+  const {Auth} = useRestApi();
   const {setError} = useContext(SiteContext);
   const [searchParams] = useSearchParams();
   const {token, setToken} = useAuth();
@@ -76,7 +76,7 @@ const Login = (props) => {
           description: "Couldn't verify login state.",
         })
       } else {
-        getAuthToken(
+        Auth.getAuthToken(
           window.location.host,
           `${window.location.protocol}//${window.location.host}/login`,
           searchParams.get('code')

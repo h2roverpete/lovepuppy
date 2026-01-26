@@ -1,11 +1,11 @@
 import {useSiteContext} from "../content/Site";
-import {Col, Form, Row, Button, Container} from "react-bootstrap";
+import {Col, Form, Row, Button} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useEffect, useState} from "react";
 
 export default function SiteFields(props) {
   const {siteData, setSiteData} = useSiteContext();
-  const {insertOrUpdateSite} = useRestApi();
+  const {Sites} = useRestApi();
   const [edits, setEdits] = useState({});
   const [touched, setTouched] = useState([]);
 
@@ -22,7 +22,7 @@ export default function SiteFields(props) {
 
   function onSubmit() {
     console.debug(`Updating site properties...`);
-    insertOrUpdateSite(edits).then((result) => {
+    Sites.insertOrUpdateSite(edits).then((result) => {
       console.debug(`Site properties updated.`);
       setSiteData(result);
     }).catch((err) => {
@@ -37,7 +37,7 @@ export default function SiteFields(props) {
   }
 
   function isValidUrl(url) {
-    return /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(url);
+    return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/.test(url);
   }
 
   function isValidBucket(bucketName) {

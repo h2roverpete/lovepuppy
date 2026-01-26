@@ -2,13 +2,12 @@ import {useSiteContext} from "../content/Site";
 import {useLocation, useNavigate} from "react-router";
 import {onMouseMove, onDragOver, onDragStart, onDragLeave, getCursorPercent} from "./DragUtils";
 import {useRestApi} from "../../api/RestApi";
-import {Container, Row} from "react-bootstrap";
 
 export default function SiteOutline(props) {
-  const {outlineData, outline} = useSiteContext();
+  const {Outline,outlineData} = useSiteContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const {movePageBefore, movePageAfter, makePageChildOf} = useRestApi();
+  const {Pages} = useRestApi();
 
   function onDrop(e, dropData) {
     e.target.style.borderWidth = 0;
@@ -21,8 +20,8 @@ export default function SiteOutline(props) {
     if (percent < 0.40) {
       console.debug(`Move page '${dragData.PageTitle}' before page '${dropData.PageTitle}'`);
       // move outline first for UI responsiveness
-      outline.movePageBefore(dragData, dropData);
-      movePageBefore(dragData.PageID, dropData.PageID)
+      Outline.movePageBefore(dragData, dropData);
+      Pages.movePageBefore(dragData.PageID, dropData.PageID)
         .then(() => {
           console.debug(`Page moved.`);
         })
@@ -32,8 +31,8 @@ export default function SiteOutline(props) {
     } else if (percent < 0.60) {
       console.debug(`Make page '${dragData.PageTitle}' child of page '${dropData.PageTitle}'`);
       // move outline first for UI responsiveness
-      outline.makeChildOf(dragData, dropData);
-      makePageChildOf(dragData.PageID, dropData.PageID)
+      Outline.makeChildOf(dragData, dropData);
+      Pages.makePageChildOf(dragData.PageID, dropData.PageID)
         .then(() => {
           console.debug(`Page moved.`);
         })
@@ -43,8 +42,8 @@ export default function SiteOutline(props) {
     } else {
       console.debug(`Move page '${dragData.PageTitle}' after page '${dropData.PageTitle}'`);
       // move outline first for UI responsiveness
-      outline.movePageAfter(dragData, dropData);
-      movePageAfter(dragData.PageID, dropData.PageID)
+      Outline.movePageAfter(dragData, dropData);
+      Pages.movePageAfter(dragData.PageID, dropData.PageID)
         .then(() => {
           console.debug(`Page moved.`);
         })

@@ -4,8 +4,6 @@ import {useRestApi} from "../api/RestApi";
 import EditProvider from "../ui/editor/EditProvider";
 
 export const AuthContext = createContext({
-  token: null,
-  setToken: (value) => console.error(`setToken() is not defined.`)
 });
 
 /**
@@ -25,13 +23,13 @@ export default function AuthProvider(props) {
   const [scope, setScope] = useState(null);
   const [username, setUsername] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const {checkToken, refreshToken, refreshAuthTokenRef} = useRestApi();
+  const {Auth} = useRestApi();
 
   useEffect(() => {
     setIsAuthenticated(cookies.token && username && scope);
   }, [cookies.token, username, scope]);
 
-  useImperativeHandle(refreshAuthTokenRef, () => {
+  useImperativeHandle(Auth.refreshAuthTokenRef, () => {
     return {
       refreshAuthToken: refreshAuthToken,
     }
@@ -71,7 +69,7 @@ export default function AuthProvider(props) {
   async function validateToken() {
     try {
       console.debug(`Validating token...`);
-      const decoded = await checkToken();
+      const decoded = await Auth.checkToken();
       console.debug(`Token data: ${JSON.stringify(decoded)}`);
       setUsername(decoded.user);
       setScope(decoded.scope);
@@ -91,7 +89,7 @@ export default function AuthProvider(props) {
 
   async function refreshAuthToken() {
     console.debug(`Refreshing auth token...`);
-    const newToken = await refreshToken(cookies.token.refresh_token, window.location.host);
+    const newToken = await Auth.refreshToken(cookies.token.refresh_token, window.location.host);
     setToken(newToken);
     return newToken;
   }

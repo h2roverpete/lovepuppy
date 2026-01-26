@@ -30,13 +30,13 @@ import React from 'react';
  */
 export default function NavBar(props) {
 
-  const {siteData, getChildren, outline} = useSiteContext();
+  const {siteData, getChildren, Outline} = useSiteContext();
   const {pageData, breadcrumbs} = usePageContext();
   const navigate = useNavigate();
   const togglerRef = useRef(null);
   const {token} = useAuth();
   const {canEdit} = useEdit();
-  const {insertOrUpdatePage, movePageAfter, movePageBefore, makePageChildOf} = useRestApi();
+  const {Pages} = useRestApi();
 
   const [showNewPage, setShowNewPage] = useState(false);
   const [newPageTitle, setNewPageTitle] = useState(null);
@@ -148,10 +148,10 @@ export default function NavBar(props) {
       PageHidden: newPageHiddenRef.current.checked
     }
     console.debug(`Insert new page...`);
-    insertOrUpdatePage(data)
+    Pages.insertOrUpdatePage(data)
       .then((result) => {
         console.debug(`Page inserted.`);
-        outline.addPage(result);
+        Outline.addPage(result);
         navigate(result.PageRoute)
       })
       .catch((e) => {
@@ -243,8 +243,8 @@ export default function NavBar(props) {
       if (percent < 0.40) {
         console.debug(`Move page '${dragData.PageTitle}' before page '${dropData.PageTitle}'`);
         // move outline first for UI responsiveness
-        outline.movePageBefore(dragData, dropData);
-        movePageBefore(dragData.PageID, dropData.PageID)
+        Outline.movePageBefore(dragData, dropData);
+        Pages.movePageBefore(dragData.PageID, dropData.PageID)
           .then(() => {
             console.debug(`Page moved.`);
           })
@@ -254,8 +254,8 @@ export default function NavBar(props) {
       } else if (percent < 0.60) {
         console.debug(`Make page '${dragData.PageTitle}' child of page '${dropData.PageTitle}'`);
         // move outline first for UI responsiveness
-        outline.makeChildOf(dragData, dropData);
-        makePageChildOf(dragData.PageID, dropData.PageID)
+        Outline.makeChildOf(dragData, dropData);
+        Pages.makePageChildOf(dragData.PageID, dropData.PageID)
           .then(() => {
             console.debug(`Page moved.`);
           })
@@ -265,8 +265,8 @@ export default function NavBar(props) {
       } else {
         console.debug(`Move page '${dragData.PageTitle}' after page '${dropData.PageTitle}'`);
         // move outline first for UI responsiveness
-        outline.movePageAfter(dragData, dropData);
-        movePageAfter(dragData.PageID, dropData.PageID)
+        Outline.movePageAfter(dragData, dropData);
+        Pages.movePageAfter(dragData.PageID, dropData.PageID)
           .then(() => {
             console.debug(`Page moved.`);
           })

@@ -6,6 +6,7 @@ export default class EditUtil {
   setEdits;
 
   constructor({data, setEdits}) {
+    if (!data) data = {}; // protect against null data
     console.debug(`Create EditUtil.`);
     this.originalData = data;
     this.setEdits = setEdits;

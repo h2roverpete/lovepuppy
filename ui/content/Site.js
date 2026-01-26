@@ -49,7 +49,7 @@ export default function Site(props) {
   const [outlineData, setOutlineData] = useState(null);
   const [error, __setError__] = useState(null); // use public setter, not __setError__
   const navigate = useNavigate();
-  const {getSite, getSiteOutline} = useRestApi();
+  const {Sites} = useRestApi();
   const {canEdit} = useEdit();
 
   /**
@@ -98,7 +98,7 @@ export default function Site(props) {
   useEffect(() => {
     if (!siteData) {
       // load site data
-      getSite().then((data) => {
+      Sites.getSite().then((data) => {
         console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(error => {
@@ -109,12 +109,12 @@ export default function Site(props) {
         setSiteData(null);
       });
     }
-  }, [getSite, siteData, setError]);
+  }, [Sites, siteData, setError]);
 
   useEffect(() => {
     if (!outlineData) {
       // load site outline
-      getSiteOutline().then((data) => {
+      Sites.getSiteOutline().then((data) => {
         console.debug(`Loaded site outline.`);
         setOutlineData(data);
       }).catch(error => {
@@ -125,7 +125,7 @@ export default function Site(props) {
         setOutlineData(null);
       });
     }
-  }, [getSiteOutline, outlineData, setError]);
+  }, [Sites, outlineData, setError]);
 
   let redirect;
   if (props.redirects && window.location.pathname === '/') {
@@ -364,8 +364,7 @@ export default function Site(props) {
   const siteContext = {
     siteData: siteData,
     setSiteData: setSiteData,
-    outlineData: outlineData,
-    outline: {
+    Outline: {
       deletePage: deletePageFromOutline,
       addPage: addPageToOutline,
       movePageBefore: movePageBefore,
@@ -373,6 +372,7 @@ export default function Site(props) {
       makeChildOf: makeChildOf,
       updatePage: updateOutlineData,
     },
+    outlineData: outlineData,
     error: error,
     setError: setError,
     getChildren: getChildren
