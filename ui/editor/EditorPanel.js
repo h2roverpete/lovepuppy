@@ -48,6 +48,7 @@ export default function EditorPanel(
     <Accordion
       activeKey={activeKey}
       style={{width: '100%'}}
+      className={'EditorPanel'}
     >
       <Accordion.Item
         style={{

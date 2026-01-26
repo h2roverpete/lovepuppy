@@ -51,11 +51,9 @@ export default function Gallery({galleryId, extraId}) {
   }
 
   return (<>
-    <div>
-    <div className="Gallery overflow-hidden">
+    <div className="Gallery overflow-hidden" style={{width:'100%'}}>
       <ImageGallery items={images}/>
     </div>
     <GalleryConfig galleryConfig={galleryConfig} extraId={extraId}/>
-    </div>
   </>)
 }

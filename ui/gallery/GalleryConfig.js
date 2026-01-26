@@ -10,7 +10,7 @@ import EditorPanel from "../editor/EditorPanel";
 export default function GalleryConfig({galleryConfig, extraId}) {
   const {canEdit} = useEdit();
   const [edits, setEdits] = useState({});
-  const editUtil = useMemo(() => new EditUtil({data: galleryConfig, setEdits: setEdits}),[galleryConfig]);
+  const editUtil = useMemo(() => new EditUtil({data: galleryConfig, setEdits: setEdits}), [galleryConfig]);
   const {Galleries, Extras} = useRestApi();
   const {refreshPage} = usePageContext();
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -83,15 +83,19 @@ export default function GalleryConfig({galleryConfig, extraId}) {
       }
       onUpdate={onUpdate}
       isDataValid={isDataValid}
-      onDelete={()=>setShowDeleteConfirmation(true)}
+      onDelete={() => setShowDeleteConfirmation(true)}
       editUtil={editUtil}
     >
       <h5>Gallery Properties</h5>
       <Row>
         <Form.Label
           column={'sm'}
+          className="required"
           sm={labelCols}
-          htmlFor={'GalleryName'}>Gallery Name</Form.Label>
+          htmlFor={'GalleryName'}
+        >
+          Gallery Name
+        </Form.Label>
         <Col>
           <Form.Control
             size={'sm'}

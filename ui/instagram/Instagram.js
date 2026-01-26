@@ -10,7 +10,7 @@ import InstagramConfig from "./InstagramConfig";
  */
 export default function Instagram({extraData}) {
   const cleanHandle = extraData.InstagramHandle.replaceAll(/[^a-zA-Z0-9-\-.]/g, '');
-  return (<div className={'Instagram'}>
+  return (<div className={'Instagram'} style={{width:'100%'}}>
     <InstagramEmbed url={`https://www.instagram.com/${cleanHandle}`} width={'100%'}/>
     <InstagramConfig extraData={extraData}/>
   </div>);

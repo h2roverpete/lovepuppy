@@ -317,7 +317,7 @@ function PageSection({pageSectionData}) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             ><BsPencil/></Button>
-            <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
+            <div className="dropdown-menu EditorDropdown" style={{cursor: 'pointer', zIndex: 300}}>
               <span className="dropdown-item"
                     onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
               <span className="dropdown-item"

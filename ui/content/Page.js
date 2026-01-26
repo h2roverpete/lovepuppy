@@ -28,7 +28,6 @@ export const PageContext = createContext(
 export default function Page(props) {
 
   const {outlineData, error, setError} = useContext(SiteContext);
-  const [pageId, __setPageId__] = useState(props.pageId);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
@@ -43,42 +42,32 @@ export default function Page(props) {
     errorData = props.error;
   }
 
-  if (props.pageId && props.pageId !== pageId) {
-    // set new page ID from props
-    setPageId(props.pageId);
-  }
-
-  if (props.login && pageId !== 0) {
-    // clear page contents if login is true
-    setPageId(0);
-  }
-
   useEffect(() => {
-    if (pageId && !pageData) {
+    if (props.pageId) {
       // load page data
-      Pages.getPage(pageId).then((data) => {
-        console.debug(`Loaded page ${pageId} data.`);
+      Pages.getPage(props.pageId).then((data) => {
+        console.debug(`Loaded page ${props.pageId} data.`);
         setPageData(data); // update state
       })
     }
-  }, [Pages.getPage, pageData, pageId]);
+  }, [Pages, props.pageId]);
 
   useEffect(() => {
-    if (pageId && !sectionData) {
+    if (pageData) {
       // load page sections
-      Pages.getPageSections(pageId).then((data) => {
-        console.debug(`Loaded page ${pageId} sections.`);
+      Pages.getPageSections(pageData.PageID).then((data) => {
+        console.debug(`Loaded page ${pageData.PageID} sections.`);
         setSectionData(data); // update state
       })
     }
-  }, [Pages.getPageSections, pageId, sectionData]);
+  }, [Pages, pageData]);
 
   useEffect(() => {
-    if (pageData && outlineData && !breadcrumbs) {
+    if (pageData && outlineData) {
       // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
-  }, [pageData, outlineData, breadcrumbs])
+  }, [pageData, outlineData])
 
   /**
    * Update a page section that has been edited.
@@ -97,21 +86,6 @@ export default function Page(props) {
     }
   }
 
-  /**
-   * Function for changing page ID.
-   * Clears out extra page related data when Page ID is changed.
-   *
-   * @param pageId {number} new page ID.
-   */
-  function setPageId(pageId) {
-    console.debug(`Set page ID to ${pageId}.`);
-    __setPageId__(pageId); // call private state setter
-    setPageData(null);
-    setSectionData(null);
-    setBreadcrumbs(null);
-    setError(null);
-  }
-
   function refreshPage() {
     console.debug(`Refresh page.`);
     setPageData({...pageData})
@@ -122,7 +96,6 @@ export default function Page(props) {
     <div className="Page" data-testid="Page">
       <PageContext
         value={{
-          pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,

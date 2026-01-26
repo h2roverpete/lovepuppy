@@ -99,27 +99,6 @@ export default function PageConfig() {
     buttonRef.current?.click();
   }
 
-  const extraButtons = <>
-    <Button
-      className="me-2"
-      size="sm"
-      variant="secondary"
-      onClick={onAddSection}
-    >
-      <span className={'d-none d-sm-block'}>Add Section</span>
-      <span className={'d-block d-sm-none'}>+Section</span>
-    </Button>
-    <Button
-      className="me-2"
-      size="sm"
-      variant="secondary"
-      onClick={() => setShowAddExtras(true)}
-    >
-      <span className={'d-none d-sm-block'}>Add Extra</span>
-      <span className={'d-block d-sm-none'}>+Extra</span>
-    </Button>
-  </>;
-
   return (<>
     <EditorPanel
       editUtil={editUtil}
@@ -130,8 +109,27 @@ export default function PageConfig() {
       panelStyle={{zIndex: 1032}}
       buttonStyle={{position: 'fixed', top: '5px'}}
       bodyStyle={{borderBottom: '1px solid gray'}}
-      extraButtons={extraButtons}
       buttonRef={buttonRef}
+      extraButtons={<>
+        <Button
+          className="me-2"
+          size="sm"
+          variant="secondary"
+          onClick={onAddSection}
+        >
+          <span className={'d-none d-sm-block'}>Add Section</span>
+          <span className={'d-block d-sm-none'}>+Section</span>
+        </Button>
+        <Button
+          className="me-2"
+          size="sm"
+          variant="secondary"
+          onClick={() => setShowAddExtras(true)}
+        >
+          <span className={'d-none d-sm-block'}>Add Extra</span>
+          <span className={'d-block d-sm-none'}>+Extra</span>
+        </Button>
+      </>}
     >
       <Row><Col><h5>Page Properties</h5></Col></Row>
       <Row>
@@ -241,10 +239,8 @@ export default function PageConfig() {
     <AddExtrasModal
       show={showAddExtras}
       onHide={() => setShowAddExtras(false)}
-      onSubmit={() => {
-        refreshPage();
-        collapsePanel();
-      }}
+      onSubmit={() => collapsePanel()}
     />
-  </>);
+  </>)
+    ;
 }

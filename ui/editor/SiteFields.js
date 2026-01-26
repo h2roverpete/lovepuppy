@@ -1,29 +1,21 @@
 import {useSiteContext} from "../content/Site";
 import {Col, Form, Row, Button} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
-import {useEffect, useState} from "react";
+import {useMemo, useState} from "react";
+import EditUtil from "./EditUtil";
 
 export default function SiteFields(props) {
+
   const {siteData, setSiteData} = useSiteContext();
   const {Sites} = useRestApi();
   const [edits, setEdits] = useState({});
-  const [touched, setTouched] = useState([]);
-
-  useEffect(() => {
-    if (siteData) {
-      setEdits({...siteData});
-    }
-  }, [siteData])
-
-  function onDataChanged({name, value}) {
-    setEdits({...edits, [name]: value});
-    setTouched([...touched, name]);
-  }
+  const editUtil = useMemo(() => new EditUtil({data: siteData, setEdits: setEdits}), [siteData]);
 
   function onSubmit() {
     console.debug(`Updating site properties...`);
     Sites.insertOrUpdateSite(edits).then((result) => {
       console.debug(`Site properties updated.`);
+      editUtil.update(result);
       setSiteData(result);
     }).catch((err) => {
       console.error(`Error updating site properties.`, err);
@@ -44,62 +36,45 @@ export default function SiteFields(props) {
     return bucketName && /[a-z.]*/.test(bucketName);
   }
 
-  function isEdited(name) {
-    if (siteData) {
-      if (!name) {
-        return touched.length > 0;
-      } else {
-        return touched.includes(name);
-      }
-    } else {
-      return false;
-    }
-  }
-
-  function onRevert() {
-    setEdits({...siteData});
-    setTouched([]);
-  }
-
   return (<>
     {siteData && (
       <div {...props}>
         <Row>
           <Col>
-            <Form.Label column={'sm'} htmlFor={'SiteName'}>Site Name</Form.Label>
+            <Form.Label column={'sm'} className={'required'} htmlFor={'SiteName'}>Site Name</Form.Label>
             <Form.Control
               size={'sm'}
               id={'SiteName'}
-              isValid={isEdited('SiteName') && edits.SiteName?.length > 0}
-              isInvalid={isEdited('SiteName') && !edits.SiteName}
+              isValid={editUtil?.isTouched('SiteName') && edits.SiteName?.length > 0}
+              isInvalid={editUtil?.isTouched('SiteName') && !edits.SiteName}
               value={edits.SiteName || ''}
-              onChange={(e) => onDataChanged({name: 'SiteName', value: e.target.value})}
+              onChange={(e) => editUtil?.onDataChanged({name: 'SiteName', value: e.target.value})}
             />
           </Col>
         </Row>
         <Row>
           <Col>
-            <Form.Label column={'sm'} htmlFor={'SiteRootUrl'}>URL</Form.Label>
+            <Form.Label column={'sm'} className={'required'} htmlFor={'SiteRootUrl'}>URL</Form.Label>
             <Form.Control
               size={'sm'}
               id={'SiteRootUrl'}
-              isValid={isEdited('SiteRootUrl') && isValidUrl(edits.SiteRootUrl)}
-              isInvalid={isEdited('SiteRootUrl') && !isValidUrl(edits.SiteRootUrl)}
+              isValid={editUtil?.isTouched('SiteRootUrl') && isValidUrl(edits.SiteRootUrl)}
+              isInvalid={editUtil?.isTouched('SiteRootUrl') && !isValidUrl(edits.SiteRootUrl)}
               value={edits.SiteRootUrl || ''}
-              onChange={(e) => onDataChanged({name: 'SiteRootUrl', value: e.target.value})}
+              onChange={(e) => editUtil?.onDataChanged({name: 'SiteRootUrl', value: e.target.value})}
             />
           </Col>
         </Row>
         <Row>
           <Col>
-            <Form.Label column={'sm'} htmlFor={'SiteBucketName'}>S3 Bucket</Form.Label>
+            <Form.Label column={'sm'} className={'required'} htmlFor={'SiteBucketName'}>S3 Bucket</Form.Label>
             <Form.Control
               size={'sm'}
               id={'SiteBucketName'}
-              isValid={isEdited('SiteBucketName') && isValidBucket(edits.SiteBucketName)}
-              isInvalid={isEdited('SiteBucketName') &&  !isValidBucket(edits.SiteBucketName)}
+              isValid={editUtil?.isTouched('SiteRootUrl') && isValidBucket(edits.SiteBucketName)}
+              isInvalid={editUtil?.isTouched('SiteRootUrl') && !isValidBucket(edits.SiteBucketName)}
               value={edits.SiteBucketName || ''}
-              onChange={(e) => onDataChanged({name: 'SiteBucketName', value: e.target.value})}
+              onChange={(e) => editUtil?.onDataChanged({name: 'SiteBucketName', value: e.target.value})}
             />
           </Col>
         </Row>
@@ -110,14 +85,14 @@ export default function SiteFields(props) {
               variant={'primary'}
               className={'me-2'}
               onClick={onSubmit}
-              disabled={!isEdited() || !isDataValid()}
+              disabled={!editUtil?.isTouched() || !isDataValid()}
             >
               Update</Button>
             <Button
               size={'sm'}
               variant={'secondary'}
-              disabled={!isEdited()}
-              onClick={() => onRevert()}
+              disabled={!editUtil?.isTouched()}
+              onClick={() => editUtil?.revert()}
             >
               Revert</Button>
           </Col>

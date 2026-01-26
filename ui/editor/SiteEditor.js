@@ -27,6 +27,7 @@ export default function SiteEditor({children}) {
           flexDirection: 'column',
           position: 'fixed',
           zIndex: '1032',
+          color: 'black'
         }}
       >
         {expanded ? (<BsChevronLeft size={'20'}/>) : ((<BsChevronRight size={'20'}/>))}

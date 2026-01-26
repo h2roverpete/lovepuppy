@@ -142,7 +142,7 @@ export default function GuestBookConfig({extraId}) {
             column={'sm'}
             className="required"
           >
-            Guest Book Name (used for email titles)
+            Guest Book Name (Title for Emails)
           </Form.Label>
           <Form.Control
             size={"sm"}
