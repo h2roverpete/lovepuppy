@@ -186,7 +186,7 @@ function GuestBook({guestBookId, extraId, guestId, guestFeedbackId, onChange}) {
         setGuestBookConfig: setGuestBookConfig,
       }
     }>
-      {guestBookConfig && (
+      {guestBookConfig && (<>
         <div className="GuestBook SectionText" key={guestBookId} style={{width: '100%'}}>
           {submitted ? (
             <>
@@ -236,11 +236,12 @@ function GuestBook({guestBookId, extraId, guestId, guestFeedbackId, onChange}) {
               </form>
             </>
           )}
-          <FormEditor>
-            <GuestBookConfig extraId={extraId}/>
-          </FormEditor>
         </div>
-      )} </GuestBookContext>
+        <FormEditor>
+          <GuestBookConfig extraId={extraId}/>
+        </FormEditor>
+      </>)}
+    </GuestBookContext>
   )
 }
 

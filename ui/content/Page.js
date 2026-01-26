@@ -3,6 +3,7 @@ import {SiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
 import PageConfig from "../editor/PageConfig";
 import FormEditor from "../editor/FormEditor";
+import AddExtrasModal from "../extras/AddExtrasModal";
 
 export const PageContext = createContext(
   {}
@@ -32,7 +33,10 @@ export default function Page(props) {
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
-  const {Pages} = useRestApi();
+  const {Pages, Extras} = useRestApi();
+  const [showAddExtraModal, setShowAddExtraModal] = useState(false);
+  const [extraPageSectionId, setExtraPageSectionId] = useState(0);
+  const [extras, setExtras] = useState([]);
 
   let errorData;
   if (error) {
@@ -59,6 +63,11 @@ export default function Page(props) {
       Pages.getPageSections(pageData.PageID).then((data) => {
         console.debug(`Loaded page ${pageData.PageID} sections.`);
         setSectionData(data); // update state
+      })
+      // load extras
+      Extras.getPageExtras(pageData.PageID).then((data) => {
+        console.debug(`Loaded page ${pageData.PageID} extras.`);
+        setExtras(data); // update state
       })
     }
   }, [Pages, pageData]);
@@ -92,6 +101,11 @@ export default function Page(props) {
     setPageData({...pageData})
   }
 
+  function addExtraModal({pageSectionId}) {
+    setShowAddExtraModal(true);
+    setExtraPageSectionId(pageSectionId);
+  }
+
   // provide context to children
   return (
     <div className="Page" data-testid="Page">
@@ -105,9 +119,18 @@ export default function Page(props) {
           setPageData: setPageData,
           setSectionData: setSectionData,
           updatePageSection: updatePageSection,
-          refreshPage: refreshPage
+          refreshPage: refreshPage,
+          addExtraModal: addExtraModal,
+          extras: extras,
         }}
       >
+        <FormEditor>
+          <AddExtrasModal
+            show={showAddExtraModal}
+            onHide={() => setShowAddExtraModal(false)}
+            pageSectionId={extraPageSectionId}
+          />
+        </FormEditor>
         <FormEditor>
           <PageConfig/>
         </FormEditor>

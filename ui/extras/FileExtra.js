@@ -29,9 +29,6 @@ export default function FileExtra({extraData}) {
                 </Col>
               </Row>
             </Container>
-            <FormEditor>
-              <ExtraConfig extraData={extraData}/>
-            </FormEditor>
           </>);
           break;
         case 'text/plain':
@@ -40,7 +37,6 @@ export default function FileExtra({extraData}) {
             .then(response => response.text())
             .then(data => setContent(<>
               <pre className={'Extra'}>{data}</pre>
-              <ExtraConfig extraData={extraData}/>
             </>))
             .catch(error => console.error(`Error fetching HTML ${fileUrl}:`, error));
           break;
@@ -50,7 +46,6 @@ export default function FileExtra({extraData}) {
             .then(response => response.text())
             .then(data => setContent(<>
               <div className={'Extra'} dangerouslySetInnerHTML={{__html: data}}/>
-              <ExtraConfig extraData={extraData}/>
             </>))
             .catch(error => console.error(`Error fetching HTML ${fileUrl}:`, error));
           break;
@@ -61,11 +56,15 @@ export default function FileExtra({extraData}) {
               <a
                 href={fileUrl}>{extraData.ExtraFilePrompt ? extraData.ExtraFilePrompt : fileName}</a>
             </div>
-            <ExtraConfig extraData={extraData}/>
           </>);
           break;
       }
     }
   }, [siteData, extraData]);
-  return content;
+  return (<>
+    {content}
+    <FormEditor>
+      <ExtraConfig extraData={extraData}/>
+    </FormEditor>
+  </>);
 }

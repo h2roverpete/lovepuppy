@@ -42,14 +42,14 @@ export default function PageSections(props) {
         <Login/>
       </>) : (<>
         {pageData && sectionData && (<>
-          {sectionData.map(section => (
+          {sectionData.map(section => (<>
             <PageSection
-              pageSectionData={section} key={section.PageSectionID}
+              pageSectionData={section}
+              key={section.PageSectionID}
               data-testid={`PageSection-section.PageSectionID`}/>
-          ))}
+          </>))}
           {props.children}
         </>)}
-        <Extras/>
       </>)}
     </>)}
     </>)

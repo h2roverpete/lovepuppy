@@ -217,11 +217,6 @@ export default function RestApi(props) {
     return response.data;
   }
 
-  async function getPageSectionExtras(pageId, pageSectionId) {
-    const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/extras`);
-    return response.data;
-  }
-
   async function insertOrUpdateExtra(data, file) {
     return await adminApiCall(() => {
       return async () => {
@@ -337,7 +332,6 @@ export default function RestApi(props) {
         deleteSectionImage: deleteSectionImage,
         deletePageSection: deletePageSection,
         insertOrUpdatePage: insertOrUpdatePage,
-        getPageSectionExtras: getPageSectionExtras,
       },
       GuestBooks: {
         getGuestBook: getGuestBook,

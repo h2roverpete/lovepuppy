@@ -7,6 +7,7 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstra
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
 import {DropState, FileDropTarget} from "../editor/FileDropTarget";
+import Extras from "../extras/Extras";
 
 /**
  * Generate a page section
@@ -17,7 +18,7 @@ function PageSection({pageSectionData}) {
 
   const {PageSections} = useRestApi();
   const {canEdit} = useEdit();
-  const {sectionData, setSectionData, updatePageSection, refreshPage} = usePageContext();
+  const {sectionData, setSectionData, updatePageSection, refreshPage, addExtraModal} = usePageContext();
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingText, setEditingText] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -356,6 +357,8 @@ function PageSection({pageSectionData}) {
                     onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Title`}</span>
                 <span className="dropdown-item"
                       onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Text`}</span>
+                <span className="dropdown-item" onClick={selectImageFile}>{`${pageSectionData?.SectionImage?.length > 0 ? 'Update' : 'Add'} Image`}</span>
+                <span className="dropdown-item" onClick={()=>addExtraModal({pageSectionId: pageSectionData.PageSectionID})}>Add Extra</span>
                 {pageSectionData.PageSectionSeq > 1 && (
                   <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
                 )}
@@ -365,7 +368,6 @@ function PageSection({pageSectionData}) {
                 )}
                 <span className="dropdown-item" style={{marginLeft: '0'}}
                       onClick={onNewSectionAbove}>New Section Above</span>
-                <span className="dropdown-item" onClick={selectImageFile}>Upload Image</span>
                 <span className="dropdown-item" onClick={() => setShowDeleteConfirmation(true)}> Delete Section</span>
               </div>
             </div>
@@ -396,6 +398,7 @@ function PageSection({pageSectionData}) {
           />
         )}
       </>)}
+      <Extras/>
     </PageSectionContext>
   );
 }

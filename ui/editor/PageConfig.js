@@ -5,9 +5,8 @@ import {usePageContext} from "../content/Page";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {useNavigate} from "react-router";
-import AddExtrasModal from "../extras/AddExtrasModal";
 import EditorPanel from "./EditorPanel";
-import FormEditor, {useFormEditor} from "./FormEditor";
+import {useFormEditor} from "./FormEditor";
 
 /**
  * Edit page metadata fields.
@@ -18,7 +17,7 @@ export default function PageConfig() {
 
   const {Pages, PageSections} = useRestApi();
   const {canEdit} = useEdit();
-  const {pageData, setPageData, refreshPage} = usePageContext();
+  const {pageData, setPageData, refreshPage, addExtraModal} = usePageContext();
   const {Outline, outlineData} = useSiteContext()
 
   const {edits, FormData} = useFormEditor();
@@ -29,7 +28,6 @@ export default function PageConfig() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   const navigate = useNavigate();
-  const [showAddExtras, setShowAddExtras] = useState(false);
 
   const buttonRef = useRef(null);
   const [routes, setRoutes] = useState([]);
@@ -126,7 +124,7 @@ export default function PageConfig() {
           className="me-2"
           size="sm"
           variant="secondary"
-          onClick={() => setShowAddExtras(true)}
+          onClick={() => addExtraModal()}
         >
           <span className={'d-none d-sm-block'}>Add Extra</span>
           <span className={'d-block d-sm-none'}>+Extra</span>
@@ -237,14 +235,5 @@ export default function PageConfig() {
         }}>Delete</Button>
       </Modal.Footer>
     </Modal>
-
-    <FormEditor>
-      <AddExtrasModal
-        show={showAddExtras}
-        onHide={() => setShowAddExtras(false)}
-        onSubmit={() => collapsePanel()}
-      />
-    </FormEditor>
-  </>)
-    ;
+  </>);
 }

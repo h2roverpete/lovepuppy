@@ -4,7 +4,6 @@ import {useSiteContext} from "../content/Site";
 import {usePageContext} from "../content/Page";
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
-import {usePageSectionContext} from "../content/PageSection";
 import {useEdit} from "../editor/EditProvider";
 import {useFormEditor} from "../editor/FormEditor";
 
@@ -19,14 +18,14 @@ import {useFormEditor} from "../editor/FormEditor";
  * @param show    {Boolean}
  * @param onHide  {function()}
  * @param onSubmit {function()}
+ * @param pageSectionId {Number}
  * @returns {JSX.Element}
  * @constructor
  */
-export default function AddExtrasModal({show, onHide, onSubmit}) {
+export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) {
 
   const {siteData} = useSiteContext();
   const {pageData, refreshPage} = usePageContext();
-  const {pageSectionData} = usePageSectionContext();
   const {GuestBooks, Galleries, Extras} = useRestApi();
   const {canEdit} = useEdit();
 
@@ -37,20 +36,8 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
   const [galleryList, setGalleryList] = useState([]);
 
   useEffect(() => {
-    FormData?.onDataChanged({name: 'SiteID', value: siteData?.SiteID});
-  }, [siteData]);
-
-  useEffect(() => {
-    FormData?.onDataChanged({name: 'PageID', value: pageData?.PageID});
-  }, [pageData]);
-
-  useEffect(() => {
-    FormData?.onDataChanged({name: 'PageSectionID', value: pageSectionData?.PageSectionID});
-  }, [pageSectionData]);
-
-  useEffect(() => {
     // load list of existing galleries
-    Galleries?.getGalleries().then((result) => {
+    Galleries.getGalleries().then((result) => {
       console.debug(`List of ${result.length} galleries loaded.`);
       setGalleryList(result);
     }).catch((err) => {
@@ -58,9 +45,9 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
     })
   }, [Galleries]);
 
-// load list of existing guest books
   useEffect(() => {
-    GuestBooks?.getGuestBooks().then((result) => {
+    // load list of existing guest books
+    GuestBooks.getGuestBooks().then((result) => {
       console.debug(`List of ${result.length} guest books loaded.`);
       setGuestBookList(result);
     }).catch((err) => {
@@ -73,16 +60,16 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
   }
 
   function onAddExtra() {
-    switch (edits?.ExtraType) {
+    switch (edits.ExtraType) {
       case 'gallery':
-        if (edits?.GalleryID) {
+        if (edits.GalleryID) {
           console.debug(`Adding gallery extra.`);
           Extras.insertOrUpdateExtra({
-            ExtraType: edits?.ExtraType,
-            SiteID: edits?.SiteID,
-            PageID: edits?.PageID,
-            PageSectionID: edits?.PageSectionID,
-            GalleryID: edits?.GalleryID
+            ExtraType: edits.ExtraType,
+            SiteID: siteData.SiteID,
+            PageID: pageData.PageID,
+            PageSectionID: pageSectionId,
+            GalleryID: edits.GalleryID
           }).then(() => {
             console.debug(`Extra added.`);
             onExtraAdded();
@@ -91,15 +78,15 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
           });
         } else {
           Galleries.insertOrUpdateGallery({
-            SiteID: edits?.SiteID,
+            SiteID: siteData.SiteID,
             GalleryName: siteData.SiteName
           }).then((result) => {
             console.debug(`Gallery added.`);
             Extras.insertOrUpdateExtra({
-              ExtraType: edits?.ExtraType,
-              SiteID: edits?.SiteID,
-              PageID: edits?.PageID,
-              PageSectionID: edits?.PageSectionID,
+              ExtraType: edits.ExtraType,
+              SiteID: siteData.SiteID,
+              PageID: pageData.PageID,
+              PageSectionID: pageSectionId,
               GalleryID: result.GalleryID
             }).then(() => {
               console.debug(`Extra added.`);
@@ -113,11 +100,11 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
         }
         break;
       case 'guestbook':
-        if (!edits?.GuestBookID) {
+        if (!edits.GuestBookID) {
           GuestBooks.insertOrUpdateGuestBook({
-            GuestBookName: edits?.GuestBookName,
-            GuestBookEmail: edits?.GuestBookEmail,
-            SiteID: edits?.SiteID,
+            GuestBookName: edits.GuestBookName,
+            GuestBookEmail: edits.GuestBookEmail,
+            SiteID: siteData.SiteID,
             ShowName: true,
             ShowEmail: true,
             ShowPhone: true,
@@ -125,10 +112,10 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
           }).then((result) => {
             console.debug(`Guest book added.`);
             Extras.insertOrUpdateExtra({
-              ExtraType: edits?.ExtraType,
-              SiteID: edits?.SiteID,
-              PageID: edits?.PageID,
-              PageSectionID: edits?.PageSectionID,
+              ExtraType: edits.ExtraType,
+              SiteID: siteData.SiteID,
+              PageID: pageData.PageID,
+              PageSectionID: pageSectionId,
               GuestBookID: result.GuestBookID
             }).then(() => {
               console.debug(`Extra added.`);
@@ -142,11 +129,11 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
         } else {
           // create an Extra for an existing guest book
           Extras.insertOrUpdateExtra({
-            ExtraType: edits?.ExtraType,
-            SiteID: edits?.SiteID,
-            PageID: edits?.PageID,
-            PageSectionID: edits?.PageSectionID,
-            GuestBookID: edits?.GuestBookID
+            ExtraType: edits.ExtraType,
+            SiteID: siteData.SiteID,
+            PageID: pageData.PageID,
+            PageSectionID: pageSectionId,
+            GuestBookID: edits.GuestBookID
           }).then(() => {
             console.debug(`Extra added.`);
             onExtraAdded();
@@ -158,11 +145,11 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
       case 'instagram':
         console.debug(`Adding Instagram extra.`);
         Extras.insertOrUpdateExtra({
-          ExtraType: edits?.ExtraType,
-          SiteID: edits?.SiteID,
-          PageID: edits?.PageID,
-          PageSectionID: edits?.PageSectionID,
-          InstagramHandle: edits?.InstagramHandle
+          ExtraType: edits.ExtraType,
+          SiteID: siteData.SiteID,
+          PageID: pageData.PageID,
+          PageSectionID: pageSectionId,
+          InstagramHandle: edits.InstagramHandle
         }).then(() => {
           console.debug(`Extra added.`);
           onExtraAdded();
@@ -171,19 +158,19 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
       case 'file':
         console.debug(`Adding File extra.`);
         Extras.insertOrUpdateExtra({
-          ExtraType: edits?.ExtraType,
-          SiteID: edits?.SiteID,
-          PageID: edits?.PageID,
-          PageSectionID: edits?.PageSectionID,
-          ExtraFile: edits?.ExtraFile,
-          ExtraFilePrompt: edits?.ExtraFilePrompt,
+          ExtraType: edits.ExtraType,
+          SiteID: siteData.SiteID,
+          PageID: pageData.PageID,
+          PageSectionID: pageSectionId,
+          ExtraFile: edits.ExtraFile,
+          ExtraFilePrompt: edits.ExtraFilePrompt,
         }).then(() => {
           console.debug(`Extra added.`);
           onExtraAdded();
         }).catch((err) => console.error(`Error adding file.`, err));
         break;
       default:
-        console.error(`Unsupported extra type ${edits?.ExtraType}`)
+        console.error(`Unsupported extra type ${edits.ExtraType}`)
     }
   }
 
@@ -191,26 +178,26 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
    * Called after an Extra is successfully added.
    */
   function onExtraAdded() {
-    FormData?.revert();
+    FormData.revert();
     refreshPage();
     onHide?.();
     onSubmit?.();
   }
 
   function isDataValid() {
-    switch (edits?.ExtraType) {
+    switch (edits.ExtraType) {
       case 'guestbook':
-        if (!edits?.GuestBookID) {
-          return isValidEmail(edits?.GuestBookEmail) && edits?.GuestBookName.length > 0;
+        if (!edits.GuestBookID) {
+          return isValidEmail(edits.GuestBookEmail) && edits.GuestBookName.length > 0;
         } else {
-          return edits?.GuestBookID > 0;
+          return edits.GuestBookID > 0;
         }
       case 'gallery':
-        return edits?.GalleryID === undefined || edits?.GalleryID > 0;
+        return edits.GalleryID === undefined || edits.GalleryID > 0;
       case 'instagram':
-        return isValidInstagramHandle(edits?.InstagramHandle);
+        return isValidInstagramHandle(edits.InstagramHandle);
       case 'file':
-        return edits?.ExtraFile !== null
+        return edits.ExtraFile !== null
       default:
         return false;
     }
@@ -221,7 +208,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
   }
 
   function onCancel() {
-    FormData?.revert();
+    FormData.revert();
     onHide?.();
   }
 
@@ -244,8 +231,8 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
             <Form.Select
               id="ExtraType"
               size={'sm'}
-              value={edits?.ExtraType}
-              onChange={(e) => FormData?.onDataChanged({name: 'ExtraType', value: e.target.value})}
+              value={edits.ExtraType}
+              onChange={(e) => FormData.onDataChanged({name: 'ExtraType', value: e.target.value})}
             >
               <option value={''}>(Select)</option>
               <option value='gallery'>Photo Gallery</option>
@@ -255,7 +242,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
             </Form.Select>
           </Col>
         </Row>
-        {edits?.ExtraType === 'guestbook' && (<>
+        {edits.ExtraType === 'guestbook' && (<>
           <Row className="mt-2">
             <Col sm={labelCols}></Col>
             <Col>
@@ -264,9 +251,9 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 name={'NewGuestBook'}
                 className='form-control-sm'
                 label='Create new guest book'
-                checked={edits?.GuestBookID === undefined}
+                checked={edits.GuestBookID === undefined}
                 onChange={() => {
-                  FormData?.onDataChanged({name: 'GuestBookID', value: undefined});
+                  FormData.onDataChanged({name: 'GuestBookID', value: undefined});
                 }}
               />
               <Form.Check
@@ -275,14 +262,14 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 value={'true'}
                 className='form-control-sm'
                 label='Use existing guest book'
-                checked={edits?.GuestBookID !== undefined}
+                checked={edits.GuestBookID !== undefined}
                 onChange={() => {
-                  FormData?.onDataChanged({name: 'GuestBookID', value: 0});
+                  FormData.onDataChanged({name: 'GuestBookID', value: 0});
                 }}
               />
             </Col>
           </Row>
-          {edits?.GuestBookID === undefined ? (<>
+          {edits.GuestBookID === undefined ? (<>
             <Row className="mt-2">
               <Form.Label className='required' column={'sm'} htmlFor={'GuestBookName'} sm={labelCols}>
                 Title for Emails</Form.Label>
@@ -291,10 +278,10 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                   id="GuestBookName"
                   name="GuestBookEmail"
                   size="sm"
-                  isValid={FormData?.isTouched('GuestBookName') && edits?.GuestBookName.length > 0}
-                  isInvalid={FormData?.isTouched('GuestBookName') && edits?.GuestBookName.length === 0}
-                  onChange={(e) => FormData?.onDataChanged({name: 'GuestBookName', value: e.target.value})}
-                  value={edits?.GuestBookName || ''}
+                  isValid={FormData.isTouched('GuestBookName') && edits.GuestBookName.length > 0}
+                  isInvalid={FormData.isTouched('GuestBookName') && edits.GuestBookName.length === 0}
+                  onChange={(e) => FormData.onDataChanged({name: 'GuestBookName', value: e.target.value})}
+                  value={edits.GuestBookName || ''}
                 />
               </Col>
             </Row>
@@ -306,8 +293,8 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                   id="GuestBookEmail"
                   name="GuestBookEmail"
                   size="sm"
-                  onChange={(e) => FormData?.onDataChanged({name: 'GuestBookEmail', value: e.target.value})}
-                  value={edits?.GuestBookEmail}
+                  onChange={(e) => FormData.onDataChanged({name: 'GuestBookEmail', value: e.target.value})}
+                  value={edits.GuestBookEmail}
                 />
               </Col>
             </Row>
@@ -325,8 +312,8 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                   id="GuestBook"
                   name="GuestBookEmail"
                   size="sm"
-                  onChange={(e) => FormData?.onDataChanged({name: 'GuestBookID', value: parseInt(e.target.value)})}
-                  value={edits?.GuestBookID}
+                  onChange={(e) => FormData.onDataChanged({name: 'GuestBookID', value: parseInt(e.target.value)})}
+                  value={edits.GuestBookID}
                 >
                   <option key={''} value={0}>(Select a guest book)</option>
                   {guestBookList.map((guestBook) => (
@@ -337,7 +324,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
             </Row>
           </>)}
         </>)}
-        {edits?.ExtraType === 'gallery' && (<>
+        {edits.ExtraType === 'gallery' && (<>
           <Row className="mt-2">
             <Col sm={labelCols}></Col>
             <Col>
@@ -346,9 +333,9 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 name={'NewGallery'}
                 className='form-control-sm'
                 label='Create new gallery'
-                checked={edits?.GalleryID === undefined}
+                checked={edits.GalleryID === undefined}
                 onChange={() => {
-                  FormData?.onDataChanged({name: 'GalleryID', value: undefined});
+                  FormData.onDataChanged({name: 'GalleryID', value: undefined});
                 }}
               />
               <Form.Check
@@ -357,14 +344,14 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 value={'true'}
                 className='form-control-sm'
                 label='Use existing gallery'
-                checked={edits?.GalleryID !== undefined}
+                checked={edits.GalleryID !== undefined}
                 onChange={() => {
-                  FormData?.onDataChanged({name: 'GalleryID', value: 0});
+                  FormData.onDataChanged({name: 'GalleryID', value: 0});
                 }}
               />
             </Col>
           </Row>
-          {edits?.GalleryID !== undefined && (
+          {edits.GalleryID !== undefined && (
             <Row className="mt-2">
               <Form.Label
                 className='required'
@@ -377,8 +364,8 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 <Form.Select
                   id="Gallery"
                   size="sm"
-                  onChange={(e) => FormData?.onDataChanged({name: 'GalleryID', value: parseInt(e.target.value)})}
-                  value={edits?.GalleryID}
+                  onChange={(e) => FormData.onDataChanged({name: 'GalleryID', value: parseInt(e.target.value)})}
+                  value={edits.GalleryID}
                 >
                   <option key={''} value={0}>(Select a gallery)</option>
                   {galleryList.map((gallery) => (
@@ -389,7 +376,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
             </Row>
           )}
         </>)}
-        {edits?.ExtraType === 'instagram' && (
+        {edits.ExtraType === 'instagram' && (
           <Row className="mt-2">
             <Form.Label
               className='required'
@@ -405,15 +392,15 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 name="InstagramHandle"
                 size="sm"
                 placeholder="@myhandle"
-                isValid={edits?.InstagramHandle && isValidInstagramHandle(edits?.InstagramHandle)}
-                isInvalid={edits?.InstagramHandle && !isValidInstagramHandle(edits?.InstagramHandle)}
-                onChange={(e) => FormData?.onDataChanged({name: 'InstagramHandle', value: e.target.value})}
-                value={edits?.InstagramHandle || ''}
+                isValid={edits.InstagramHandle && isValidInstagramHandle(edits.InstagramHandle)}
+                isInvalid={edits.InstagramHandle && !isValidInstagramHandle(edits.InstagramHandle)}
+                onChange={(e) => FormData.onDataChanged({name: 'InstagramHandle', value: e.target.value})}
+                value={edits.InstagramHandle || ''}
               />
             </Col>
           </Row>
         )}
-        {edits?.ExtraType === 'file' && (<>
+        {edits.ExtraType === 'file' && (<>
           <Row className="mt-2">
             <Form.Label
               className='required'
@@ -429,13 +416,13 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 id="ExtraFile"
                 name="ExtraFile"
                 size="sm"
-                onChange={(e) => FormData?.onDataChanged({name: 'ExtraFile', value: e.target.files[0]})}
+                onChange={(e) => FormData.onDataChanged({name: 'ExtraFile', value: e.target.files[0]})}
               />
             </Col>
           </Row>
           <Row
             className="mt-2"
-            hidden={!edits?.ExtraFile || edits?.ExtraFile?.type?.startsWith('text/')}
+            hidden={!edits.ExtraFile || edits.ExtraFile.type?.startsWith('text/')}
           >
             <Form.Label
               column={'sm'}
@@ -449,7 +436,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
                 id="ExtraFilePrompt"
                 name="ExtraFilePrompt"
                 size="sm"
-                onChange={(e) => FormData?.onDataChanged({name: 'ExtraFilePrompt', value: e.target.value})}
+                onChange={(e) => FormData.onDataChanged({name: 'ExtraFilePrompt', value: e.target.value})}
               />
             </Col>
           </Row>
