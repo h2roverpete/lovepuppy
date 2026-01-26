@@ -19,63 +19,6 @@ export default function ExtraConfig({extraData}) {
   }
 
   const labelCols = 2;
-  const content = (<>
-    <h5>File Properties</h5>
-    <Row className="mt-2">
-      <Form.Label
-        column={'sm'}
-        sm={labelCols}
-        htmlFor={'CurrentFile'}>Current File</Form.Label>
-      <Col>
-        <Form.Control
-          size={'sm'}
-          id={'CurrentFile'}
-          value={extraData.ExtraFile}
-          readOnly={true}
-          disabled={true}
-        />
-      </Col>
-    </Row>
-    <Row className="mt-2">
-      <Form.Label
-        column={'sm'}
-        sm={labelCols}
-        htmlFor={'ExtraFile'}>Replace File</Form.Label>
-      <Col>
-        <Form.Control
-          type={'file'}
-          size={'sm'}
-          id={'ExtraFile'}
-          onChange={(e) => {
-            editUtil?.onDataChanged({
-                changes: [
-                  {name: 'ExtraFile', value: e.target.files[0]},
-                  {name: 'ExtraFileMimeType', value: e.target.files[0].type}
-                ]
-              }
-            );
-          }}
-        />
-      </Col>
-    </Row>
-    <Row
-      className="mt-2"
-      hidden={edits.ExtraFileMimeType?.startsWith('text/')}
-    >
-      <Form.Label
-        column={'sm'}
-        sm={labelCols}
-        htmlFor={'ExtraFilePrompt'}>File Prompt</Form.Label>
-      <Col>
-        <Form.Control
-          size={'sm'}
-          id={'ExtraFilePrompt'}
-          value={edits.ExtraFilePrompt || ''}
-          onChange={(e) => editUtil?.onDataChanged({name: 'ExtraFilePrompt', value: e.target.value})}
-        />
-      </Col>
-    </Row>
-  </>);
 
   return (
     <EditorPanel
@@ -101,7 +44,61 @@ export default function ExtraConfig({extraData}) {
       isDataValid={() => true}
       editUtil={editUtil}
     >
-      {content}
+      <h5>File Properties</h5>
+      <Row className="mt-2">
+        <Form.Label
+          column={'sm'}
+          sm={labelCols}
+          htmlFor={'CurrentFile'}>Current File</Form.Label>
+        <Col>
+          <Form.Control
+            size={'sm'}
+            id={'CurrentFile'}
+            value={extraData.ExtraFile}
+            readOnly={true}
+            disabled={true}
+          />
+        </Col>
+      </Row>
+      <Row className="mt-2">
+        <Form.Label
+          column={'sm'}
+          sm={labelCols}
+          htmlFor={'ExtraFile'}>Replace File</Form.Label>
+        <Col>
+          <Form.Control
+            type={'file'}
+            size={'sm'}
+            id={'ExtraFile'}
+            onChange={(e) => {
+              editUtil?.onDataChanged({
+                  changes: [
+                    {name: 'ExtraFile', value: e.target.files[0]},
+                    {name: 'ExtraFileMimeType', value: e.target.files[0].type}
+                  ]
+                }
+              );
+            }}
+          />
+        </Col>
+      </Row>
+      <Row
+        className="mt-2"
+        hidden={edits.ExtraFileMimeType?.startsWith('text/')}
+      >
+        <Form.Label
+          column={'sm'}
+          sm={labelCols}
+          htmlFor={'ExtraFilePrompt'}>File Prompt</Form.Label>
+        <Col>
+          <Form.Control
+            size={'sm'}
+            id={'ExtraFilePrompt'}
+            value={edits.ExtraFilePrompt || ''}
+            onChange={(e) => editUtil?.onDataChanged({name: 'ExtraFilePrompt', value: e.target.value})}
+          />
+        </Col>
+      </Row>
     </EditorPanel>
   );
 }

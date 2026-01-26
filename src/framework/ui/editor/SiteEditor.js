@@ -44,7 +44,7 @@ export default function SiteEditor({children}) {
             zIndex: '1031',
           }}>
             <div style={{
-              width: '300px',
+              width: '250px',
               padding: '20px 10px 10px 23px',
               display: 'flex',
               flexDirection: 'column',

@@ -1,8 +1,5 @@
 import DatePicker from "react-datepicker";
 
-// number of milliseconds in one day
-const ONE_DAY = 1000 * 60 * 60 * 24;
-
 /**
  * Insert a date picker form control.
  *

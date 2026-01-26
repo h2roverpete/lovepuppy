@@ -25,7 +25,7 @@ export default function Extras() {
         setExtras(result);
       });
     }
-  }, [pageData])
+  }, [pageData, Extras])
   return (<>
     {extras.map((extra) => (<React.Fragment key={extra.ExtraID}>
       {extra.ExtraType === 'guestbook' && (

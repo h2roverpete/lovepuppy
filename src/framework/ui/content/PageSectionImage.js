@@ -20,7 +20,7 @@ import {Button} from "react-bootstrap";
  */
 export default function PageSectionImage({pageSectionData, imageRef, dropTargetRef, dropTargetState}) {
 
-  const {insertOrUpdatePageSection, deleteSectionImage} = useRestApi();
+  const {PageSections} = useRestApi();
   const {sectionData, setSectionData} = usePageContext();
   const {canEdit} = useEdit();
   const {siteData} = useSiteContext();
@@ -28,7 +28,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
   function setImageAlign(align) {
     pageSectionData.ImageAlign = align;
     console.debug(`Updating image alignment...`);
-    insertOrUpdatePageSection(pageSectionData)
+    PageSections.insertOrUpdatePageSection(pageSectionData)
       .then(() => console.debug(`Updated image alignment.`))
       .catch(error => console.error(`Error updating image alignment.`, error));
     setSectionData([...sectionData]);
@@ -41,7 +41,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
       pageSectionData.ImageAlign = 'right';
     }
     console.debug(`Updating image position...`);
-    insertOrUpdatePageSection(pageSectionData)
+    PageSections.insertOrUpdatePageSection(pageSectionData)
       .then(() => console.debug(`Updated image position.`))
       .catch(error => console.error(`Error updating image position.`, error));
     setSectionData([...sectionData]);
@@ -50,7 +50,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
   function hideImageFrame(hide) {
     pageSectionData.HideImageFrame = hide;
     console.debug(`Updating image frame...`);
-    insertOrUpdatePageSection(pageSectionData)
+    PageSections.insertOrUpdatePageSection(pageSectionData)
       .then(() => console.debug(`Updated image frame.`))
       .catch(error => console.error(`Error updating image frame.`, error));
     setSectionData([...sectionData]);
@@ -58,7 +58,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
 
   function deleteImage() {
     console.debug(`Deleting section image...`);
-    deleteSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID)
+    PageSections.deleteSectionImage(pageSectionData.PageID, pageSectionData.PageSectionID)
       .then(() => {
         console.debug(`Deleted section image.`)
         pageSectionData.SectionImage = null;
@@ -70,7 +70,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
   function setImageWidth(width) {
     console.debug(`Setting image width to ${width}...`);
     pageSectionData.ImageWidth = width;
-    insertOrUpdatePageSection(pageSectionData)
+    PageSections.insertOrUpdatePageSection(pageSectionData)
       .then(() => console.debug(`Updated image width.`))
       .catch(error => console.error(`Error updating image width.`, error));
     setSectionData([...sectionData]);

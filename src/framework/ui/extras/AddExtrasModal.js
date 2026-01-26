@@ -43,15 +43,15 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
   useEffect(() => {
     let changed = false;
     const newData = {...edits};
-    if (siteData && !newData.SiteID) {
+    if (siteData) {
       newData.SiteID = siteData.SiteID;
       changed = true;
     }
-    if (pageData && !newData.PageID) {
+    if (pageData) {
       newData.PageID = pageData.PageID;
       changed = true;
     }
-    if (pageSectionData && !newData.PageSectionID) {
+    if (pageSectionData) {
       newData.PageSectionID = pageSectionData.PageSectionID;
       changed = true;
     }
@@ -249,7 +249,7 @@ export default function AddExtrasModal({show, onHide, onSubmit}) {
 
   return (
     <Modal show={show} onHide={onCancel}>
-      <Modal.Header><h5>Add an Extra to '{pageData.PageTitle}'</h5></Modal.Header>
+      <Modal.Header><h5>Add an Extra</h5></Modal.Header>
       <Modal.Body>
         <Row>
           <Form.Label
