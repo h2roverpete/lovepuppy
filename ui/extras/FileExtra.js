@@ -2,6 +2,7 @@ import {useSiteContext} from "../content/Site";
 import {useEffect, useState} from "react";
 import ExtraConfig from "./ExtraConfig";
 import {Col, Container, Row} from "react-bootstrap";
+import FormEditor from "../editor/FormEditor";
 
 export default function FileExtra({extraData}) {
 
@@ -28,7 +29,9 @@ export default function FileExtra({extraData}) {
                 </Col>
               </Row>
             </Container>
-            <ExtraConfig extraData={extraData}/>
+            <FormEditor>
+              <ExtraConfig extraData={extraData}/>
+            </FormEditor>
           </>);
           break;
         case 'text/plain':

@@ -1,33 +1,37 @@
 import {useEdit} from "../editor/EditProvider";
 import {Row, Form, Col, Button, Modal} from "react-bootstrap";
-import {useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "../content/Page";
 import DateField from "../forms/DateField";
-import EditUtil from "../editor/EditUtil";
 import EditorPanel from "../editor/EditorPanel";
+import {useFormEditor} from "../editor/FormEditor";
 
-export default function GalleryConfig({galleryConfig, extraId}) {
+export default function GalleryConfig({galleryConfig, setGalleryConfig, extraId}) {
+
   const {canEdit} = useEdit();
-  const [edits, setEdits] = useState({});
-  const editUtil = useMemo(() => new EditUtil({data: galleryConfig, setEdits: setEdits}), [galleryConfig]);
   const {Galleries, Extras} = useRestApi();
   const {refreshPage} = usePageContext();
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const {edits, FormData} = useFormEditor();
+  useEffect(() => {
+    FormData.setData(galleryConfig);
+  }, [galleryConfig]);
 
   if (!canEdit) {
     return <></>
   }
 
   function isDataValid() {
-    return edits.GalleryName?.length > 0;
+    return edits?.GalleryName?.length > 0;
   }
 
   function onUpdate() {
     console.log(`Updating gallery.`);
     Galleries.insertOrUpdateGallery(edits)
       .then((result) => {
-        editUtil?.update(result);
+        FormData?.update(result);
+        setGalleryConfig(result);
       })
       .catch((err) => {
         console.error(`Error updating gallery.`, err);
@@ -57,7 +61,11 @@ export default function GalleryConfig({galleryConfig, extraId}) {
   const labelCols = 3;
 
   return (<>
-    <Modal show={showDeleteConfirmation} onClose={() => setShowDeleteConfirmation(false)}>
+    <Modal
+      show={showDeleteConfirmation}
+      onClose={() => setShowDeleteConfirmation(false)}
+      className={'Editor'}
+    >
       <Modal.Header><h5>Delete Gallery</h5></Modal.Header>
       <Modal.Body>Are you sure you want to delete '{galleryConfig?.GalleryName}' gallery? This action can't be
         undone.</Modal.Body>
@@ -84,7 +92,6 @@ export default function GalleryConfig({galleryConfig, extraId}) {
       onUpdate={onUpdate}
       isDataValid={isDataValid}
       onDelete={() => setShowDeleteConfirmation(true)}
-      editUtil={editUtil}
     >
       <h5>Gallery Properties</h5>
       <Row>
@@ -100,10 +107,10 @@ export default function GalleryConfig({galleryConfig, extraId}) {
           <Form.Control
             size={'sm'}
             id={'GalleryName'}
-            isValid={editUtil?.isTouched('GalleryName') && edits.GalleryName.length > 0}
-            isInvalid={editUtil?.isTouched('GalleryName') && edits.GalleryName.length === 0}
-            value={edits.GalleryName}
-            onChange={(e) => editUtil?.onDataChanged({name: 'GalleryName', value: e.target.value})}
+            isValid={FormData?.isTouched('GalleryName') && edits?.GalleryName.length > 0}
+            isInvalid={FormData?.isTouched('GalleryName') && edits?.GalleryName.length === 0}
+            value={edits?.GalleryName}
+            onChange={(e) => FormData?.onDataChanged({name: 'GalleryName', value: e.target.value})}
           />
         </Col>
       </Row>
@@ -118,8 +125,8 @@ export default function GalleryConfig({galleryConfig, extraId}) {
             size={'sm'}
             id={'GalleryDescription'}
             rows={1}
-            value={edits.GalleryDescription}
-            onChange={(e) => editUtil?.onDataChanged({name: 'GalleryDescription', value: e.target.value})}
+            value={edits?.GalleryDescription}
+            onChange={(e) => FormData?.onDataChanged({name: 'GalleryDescription', value: e.target.value})}
           />
         </Col>
       </Row>
@@ -134,8 +141,8 @@ export default function GalleryConfig({galleryConfig, extraId}) {
             size={'sm'}
             id={'GalleryLongDescription'}
             rows={3}
-            value={edits.GalleryLongDescription}
-            onChange={(e) => editUtil?.onDataChanged({name: 'GalleryLongDescription', value: e.target.value})}
+            value={edits?.GalleryLongDescription}
+            onChange={(e) => FormData?.onDataChanged({name: 'GalleryLongDescription', value: e.target.value})}
           />
         </Col>
       </Row>
@@ -149,8 +156,8 @@ export default function GalleryConfig({galleryConfig, extraId}) {
             name={'GalleryDate'}
             size={'sm'}
             id={'GalleryDate'}
-            value={edits.GalleryDate}
-            onChange={editUtil?.onDataChanged}
+            value={edits?.GalleryDate}
+            onChange={FormData?.onDataChanged}
           />
         </Col>
       </Row>

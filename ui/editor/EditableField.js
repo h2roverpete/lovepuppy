@@ -1,7 +1,7 @@
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import EditButtons, {EditAction} from "./EditButtons";
 import {useEdit} from "./EditProvider";
-import {Button, Modal, ModalBody, ModalFooter} from "react-bootstrap";
+import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
 import AlignButtons, {AlignAction} from "./AlignButtons";
 
 /**
@@ -41,6 +41,14 @@ export default function EditableField(props) {
   const {canEdit} = useEdit();
   const [isEditing, setEditing] = useState(props.editing);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [originalContent, setOriginalContent] = useState(null);
+  useEffect(() => {
+    setOriginalContent(props.textContent);
+  },[props.textContent]);
+  const [originalAlign, setOriginalAlign] = useState(null);
+  useEffect(() => {
+    setOriginalAlign(props.textAlign);
+  },[props.textAlign]);
 
   useEffect(() => {
     if (isEditing) {
@@ -75,17 +83,18 @@ export default function EditableField(props) {
     }
   }
 
-  const startEditing = useCallback(() => {
+  function startEditing() {
     // set editing flag
     setEditing(true);
     // transform text from display HTML to source
     props.fieldRef.current.textContent = props.fieldRef.current.innerHTML
-  }, [props.fieldRef]);
+  }
 
-  const cancelEditing = useCallback(() => {
+  function cancelEditing() {
     // revert title value and alignment
-    //props.fieldRef.current.innerHTML = props.textContent;
-    //props.fieldRef.current.style.textAlign = props.textAlign;
+    props.fieldRef.current.innerHTML = originalContent ? originalContent : '';
+    props.fieldRef.current.style.textAlign = originalAlign ? originalAlign : '';
+
     // hide confirmation
     if (showConfirmation) {
       setShowConfirmation(false);
@@ -94,9 +103,9 @@ export default function EditableField(props) {
     setEditing(false);
     // notify caller we canceled
     props.callback({textContent: null, textAlign: null});
-  }, [setShowConfirmation, props, showConfirmation]);
+  }
 
-  const commitEdits = useCallback(() => {
+  function commitEdits() {
     console.debug(`Committing edits...`);
     props.callback({
       textContent: props.fieldRef.current.textContent,
@@ -107,7 +116,7 @@ export default function EditableField(props) {
     props.fieldRef.current.innerHTML = props.fieldRef.current.textContent;
     setShowConfirmation(false);
     setEditing(false);
-  }, [props, setShowConfirmation, setEditing,]);
+  }
 
   useEffect(() => {
     if (props.editing && !isEditing) {
@@ -115,7 +124,7 @@ export default function EditableField(props) {
     }
   }, [props.editing, isEditing, startEditing]);
 
-  const editCallback = useCallback((action) => {
+  function editCallback(action) {
     switch (action) {
       case EditAction.EDIT:
         startEditing();
@@ -138,12 +147,12 @@ export default function EditableField(props) {
       default:
         break;
     }
-  }, [cancelEditing, commitEdits, props.fieldRef, startEditing]);
+  }
 
-  const onHideConfirmation = useCallback(() => {
+  function onHideConfirmation() {
     // canceled by clicking outside
     cancelEditing();
-  }, [cancelEditing]);
+  }
 
   // update field properties
   if (props.fieldRef.current) {
@@ -172,7 +181,14 @@ export default function EditableField(props) {
   return (
     <>{canEdit ? (
       <>
-        <Modal show={showConfirmation} onHide={onHideConfirmation}>
+        <Modal
+          show={showConfirmation}
+          onHide={onHideConfirmation}
+          className={'Editor'}
+        >
+          <ModalHeader>
+            <h5>Leaving Edit Mode</h5>
+          </ModalHeader>
           <ModalBody>Do you want to save your changes?</ModalBody>
           <ModalFooter>
             <Button size={'sm'} variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>

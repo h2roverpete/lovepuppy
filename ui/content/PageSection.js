@@ -17,7 +17,7 @@ function PageSection({pageSectionData}) {
 
   const {PageSections} = useRestApi();
   const {canEdit} = useEdit();
-  const {sectionData, setSectionData, updatePageSection} = usePageContext();
+  const {sectionData, setSectionData, updatePageSection, refreshPage} = usePageContext();
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingText, setEditingText] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -33,7 +33,8 @@ function PageSection({pageSectionData}) {
       style={{textAlign: pageSectionData.TitleAlign, width: '100%'}}
     />
   );
-  const onTitleChanged = useCallback(({textContent, textAlign}) => {
+
+  function onTitleChanged({textContent, textAlign}) {
     if (textContent != null) {
       console.debug(`Update section title...`);
       pageSectionData.SectionTitle = textContent;
@@ -43,7 +44,7 @@ function PageSection({pageSectionData}) {
         .catch(error => console.error(`Error updating section title.`, error));
     }
     setEditingTitle(false);
-  }, [pageSectionData, PageSections.insertOrUpdatePageSection]);
+  };
 
   const sectionTextRef = useRef(null);
   const sectionText = (
@@ -55,7 +56,7 @@ function PageSection({pageSectionData}) {
     />
   );
 
-  const onTextChanged = useCallback(({textContent, textAlign}) => {
+  function onTextChanged({textContent, textAlign}) {
     if (textContent != null) {
       console.debug(`Update section text...`);
       pageSectionData.SectionText = textContent;
@@ -65,7 +66,7 @@ function PageSection({pageSectionData}) {
         .catch(error => console.error(`Error updating section text.`, error));
     }
     setEditingText(false);
-  }, [pageSectionData, PageSections.insertOrUpdatePageSection]);
+  }
 
   function deleteSection() {
     if (pageSectionData) {
@@ -153,6 +154,36 @@ function PageSection({pageSectionData}) {
       } else {
         console.error(`Section sequence error, can't move down.`);
       }
+    }
+  }
+
+  function onNewSectionAbove() {
+    if (sectionData && pageSectionData) {
+      console.debug(`Adding page section...`);
+      PageSections.insertOrUpdatePageSection({
+        PageID: pageSectionData.PageID,
+        PageSectionSeq: pageSectionData.PageSectionSeq,
+      }).then((result) => {
+        console.debug(`Added page section.`);
+        let toUpdate = 0;
+        let updated = 0;
+        for (const section of sectionData) {
+          if (section.PageSectionID !== result.PageSectionID && section.PageSectionSeq >= result.PageSectionSeq) {
+            console.debug(`Updating section sequence.`);
+            toUpdate++;
+            PageSections.insertOrUpdatePageSection({
+              ...section,
+              PageSectionSeq: section.PageSectionSeq + 1,
+            }).then(() => {
+              console.debug(`Updated section sequence.`);
+              if (++updated === toUpdate) {
+                // all updated
+                refreshPage();
+              }
+            }).catch(error => console.error(`Error updating section sequence.`, error));
+          }
+        }
+      }).catch(error => console.error(`Error adding section.`, error));
     }
   }
 
@@ -255,8 +286,12 @@ function PageSection({pageSectionData}) {
     <PageSectionContext value={{
       pageSectionData: pageSectionData
     }}>
-      {canEdit && (<>
-        <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+      {canEdit ? (<>
+        <Modal
+          show={showDeleteConfirmation}
+          onHide={() => setShowDeleteConfirmation(false)}
+          className={'Editor'}
+        >
           <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
           <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
           <ModalFooter>
@@ -267,77 +302,100 @@ function PageSection({pageSectionData}) {
               setShowDeleteConfirmation(false)
             }}>Delete Section
             </Button>
-
           </ModalFooter>
         </Modal>
-      </>)}
-      <div
-        className={`PageSection`}
-        style={{position: 'relative'}}
-        data-testid={`PageSection-${pageSectionData.PageSectionID}`}
-        ref={sectionRef}
-      >
-        <EditableField
-          field={sectionTitle}
-          fieldRef={sectionTitleRef}
-          textContent={pageSectionData.SectionTitle}
-          textAlign={pageSectionData.TitleAlign}
-          callback={onTitleChanged}
-          editing={editingTitle}
-        />
+        <div
+          className={`PageSection`}
+          style={{
+            position: 'relative',
+            minHeight: pageSectionData.SectionText ? 0 : '30px'
+          }}
+          data-testid={`PageSection-${pageSectionData.PageSectionID}`}
+          ref={sectionRef}
+        >
+          <EditableField
+            field={sectionTitle}
+            fieldRef={sectionTitleRef}
+            textContent={pageSectionData.SectionTitle}
+            textAlign={pageSectionData.TitleAlign}
+            callback={onTitleChanged}
+            editing={editingTitle}
+          />
+          <PageSectionImage
+            pageSectionData={pageSectionData}
+            imageRef={sectionImageRef}
+            dropTargetRef={dropFileRef}
+            dropTargetState={uploadPrompt}
+          />
+          <EditableField
+            field={sectionText}
+            fieldRef={sectionTextRef}
+            textContent={pageSectionData.SectionText}
+            textAlign={pageSectionData.TextAlign}
+            callback={onTextChanged}
+            allowEnterKey={true}
+            editing={editingText}
+          />
+          <input type="file" ref={fileInputRef} hidden={true}/>
+          {!editingText && !editingTitle && (
+            <div
+              className="dropdown"
+              style={{position: 'absolute', top: '2px', right: '2px', zIndex: 100}}
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
+                className={`border btn-light`}
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              ><BsPencil/></Button>
+              <div className="dropdown-menu Editor" style={{cursor: 'pointer', zIndex: 300}}>
+              <span className="dropdown-item"
+                    onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Title`}</span>
+                <span className="dropdown-item"
+                      onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Text`}</span>
+                {pageSectionData.PageSectionSeq > 1 && (
+                  <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
+                )}
+                {pageSectionData.PageSectionSeq < sectionData.length && (
+                  <span className="dropdown-item" style={{marginLeft: '0'}} onClick={onMoveDown}>Move
+                  Down</span>
+                )}
+                <span className="dropdown-item" style={{marginLeft: '0'}}
+                      onClick={onNewSectionAbove}>New Section Above</span>
+                <span className="dropdown-item" onClick={selectImageFile}>Upload Image</span>
+                <span className="dropdown-item" onClick={() => setShowDeleteConfirmation(true)}> Delete Section</span>
+              </div>
+            </div>
+          )}
+          {!pageSectionData.SectionImage && (
+            <FileDropTarget state={uploadPrompt} ref={dropFileRef}/>
+          )}
+        </div>
+      </>) : (<>
+        {pageSectionData.SectionTitle && (
+          <h2
+            className={'SectionTitle'}
+            dangerouslySetInnerHTML={{__html: pageSectionData.SectionTitle}}
+            style={{textAlign: pageSectionData.TitleAlign, width: '100%'}}
+          />
+        )}
         <PageSectionImage
           pageSectionData={pageSectionData}
           imageRef={sectionImageRef}
           dropTargetRef={dropFileRef}
           dropTargetState={uploadPrompt}
         />
-        <EditableField
-          field={sectionText}
-          fieldRef={sectionTextRef}
-          textContent={pageSectionData.SectionText}
-          textAlign={pageSectionData.TextAlign}
-          callback={onTextChanged}
-          allowEnterKey={true}
-          editing={editingText}
-        />
-        {canEdit && (<>
-          <input type="file" ref={fileInputRef} hidden={true}/>
-        </>)}
-        {(canEdit && !editingText && !editingTitle) && (
+        {pageSectionData.SectionText && (
           <div
-            className="dropdown"
-            style={{position: 'absolute', top: '2px', right: '2px', zIndex: 100}}
-          >
-            <Button
-              variant="secondary"
-              size="sm"
-              style={{border: 'none', boxShadow: 'none', margin: '2px', padding: '2px 5px', zIndex: 200}}
-              className={`border btn-light`}
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            ><BsPencil/></Button>
-            <div className="dropdown-menu EditorDropdown" style={{cursor: 'pointer', zIndex: 300}}>
-              <span className="dropdown-item"
-                    onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
-              <span className="dropdown-item"
-                    onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Section Text`}</span>
-              {pageSectionData.PageSectionSeq > 1 && (
-                <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
-              )}
-              {pageSectionData.PageSectionSeq < sectionData.length && (
-                <span className="dropdown-item" style={{marginLeft: '0'}} onClick={onMoveDown}>Move
-                  Down</span>
-              )}
-              <span className="dropdown-item" onClick={selectImageFile}>Upload Image</span>
-              <span className="dropdown-item" onClick={() => setShowDeleteConfirmation(true)}> Delete Section</span>
-            </div>
-          </div>
+            className={'SectionText'}
+            dangerouslySetInnerHTML={{__html: pageSectionData.SectionText}}
+            style={{textAlign: pageSectionData.TextAlign, width: '100%'}}
+          />
         )}
-        {!pageSectionData.SectionImage && (
-          <FileDropTarget state={uploadPrompt} ref={dropFileRef}/>
-        )}
-      </div>
+      </>)}
     </PageSectionContext>
   );
 }

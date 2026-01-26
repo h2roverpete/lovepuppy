@@ -3,6 +3,8 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import ImageGallery from "react-image-gallery";
 import {useRestApi} from "../../api/RestApi";
 import GalleryConfig from "./GalleryConfig";
+import FormEditor from "../editor/FormEditor";
+import './Gallery.css';
 
 /**
  * Display a photo gallery
@@ -51,9 +53,15 @@ export default function Gallery({galleryId, extraId}) {
   }
 
   return (<>
-    <div className="Gallery overflow-hidden" style={{width:'100%'}}>
+    <div className="Gallery mt-4">
       <ImageGallery items={images}/>
     </div>
-    <GalleryConfig galleryConfig={galleryConfig} extraId={extraId}/>
+    <FormEditor>
+      <GalleryConfig
+        galleryConfig={galleryConfig}
+        setGalleryConfig={setGalleryConfig}
+        extraId={extraId}
+      />
+    </FormEditor>
   </>)
 }

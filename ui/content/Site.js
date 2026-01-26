@@ -1,4 +1,4 @@
-import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
@@ -15,8 +15,7 @@ import SiteEditor from "../editor/SiteEditor";
  * @property {String} description
  */
 
-export const SiteContext = createContext({
-});
+export const SiteContext = createContext({});
 
 /**
  * @typedef SiteProps
@@ -56,7 +55,7 @@ export default function Site(props) {
    * Display the site in an error state.
    * @param {ErrorData} errorData
    */
-  const setError = useCallback((errorData) => {
+  function setError(errorData) {
     // use stringify for deep compare
     if (JSON.stringify(errorData) !== JSON.stringify(error)) {
       __setError__(errorData);
@@ -65,7 +64,7 @@ export default function Site(props) {
         navigate('/error');
       }
     }
-  }, [__setError__, error, navigate]);
+  }
 
   // set error from props if defined
   useEffect(() => {
@@ -281,7 +280,7 @@ export default function Site(props) {
           PageRoute: page.PageRoute,
           Modified: page.Modified,
           OutlineLevel: level,
-          OutlineSort: setCharAt(parent ? parent.OutlineSort : '0'.repeat(20), level*2, page.OutlineSeq.toString().padStart(2,"0"))
+          OutlineSort: setCharAt(parent ? parent.OutlineSort : '0'.repeat(20), level * 2, page.OutlineSeq.toString().padStart(2, "0"))
         }
         result.push(child);
         result = result.concat(buildOutline(pages, child.PageID, level + 1, child));

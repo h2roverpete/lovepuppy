@@ -1,18 +1,20 @@
-import {useMemo, useState} from "react";
-import EditUtil from "../editor/EditUtil";
 import {Col, Form, Row} from "react-bootstrap";
 import EditorPanel from "../editor/EditorPanel";
 import {useEdit} from "../editor/EditProvider";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "../content/Page";
+import {useFormEditor} from "../editor/FormEditor";
+import {useEffect} from "react";
 
 export default function ExtraConfig({extraData}) {
 
   const {canEdit} = useEdit();
-  const [edits, setEdits] = useState({});
-  const editUtil = useMemo(() => new EditUtil({data: extraData, setEdits: setEdits}), [extraData]);
   const {Extras} = useRestApi();
   const {refreshPage} = usePageContext();
+  const {edits, FormData} = useFormEditor();
+  useEffect(() => {
+    FormData?.setData(extraData);
+  },[extraData]);
 
   if (!canEdit) {
     return <></>;
@@ -26,7 +28,7 @@ export default function ExtraConfig({extraData}) {
         console.log(`Updating extra.`);
         Extras.insertOrUpdateExtra(edits).then((result) => {
           console.log(`Extra updated.`);
-          editUtil.update(result);
+          FormData?.update(result);
           refreshPage();
         }).catch((err) => {
           console.error(`Error updating extra.`, err);
@@ -42,7 +44,6 @@ export default function ExtraConfig({extraData}) {
         });
       }}
       isDataValid={() => true}
-      editUtil={editUtil}
     >
       <h5>File Properties</h5>
       <Row className="mt-2">
@@ -71,7 +72,7 @@ export default function ExtraConfig({extraData}) {
             size={'sm'}
             id={'ExtraFile'}
             onChange={(e) => {
-              editUtil?.onDataChanged({
+              FormData?.onDataChanged({
                   changes: [
                     {name: 'ExtraFile', value: e.target.files[0]},
                     {name: 'ExtraFileMimeType', value: e.target.files[0].type}
@@ -84,7 +85,7 @@ export default function ExtraConfig({extraData}) {
       </Row>
       <Row
         className="mt-2"
-        hidden={edits.ExtraFileMimeType?.startsWith('text/')}
+        hidden={edits?.ExtraFileMimeType?.startsWith('text/')}
       >
         <Form.Label
           column={'sm'}
@@ -94,8 +95,8 @@ export default function ExtraConfig({extraData}) {
           <Form.Control
             size={'sm'}
             id={'ExtraFilePrompt'}
-            value={edits.ExtraFilePrompt || ''}
-            onChange={(e) => editUtil?.onDataChanged({name: 'ExtraFilePrompt', value: e.target.value})}
+            value={edits?.ExtraFilePrompt || ''}
+            onChange={(e) => FormData?.onDataChanged({name: 'ExtraFilePrompt', value: e.target.value})}
           />
         </Col>
       </Row>

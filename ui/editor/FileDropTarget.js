@@ -31,7 +31,7 @@ export function FileDropTarget({ref, state, hidden}) {
 
   return (
     <div
-      className="DropFile"
+      className="DropFile Editor"
       ref={ref}
       hidden={true}
       style={{pointerEvents: 'none'}}

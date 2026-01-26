@@ -2,6 +2,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
 import PageConfig from "../editor/PageConfig";
+import FormEditor from "../editor/FormEditor";
 
 export const PageContext = createContext(
   {}
@@ -27,7 +28,7 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, error, setError} = useContext(SiteContext);
+  const {outlineData, error} = useContext(SiteContext);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
@@ -107,7 +108,9 @@ export default function Page(props) {
           refreshPage: refreshPage
         }}
       >
-        <PageConfig/>
+        <FormEditor>
+          <PageConfig/>
+        </FormEditor>
         {props.children}
       </PageContext>
     </div>
