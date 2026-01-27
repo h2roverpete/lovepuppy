@@ -1,6 +1,6 @@
 import PageSection from './PageSection';
-import React, {useContext, useEffect} from "react";
-import {PageContext} from "./Page";
+import React, {Fragment, useEffect} from "react";
+import {usePageContext} from "./Page";
 import Login from "../../auth/Login";
 import {useEdit} from "../editor/EditProvider";
 
@@ -17,7 +17,7 @@ import {useEdit} from "../editor/EditProvider";
  * @constructor
  */
 export default function PageSections(props) {
-  const {pageData, sectionData, error, login} = useContext(PageContext);
+  const {pageData, sectionData, error, login} = usePageContext();
 
   const {canEdit} = useEdit();
   useEffect(() => {
@@ -36,23 +36,19 @@ export default function PageSections(props) {
   return (
     <>{error ? (
       <div className={'PageSection'} dangerouslySetInnerHTML={{__html: error.description}}></div>
-    ) : (
-      <>{login ? (
-        // don't display page sections, display login UI instead
+    ) : (<>
+      {login ? (<>
         <Login/>
-      ) : (
-        <>{pageData && sectionData && (
-          // display page sections
-          <>
-            {sectionData.map(section => (
-              <PageSection
-                pageSectionData={section} key={section.PageSectionID}
-                data-testid={`PageSection-section.PageSectionID`}/>
-            ))}
-            {props.children}
-          </>
-        )}</>
-      )}</>
-    )}</>
-  )
+      </>) : (<>
+        {pageData && sectionData && (<>
+          {sectionData.map(section => (<Fragment key={section.PageSectionID}>
+            <PageSection
+              pageSectionData={section}
+              data-testid={`PageSection-section.PageSectionID`}/>
+          </Fragment>))}
+          {props.children}
+        </>)}
+      </>)}
+    </>)}
+    </>)
 }

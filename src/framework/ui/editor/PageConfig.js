@@ -1,13 +1,12 @@
 import {useEdit} from "./EditProvider";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {usePageContext} from "../content/Page";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {useNavigate} from "react-router";
-import AddExtrasModal from "../extras/AddExtrasModal";
-import EditUtil from "./EditUtil";
 import EditorPanel from "./EditorPanel";
+import {useFormEditor} from "./FormEditor";
 
 /**
  * Edit page metadata fields.
@@ -18,15 +17,17 @@ export default function PageConfig() {
 
   const {Pages, PageSections} = useRestApi();
   const {canEdit} = useEdit();
-  const {pageData, setPageData, refreshPage} = usePageContext();
+  const {pageData, setPageData, refreshPage, addExtraModal} = usePageContext();
   const {Outline, outlineData} = useSiteContext()
 
-  const [edits, setEdits] = useState({});
-  const editUtil = useMemo(() => new EditUtil({data: pageData, setEdits: setEdits}), [pageData]);
+  const {edits, FormData} = useFormEditor();
+  useEffect(() => {
+    FormData.update(pageData);
+  }, [pageData])
+
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   const navigate = useNavigate();
-  const [showAddExtras, setShowAddExtras] = useState(false);
 
   const buttonRef = useRef(null);
   const [routes, setRoutes] = useState([]);
@@ -47,14 +48,14 @@ export default function PageConfig() {
   }
 
   function isDataValid() {
-    return isValidRoute(edits.PageRoute)
+    return isValidRoute(edits?.PageRoute)
   }
 
   function onUpdate() {
     console.debug(`Updating page...`);
     Pages.insertOrUpdatePage(edits).then((result) => {
       console.debug(`Updated page.`);
-      editUtil.update(result)
+      FormData?.update(result)
       Outline.updatePage(result);
       setPageData(result);
     }).catch((error) => {
@@ -99,30 +100,8 @@ export default function PageConfig() {
     buttonRef.current?.click();
   }
 
-  const extraButtons = <>
-    <Button
-      className="me-2"
-      size="sm"
-      variant="secondary"
-      onClick={onAddSection}
-    >
-      <span className={'d-none d-sm-block'}>Add Section</span>
-      <span className={'d-block d-sm-none'}>+Section</span>
-    </Button>
-    <Button
-      className="me-2"
-      size="sm"
-      variant="secondary"
-      onClick={() => setShowAddExtras(true)}
-    >
-      <span className={'d-none d-sm-block'}>Add Extra</span>
-      <span className={'d-block d-sm-none'}>+Extra</span>
-    </Button>
-  </>;
-
   return (<>
     <EditorPanel
-      editUtil={editUtil}
       position={'fixed'}
       onUpdate={onUpdate}
       onDelete={() => setShowDeleteConfirmation(true)}
@@ -130,8 +109,27 @@ export default function PageConfig() {
       panelStyle={{zIndex: 1032}}
       buttonStyle={{position: 'fixed', top: '5px'}}
       bodyStyle={{borderBottom: '1px solid gray'}}
-      extraButtons={extraButtons}
       buttonRef={buttonRef}
+      extraButtons={<>
+        <Button
+          className="me-2"
+          size="sm"
+          variant="secondary"
+          onClick={onAddSection}
+        >
+          <span className={'d-none d-sm-block'}>Add Section</span>
+          <span className={'d-block d-sm-none'}>+Section</span>
+        </Button>
+        <Button
+          className="me-2"
+          size="sm"
+          variant="secondary"
+          onClick={() => addExtraModal()}
+        >
+          <span className={'d-none d-sm-block'}>Add Extra</span>
+          <span className={'d-block d-sm-none'}>+Extra</span>
+        </Button>
+      </>}
     >
       <Row><Col><h5>Page Properties</h5></Col></Row>
       <Row>
@@ -146,8 +144,8 @@ export default function PageConfig() {
             size={'sm'}
             id={'NavTitle'}
             name={'NavTitle'}
-            value={edits.NavTitle || ''}
-            onChange={(e) => editUtil?.onDataChanged({name: 'NavTitle', value: e.target.value})}
+            value={edits?.NavTitle || ''}
+            onChange={(e) => FormData?.onDataChanged({name: 'NavTitle', value: e.target.value})}
           />
         </Col>
 
@@ -162,10 +160,10 @@ export default function PageConfig() {
             size={'sm'}
             id={'PageRoute'}
             name={'PageRoute'}
-            isValid={editUtil?.isTouched('PageRoute') && isValidRoute(edits.PageRoute)}
-            isInvalid={editUtil?.isTouched('PageRoute') && !isValidRoute(edits.PageRoute)}
-            value={edits.PageRoute || ''}
-            onChange={(e) => editUtil?.onDataChanged({name: 'PageRoute', value: e.target.value})}
+            isValid={FormData?.isTouched('PageRoute') && isValidRoute(edits?.PageRoute)}
+            isInvalid={FormData?.isTouched('PageRoute') && !isValidRoute(edits?.PageRoute)}
+            value={edits?.PageRoute || ''}
+            onChange={(e) => FormData?.onDataChanged({name: 'PageRoute', value: e.target.value})}
           />
         </Col>
         <Col>
@@ -178,8 +176,8 @@ export default function PageConfig() {
           <Form.Control
             size={'sm'}
             id={'PageMetaTitle'}
-            value={edits.PageMetaTitle || ''}
-            onChange={(e) => editUtil?.onDataChanged({name: 'PageMetaTitle', value: e.target.value})}
+            value={edits?.PageMetaTitle || ''}
+            onChange={(e) => FormData?.onDataChanged({name: 'PageMetaTitle', value: e.target.value})}
           />
         </Col>
       </Row>
@@ -194,8 +192,8 @@ export default function PageConfig() {
           <Form.Control
             size={'sm'}
             id={'PageMetaDescription'}
-            value={edits.PageMetaDescription || ''}
-            onChange={(e) => editUtil?.onDataChanged({name: 'PageMetaDescription', value: e.target.value})}
+            value={edits?.PageMetaDescription || ''}
+            onChange={(e) => FormData?.onDataChanged({name: 'PageMetaDescription', value: e.target.value})}
           />
         </Col>
         <Col sm={6}>
@@ -208,8 +206,8 @@ export default function PageConfig() {
           <Form.Control
             size={'sm'}
             id={'PageMetaKeywords'}
-            value={edits.PageMetaKeywords || ''}
-            onChange={(e) => editUtil?.onDataChanged({name: 'PageMetaKeywords', value: e.target.value})}
+            value={edits?.PageMetaKeywords || ''}
+            onChange={(e) => FormData?.onDataChanged({name: 'PageMetaKeywords', value: e.target.value})}
           />
         </Col>
       </Row>
@@ -217,10 +215,10 @@ export default function PageConfig() {
         <Col>
           <Form.Check
             className={'form-control-sm mt-2'}
-            checked={edits.PageHidden || false}
+            checked={edits?.PageHidden || false}
             id={'PageHidden'}
             label={'Hide page from site navigation'}
-            onChange={(e) => editUtil?.onDataChanged({name: 'PageHidden', value: e.target.checked})}
+            onChange={(e) => FormData?.onDataChanged({name: 'PageHidden', value: e.target.checked})}
           />
         </Col>
       </Row>
@@ -237,14 +235,5 @@ export default function PageConfig() {
         }}>Delete</Button>
       </Modal.Footer>
     </Modal>
-
-    <AddExtrasModal
-      show={showAddExtras}
-      onHide={() => setShowAddExtras(false)}
-      onSubmit={() => {
-        refreshPage();
-        collapsePanel();
-      }}
-    />
   </>);
 }

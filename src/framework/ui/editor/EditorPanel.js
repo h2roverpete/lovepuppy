@@ -1,18 +1,14 @@
 import {Accordion, AccordionButton, Button, Col, Row} from "react-bootstrap";
 import {useState} from "react";
 import {useEdit} from "./EditProvider";
-
-/**
- *
- */
+import {useFormEditor} from "./FormEditor";
 
 /**
  * Display a collapsable editing panel
  *
- * @param onUpdate {MouseEventHandler}    Callback when Update button is clicked.
- * @param onDelete {MouseEventHandler}    Callback when Delete button is clicked.
- * @param isDataValid {function}          Callback to check if data is valid.
- * @param editUtil {EditUtil}             Edit utility to manage changes.
+ * @param onUpdate {function()}    Callback when Update button is clicked.
+ * @param onDelete {function()}    Callback when Delete button is clicked.
+ * @param isDataValid {function()}          Callback to check if data is valid.
  * @param [extraButtons] {JSX.Element}    Extra buttons for the bottom of the panel.
  * @param children {[JSX.Element]}        Child elements, i.e. Rows and Cols and form controls.
  * @param [position] {String}             Position attribute for the panel, i.e. 'fixed' or 'relative'
@@ -28,7 +24,6 @@ export default function EditorPanel(
     onUpdate,
     onDelete,
     isDataValid,
-    editUtil,
     children,
     position,
     buttonStyle,
@@ -38,6 +33,8 @@ export default function EditorPanel(
     extraButtons
   }
 ) {
+  const {FormData} = useFormEditor();
+
   const [activeKey, setActiveKey] = useState('');
 
   const {canEdit} = useEdit();
@@ -48,6 +45,7 @@ export default function EditorPanel(
     <Accordion
       activeKey={activeKey}
       style={{width: '100%'}}
+      className={'Editor'}
     >
       <Accordion.Item
         style={{
@@ -87,22 +85,23 @@ export default function EditorPanel(
                   className="me-2"
                   size={'sm'}
                   variant="primary"
-                  onClick={onUpdate}
-                  disabled={!isDataValid() || !editUtil?.isDataChanged()}
+                  onClick={()=>{
+                    setActiveKey('');
+                    onUpdate?.();
+                  }}
+                  disabled={!isDataValid() || !FormData?.isDataChanged()}
                 >
                   Update
                 </Button>
               )}
-              {editUtil && (
-                <Button
-                  size={'sm'}
-                  variant="secondary"
-                  onClick={() => editUtil.revert()}
-                  disabled={!editUtil.isDataChanged()}
-                >
-                  Revert
-                </Button>
-              )}
+              <Button
+                size={'sm'}
+                variant="secondary"
+                onClick={() => FormData?.revert()}
+                disabled={!FormData?.isDataChanged()}
+              >
+                Revert
+              </Button>
             </Col>
             <Col style={{textAlign: 'end'}} className={'ps-0'}>
               {extraButtons}

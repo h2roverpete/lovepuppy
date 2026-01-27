@@ -25,6 +25,10 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
   const {canEdit} = useEdit();
   const {siteData} = useSiteContext();
 
+  if (!pageSectionData.SectionImage) {
+    return <></>;
+  }
+
   function setImageAlign(align) {
     pageSectionData.ImageAlign = align;
     console.debug(`Updating image alignment...`);
@@ -149,7 +153,7 @@ export default function PageSectionImage({pageSectionData, imageRef, dropTargetR
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               ><BsArrowsMove/></Button>
-              <div className="dropdown-menu" style={{cursor: 'pointer', zIndex: 300}}>
+              <div className="dropdown-menu Editor" style={{cursor: 'pointer', zIndex: 300}}>
                 {pageSectionData.ImageAlign !== 'left' && (
                   <span className="dropdown-item" onClick={() => setImageAlign('left')}>Align Left</span>)}
                 {pageSectionData.ImageAlign !== 'center' && pageSectionData.ImagePosition === 'above' && (

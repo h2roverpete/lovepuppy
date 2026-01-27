@@ -2,6 +2,7 @@ import {useSiteContext} from "../content/Site";
 import {useEffect, useState} from "react";
 import ExtraConfig from "./ExtraConfig";
 import {Col, Container, Row} from "react-bootstrap";
+import FormEditor from "../editor/FormEditor";
 
 export default function FileExtra({extraData}) {
 
@@ -28,7 +29,6 @@ export default function FileExtra({extraData}) {
                 </Col>
               </Row>
             </Container>
-            <ExtraConfig extraData={extraData}/>
           </>);
           break;
         case 'text/plain':
@@ -37,7 +37,6 @@ export default function FileExtra({extraData}) {
             .then(response => response.text())
             .then(data => setContent(<>
               <pre className={'Extra'}>{data}</pre>
-              <ExtraConfig extraData={extraData}/>
             </>))
             .catch(error => console.error(`Error fetching HTML ${fileUrl}:`, error));
           break;
@@ -47,7 +46,6 @@ export default function FileExtra({extraData}) {
             .then(response => response.text())
             .then(data => setContent(<>
               <div className={'Extra'} dangerouslySetInnerHTML={{__html: data}}/>
-              <ExtraConfig extraData={extraData}/>
             </>))
             .catch(error => console.error(`Error fetching HTML ${fileUrl}:`, error));
           break;
@@ -58,11 +56,15 @@ export default function FileExtra({extraData}) {
               <a
                 href={fileUrl}>{extraData.ExtraFilePrompt ? extraData.ExtraFilePrompt : fileName}</a>
             </div>
-            <ExtraConfig extraData={extraData}/>
           </>);
           break;
       }
     }
   }, [siteData, extraData]);
-  return content;
+  return (<>
+    {content}
+    <FormEditor>
+      <ExtraConfig extraData={extraData}/>
+    </FormEditor>
+  </>);
 }

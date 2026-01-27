@@ -7,9 +7,9 @@ export const RestApiContext = React.createContext({});
 
 export default function RestApi(props) {
 
-  const siteId = useMemo(() => parseInt(process.env.REACT_APP_SITE_ID), []);
-  const host = useMemo(() => process.env.REACT_APP_BACKEND_HOST, []);
-  const apiKey = useMemo(() => process.env.REACT_APP_API_KEY, []);
+  const siteId = parseInt(process.env.REACT_APP_SITE_ID);
+  const host = process.env.REACT_APP_BACKEND_HOST;
+  const apiKey = process.env.REACT_APP_API_KEY;
   const [cookies] = useCookies(); // can't use auth context, access directly
 
   axios.defaults.headers.common["x-api-key"] = apiKey;
@@ -217,11 +217,6 @@ export default function RestApi(props) {
     return response.data;
   }
 
-  async function getPageSectionExtras(pageId, pageSectionId) {
-    const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/extras`);
-    return response.data;
-  }
-
   async function insertOrUpdateExtra(data, file) {
     return await adminApiCall(() => {
       return async () => {
@@ -337,7 +332,6 @@ export default function RestApi(props) {
         deleteSectionImage: deleteSectionImage,
         deletePageSection: deletePageSection,
         insertOrUpdatePage: insertOrUpdatePage,
-        getPageSectionExtras: getPageSectionExtras,
       },
       GuestBooks: {
         getGuestBook: getGuestBook,

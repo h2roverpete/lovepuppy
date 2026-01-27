@@ -67,7 +67,6 @@ export default function SiteOutline(props) {
             opacity: page.PageHidden ? 0.5 : 1.0,
             background: location.pathname === page.PageRoute ? '#00000020' : 'transparent',
           }}
-          className={`small`}
           onClick={() => {
             navigate(page.PageRoute)
           }}

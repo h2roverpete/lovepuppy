@@ -6,6 +6,7 @@ import {useRestApi} from "../../api/RestApi";
 import {Button} from "react-bootstrap";
 import GuestBookConfig from "./GuestBookConfig";
 import {isValidEmail} from "../forms/EmailField";
+import FormEditor from "../editor/FormEditor";
 
 
 export const GuestBookContext = createContext({
@@ -38,7 +39,7 @@ export function useGuestBook() {
  * @returns {JSX.Element}
  * @constructor
  */
-function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
+function GuestBook({guestBookId, extraId, guestId, guestFeedbackId, onChange}) {
 
   const {GuestBooks} = useRestApi();
 
@@ -64,7 +65,7 @@ function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
         console.error(`Error loading guest book: ${error}`);
       });
     }
-  }, [guestBookId, GuestBooks.getGuestBook]);
+  }, [GuestBooks, guestBookId, GuestBooks.getGuestBook]);
 
   useEffect(() => {
     if (guestId) {
@@ -79,7 +80,7 @@ function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
         console.error(`Error getting guest data: ${error}`);
       });
     }
-  }, [guestId, guestBookId, GuestBooks.getGuest])
+  }, [GuestBooks, guestId, guestBookId, GuestBooks.getGuest])
 
   useEffect(() => {
     if (guestFeedbackId) {
@@ -94,7 +95,7 @@ function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
         console.error(`Error getting feedback data: ${error}`);
       });
     }
-  }, [guestFeedbackId, GuestBooks.getGuestFeedback])
+  }, [GuestBooks, guestFeedbackId, GuestBooks.getGuestFeedback])
 
   /**
    * Handle changes in response to data entry.
@@ -185,8 +186,8 @@ function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
         setGuestBookConfig: setGuestBookConfig,
       }
     }>
-      {guestBookConfig && (
-        <div className="guestbook" key={guestBookId}>
+      {guestBookConfig && (<>
+        <div className="GuestBook SectionText" key={guestBookId} style={{width: '100%'}}>
           {submitted ? (
             <>
               <p
@@ -235,9 +236,12 @@ function GuestBook({guestBookId,extraId,guestId,guestFeedbackId,onChange}) {
               </form>
             </>
           )}
-          <GuestBookConfig extraId={extraId}/>
         </div>
-      )} </GuestBookContext>
+        <FormEditor>
+          <GuestBookConfig extraId={extraId}/>
+        </FormEditor>
+      </>)}
+    </GuestBookContext>
   )
 }
 

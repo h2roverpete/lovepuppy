@@ -112,7 +112,7 @@ const Login = (props) => {
           <input type="hidden" name="state" value={cookies.loginState}/>
           <input type="hidden" name="scope" value={scope}/>
           <Row className="mt-4">
-            <Form.Label className={'required'} htmlFor="username" column={true} sm={2}>
+            <Form.Label className={'required'} htmlFor="username" column={true} sm={3}>
               Login
             </Form.Label>
             <Col sm={4}>
@@ -127,7 +127,7 @@ const Login = (props) => {
             </Col>
           </Row>
           <Row className={'mt-2'}>
-            <Form.Label className={'required'} htmlFor="password" column={true} sm={2}>
+            <Form.Label className={'required'} htmlFor="password" column={true} sm={3}>
               Password
             </Form.Label>
             <Col sm={4}>

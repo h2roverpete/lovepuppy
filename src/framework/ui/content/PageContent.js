@@ -1,5 +1,3 @@
-import Extras from "../extras/Extras";
-
 /**
  * Element to show page content
  *
@@ -12,7 +10,6 @@ export default function PageContent({children}) {
   return (
     <div className="PageContent container-fluid" data-testid="PageContent">
       {children}
-      <Extras/>
     </div>
   )
 }

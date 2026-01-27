@@ -2,6 +2,8 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {SiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
 import PageConfig from "../editor/PageConfig";
+import FormEditor from "../editor/FormEditor";
+import AddExtrasModal from "../extras/AddExtrasModal";
 
 export const PageContext = createContext(
   {}
@@ -27,12 +29,14 @@ export const PageContext = createContext(
  */
 export default function Page(props) {
 
-  const {outlineData, error, setError} = useContext(SiteContext);
-  const [pageId, __setPageId__] = useState(props.pageId);
+  const {outlineData, error} = useContext(SiteContext);
   const [pageData, setPageData] = useState(null);
   const [sectionData, setSectionData] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(null);
-  const {Pages} = useRestApi();
+  const {Pages, Extras} = useRestApi();
+  const [showAddExtraModal, setShowAddExtraModal] = useState(false);
+  const [extraPageSectionId, setExtraPageSectionId] = useState(0);
+  const [extras, setExtras] = useState([]);
 
   let errorData;
   if (error) {
@@ -43,42 +47,37 @@ export default function Page(props) {
     errorData = props.error;
   }
 
-  if (props.pageId && props.pageId !== pageId) {
-    // set new page ID from props
-    setPageId(props.pageId);
-  }
-
-  if (props.login && pageId !== 0) {
-    // clear page contents if login is true
-    setPageId(0);
-  }
-
   useEffect(() => {
-    if (pageId && !pageData) {
+    if (props.pageId) {
       // load page data
-      Pages.getPage(pageId).then((data) => {
-        console.debug(`Loaded page ${pageId} data.`);
+      Pages.getPage(props.pageId).then((data) => {
+        console.debug(`Loaded page ${props.pageId} data.`);
         setPageData(data); // update state
       })
     }
-  }, [Pages.getPage, pageData, pageId]);
+  }, [props.pageId]);
 
   useEffect(() => {
-    if (pageId && !sectionData) {
+    if (pageData) {
       // load page sections
-      Pages.getPageSections(pageId).then((data) => {
-        console.debug(`Loaded page ${pageId} sections.`);
+      Pages.getPageSections(pageData.PageID).then((data) => {
+        console.debug(`Loaded page ${pageData.PageID} sections.`);
         setSectionData(data); // update state
       })
+      // load extras
+      Extras.getPageExtras(pageData.PageID).then((data) => {
+        console.debug(`Loaded page ${pageData.PageID} extras.`);
+        setExtras(data); // update state
+      })
     }
-  }, [Pages.getPageSections, pageId, sectionData]);
+  }, [pageData]);
 
   useEffect(() => {
-    if (pageData && outlineData && !breadcrumbs) {
+    if (pageData && outlineData) {
       // build breadcrumb data
       setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID)); // update state
     }
-  }, [pageData, outlineData, breadcrumbs])
+  }, [pageData, outlineData])
 
   /**
    * Update a page section that has been edited.
@@ -97,24 +96,14 @@ export default function Page(props) {
     }
   }
 
-  /**
-   * Function for changing page ID.
-   * Clears out extra page related data when Page ID is changed.
-   *
-   * @param pageId {number} new page ID.
-   */
-  function setPageId(pageId) {
-    console.debug(`Set page ID to ${pageId}.`);
-    __setPageId__(pageId); // call private state setter
-    setPageData(null);
-    setSectionData(null);
-    setBreadcrumbs(null);
-    setError(null);
-  }
-
   function refreshPage() {
     console.debug(`Refresh page.`);
     setPageData({...pageData})
+  }
+
+  function addExtraModal({pageSectionId}) {
+    setShowAddExtraModal(true);
+    setExtraPageSectionId(pageSectionId);
   }
 
   // provide context to children
@@ -122,7 +111,6 @@ export default function Page(props) {
     <div className="Page" data-testid="Page">
       <PageContext
         value={{
-          pageId: pageId,
           pageData: pageData,
           sectionData: sectionData,
           breadcrumbs: breadcrumbs,
@@ -131,10 +119,21 @@ export default function Page(props) {
           setPageData: setPageData,
           setSectionData: setSectionData,
           updatePageSection: updatePageSection,
-          refreshPage: refreshPage
+          refreshPage: refreshPage,
+          addExtraModal: addExtraModal,
+          extras: extras,
         }}
       >
-        <PageConfig/>
+        <FormEditor>
+          <AddExtrasModal
+            show={showAddExtraModal}
+            onHide={() => setShowAddExtraModal(false)}
+            pageSectionId={extraPageSectionId}
+          />
+        </FormEditor>
+        <FormEditor>
+          <PageConfig/>
+        </FormEditor>
         {props.children}
       </PageContext>
     </div>

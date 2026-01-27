@@ -15,8 +15,7 @@ import SiteEditor from "../editor/SiteEditor";
  * @property {String} description
  */
 
-export const SiteContext = createContext({
-});
+export const SiteContext = createContext({});
 
 /**
  * @typedef SiteProps
@@ -65,7 +64,7 @@ export default function Site(props) {
         navigate('/error');
       }
     }
-  }, [__setError__, error, navigate]);
+  }, [navigate, error]);
 
   // set error from props if defined
   useEffect(() => {
@@ -96,36 +95,20 @@ export default function Site(props) {
   }
 
   useEffect(() => {
-    if (!siteData) {
-      // load site data
-      Sites.getSite().then((data) => {
-        console.debug(`Loaded site ${data.SiteID}.`);
-        setSiteData(data);
-      }).catch(error => {
-        setError({
-          title: `${error.status} Server Error`,
-          description: `Site data could not be loaded.<br>Code: ${error.code}`
-        });
-        setSiteData(null);
-      });
-    }
-  }, [Sites, siteData, setError]);
+    // load site data
+    Sites.getSite().then((data) => {
+      console.debug(`Loaded site ${data.SiteID}.`);
+      setSiteData(data);
+    }).catch(err => console.error(`Error loading site.`, err));
+  }, []);
 
   useEffect(() => {
-    if (!outlineData) {
-      // load site outline
-      Sites.getSiteOutline().then((data) => {
-        console.debug(`Loaded site outline.`);
-        setOutlineData(data);
-      }).catch(error => {
-        setError({
-          title: `${error.status} Server Error`,
-          description: `Site data could not be loaded.<br>Code: ${error.code}`
-        });
-        setOutlineData(null);
-      });
-    }
-  }, [Sites, outlineData, setError]);
+    // load site outline
+    Sites.getSiteOutline().then((data) => {
+      console.debug(`Loaded site outline.`);
+      setOutlineData(data);
+    }).catch(err => console.error(`Error loading outline.`, err));
+  }, []);
 
   let redirect;
   if (props.redirects && window.location.pathname === '/') {
@@ -281,7 +264,7 @@ export default function Site(props) {
           PageRoute: page.PageRoute,
           Modified: page.Modified,
           OutlineLevel: level,
-          OutlineSort: setCharAt(parent ? parent.OutlineSort : '0'.repeat(20), level*2, page.OutlineSeq.toString().padStart(2,"0"))
+          OutlineSort: setCharAt(parent ? parent.OutlineSort : '0'.repeat(20), level * 2, page.OutlineSeq.toString().padStart(2, "0"))
         }
         result.push(child);
         result = result.concat(buildOutline(pages, child.PageID, level + 1, child));
