@@ -74,12 +74,11 @@ export default function Site(props) {
   }, [props.error, setError]);
 
   /**
-   * Use the site outline to get child pages.
-   * Provided as a utility for users of the Site context.
+   * Retrieve child pages of the specified page.
    *
    * @param pageId {number}         Page ID to get children from.
    * @param [showHidden] {boolean}  Return hidden pages? (default=false)
-   * @returns {[OutlineData]}
+   * @returns {[OutlineData]}       Children, or an empty array if no child pages.
    */
   function getChildren(pageId, showHidden) {
     const result = [];
@@ -140,7 +139,7 @@ export default function Site(props) {
         }
         return item;
       })
-      setOutlineData(newOutlineData);
+      setOutlineData(buildOutline(newOutlineData));
     }
   }
 
@@ -153,7 +152,7 @@ export default function Site(props) {
         }
         return item;
       })
-      setOutlineData(newOutlineData);
+      setOutlineData(buildOutline(newOutlineData));
     }
   }
 
@@ -161,7 +160,7 @@ export default function Site(props) {
     if (outlineData && pageData) {
       console.debug(`Add page ${pageData.PageID} to outline.`)
       const newOutlineData = [...outlineData, pageData];
-      setOutlineData(newOutlineData);
+      setOutlineData(buildOutline(newOutlineData));
     } else {
       console.error(`Can't add page to outline. Outline or page data are null.`);
     }
@@ -234,10 +233,10 @@ export default function Site(props) {
   }
 
   /**
-   * Build an outline from an array of page data.
-   * The result is sorted using the OutlineSeq field.
+   * Build or rebuild the site outline in the proper sequence
+   * from an unsorted array of page data.
    *
-   * @param pages {[OutlineData]}      Array of page data (arbitrary sort order)
+   * @param pages {[OutlineData]}   Array of page data (arbitrary sort order)
    * @param [parentId] {number}     Parent page ID.
    * @param [level] {number}        Level number, also a trigger to recurse through all children.
    * @param [parent] {OutlineData}  Parent's sort string
@@ -370,8 +369,7 @@ export default function Site(props) {
           </div>
         </SiteEditor>
       </SiteContext>
-    )
-      ;
+    );
   } else {
     return (
       <SiteContext value={siteContext}>

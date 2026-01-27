@@ -19,7 +19,7 @@ export default function NewPageModal({show, setShow}) {
   const {canEdit} = useEdit();
   const {siteData, Outline, outlineData} = useSiteContext();
   const {pageData} = usePageContext();
-  const {Pages} = useRestApi();
+  const {Pages, PageSections} = useRestApi();
   const navigate = useNavigate();
   const {edits, FormData} = useFormEditor();
   const [routes, setRoutes] = useState([]);
@@ -64,14 +64,17 @@ export default function NewPageModal({show, setShow}) {
     })
       .then((result) => {
         console.debug(`Page inserted.`);
-        setShow?.(false);
-        FormData.revert();
-        Outline.addPage(result);
-        navigate(result.PageRoute);
-      })
-      .catch((e) => {
-        console.error(`Error inserting new page.`, e);
-      });
+        PageSections.insertOrUpdatePageSection({
+          PageID: result.PageID,
+          ParentID: 0
+        }).then((result) => {
+          console.debug(`Page section inserted.`);
+          setShow?.(false);
+          FormData.revert();
+          Outline.addPage(result);
+          navigate(result.PageRoute);
+        }).catch(e => console.error(`Error inserting new page section.`, e));
+      }).catch(e => console.error(`Error inserting new page.`, e));
   }
 
   function onCancel() {
@@ -147,7 +150,7 @@ export default function NewPageModal({show, setShow}) {
               className={'form-control-sm'}
               id={'PageHidden'}
               label={'Hide page from site navigation'}
-              checked={edits.PageHidden}
+              checked={edits.PageHidden === true}
               onChange={(e) => {
                 FormData.onDataChanged({name: 'PageHidden', value: e.target.checked})
               }}

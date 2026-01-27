@@ -161,26 +161,56 @@ function PageSection({pageSectionData}) {
 
   function onNewSectionAbove() {
     if (sectionData && pageSectionData) {
-      console.debug(`Adding page section...`);
+      console.debug(`Adding page section above...`);
       PageSections.insertOrUpdatePageSection({
         PageID: pageSectionData.PageID,
         PageSectionSeq: pageSectionData.PageSectionSeq,
       }).then((result) => {
         console.debug(`Added page section.`);
+        const newSectionData = [...sectionData, result];
         let toUpdate = 0;
         let updated = 0;
-        for (const section of sectionData) {
+        for (const section of newSectionData) {
           if (section.PageSectionID !== result.PageSectionID && section.PageSectionSeq >= result.PageSectionSeq) {
             console.debug(`Updating section sequence.`);
             toUpdate++;
-            PageSections.insertOrUpdatePageSection({
-              ...section,
-              PageSectionSeq: section.PageSectionSeq + 1,
-            }).then(() => {
+            section.PageSectionSeq++;
+            PageSections.insertOrUpdatePageSection(section).then(() => {
               console.debug(`Updated section sequence.`);
               if (++updated === toUpdate) {
                 // all updated
-                refreshPage();
+                newSectionData.sort((a, b) => a.PageSectionSeq - b.PageSectionSeq);
+                setSectionData(newSectionData);
+              }
+            }).catch(error => console.error(`Error updating section sequence.`, error));
+          }
+        }
+      }).catch(error => console.error(`Error adding section.`, error));
+    }
+  }
+
+  function onNewSectionBelow() {
+    if (sectionData && pageSectionData) {
+      console.debug(`Adding page section below...`);
+      PageSections.insertOrUpdatePageSection({
+        PageID: pageSectionData.PageID,
+        PageSectionSeq: pageSectionData.PageSectionSeq+1,
+      }).then((result) => {
+        console.debug(`Added page section.`);
+        const newSectionData = [...sectionData, result];
+        let toUpdate = 0;
+        let updated = 0;
+        for (const section of newSectionData) {
+          if (section.PageSectionID !== result.PageSectionID && section.PageSectionSeq > result.PageSectionSeq) {
+            console.debug(`Updating section sequence.`);
+            toUpdate++;
+            section.PageSectionSeq++;
+            PageSections.insertOrUpdatePageSection(section).then(() => {
+              console.debug(`Updated section sequence.`);
+              if (++updated === toUpdate) {
+                // all updated
+                newSectionData.sort((a, b) => a.PageSectionSeq - b.PageSectionSeq);
+                setSectionData(newSectionData);
               }
             }).catch(error => console.error(`Error updating section sequence.`, error));
           }
@@ -358,11 +388,11 @@ function PageSection({pageSectionData}) {
               ><BsPencil/></Button>
               <div className="dropdown-menu Editor" style={{cursor: 'pointer', zIndex: 300}}>
               <span className="dropdown-item"
-                    onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Title`}</span>
+                    onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Section Title`}</span>
                 <span className="dropdown-item"
-                      onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Text`}</span>
+                      onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Section Text`}</span>
                 <span className="dropdown-item"
-                      onClick={selectImageFile}>{`${pageSectionData?.SectionImage?.length > 0 ? 'Update' : 'Add'} Image`}</span>
+                      onClick={selectImageFile}>{`${pageSectionData?.SectionImage?.length > 0 ? 'Update' : 'Add'} Section Image`}</span>
                 <span className="dropdown-item"
                       onClick={() => addExtraModal({pageSectionId: pageSectionData.PageSectionID})}>Add Extra</span>
                 {pageSectionData.PageSectionSeq > 1 && (
@@ -374,6 +404,8 @@ function PageSection({pageSectionData}) {
                 )}
                 <span className="dropdown-item" style={{marginLeft: '0'}}
                       onClick={onNewSectionAbove}>New Section Above</span>
+                <span className="dropdown-item" style={{marginLeft: '0'}}
+                      onClick={onNewSectionBelow}>New Section Below</span>
                 <span className="dropdown-item" onClick={() => setShowDeleteConfirmation(true)}> Delete Section</span>
               </div>
             </div>

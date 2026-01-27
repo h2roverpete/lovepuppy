@@ -55,7 +55,6 @@ export default function SiteOutline(props) {
     e.preventDefault();
   }
 
-  console.debug(`Show outline. location=${JSON.stringify(location)}`);
   return (
     <div {...props}>
       {outlineData?.map((page) => (

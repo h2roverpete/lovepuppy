@@ -87,9 +87,9 @@ export default function Page(props) {
     for (let i = 0; i < sectionData.length; i++) {
       if (sectionData[i].PageSectionID === newData.PageSectionID) {
         console.debug(`Updating data for page section ${newData.PageSectionID}.`);
-        // need new array to trigger updates
         const newSectionData = [...sectionData];
         newSectionData[i] = newData;
+        newSectionData.sort((a, b) => a.PageSectionSeq - b.PageSectionSeq);
         setSectionData(newSectionData);
         break;
       }
