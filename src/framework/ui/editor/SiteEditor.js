@@ -66,10 +66,7 @@ export default function SiteEditor({children}) {
           </div>
         </div>
       </Collapse>
-
-      {
-        children
-      }
+      {children}
     </div>
   )
 }

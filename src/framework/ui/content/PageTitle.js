@@ -27,7 +27,7 @@ import {useSiteContext} from "./Site";
 export default function PageTitle(props) {
 
   const {pageData, error, login} = useContext(PageContext);
-  const {updateOutlineData} = useSiteContext();
+  const {Outline} = useSiteContext();
   const {Pages} = useRestApi();
   const {canEdit} = useEdit();
   const [editingTitle, setEditingTitle] = useState(false);
@@ -41,7 +41,7 @@ export default function PageTitle(props) {
         .then((result) => {
           console.debug(`Page title updated.`);
           // refresh outline with new title
-          updateOutlineData(result);
+          Outline.updatePage(result);
         })
         .catch((err) => {
           console.error(`Error updating page title: ${err.message}`);
