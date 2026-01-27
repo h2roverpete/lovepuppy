@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import EditButtons, {EditAction} from "./EditButtons";
 import {useEdit} from "./EditProvider";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
@@ -44,11 +44,11 @@ export default function EditableField(props) {
   const [originalContent, setOriginalContent] = useState(null);
   useEffect(() => {
     setOriginalContent(props.textContent);
-  },[props.textContent]);
+  }, [props.textContent]);
   const [originalAlign, setOriginalAlign] = useState(null);
   useEffect(() => {
     setOriginalAlign(props.textAlign);
-  },[props.textAlign]);
+  }, [props.textAlign]);
 
   useEffect(() => {
     if (isEditing) {
@@ -83,12 +83,15 @@ export default function EditableField(props) {
     }
   }
 
+  const divRef = useRef(null);
   const startEditing = useCallback(() => {
+    // enable pointer events if they were disabled for drag and drop
+    divRef.current.style.pointerEvents = 'auto';
     // set editing flag
     setEditing(true);
     // transform text from display HTML to source
     props.fieldRef.current.textContent = props.fieldRef.current.innerHTML
-  },[props.fieldRef]);
+  }, [props.fieldRef]);
 
   function cancelEditing() {
     // revert title value and alignment
@@ -196,8 +199,15 @@ export default function EditableField(props) {
           </ModalFooter>
         </Modal>
 
-        <div style={{position: 'relative', width: '100%', pointerEvents: isEditing || props.showEditButton ? 'auto' : 'none'}}>
-          <div className={isEditing || props.textContent?.length > 0 || props.alwaysShow ? 'd-block': 'd-none'} style={{width:'100%'}}>{props.field}</div>
+        <div
+          style={{position: 'relative', width: '100%', pointerEvents: 'auto'}}
+          onDragEnter={(e) => {
+            e.currentTarget.style.pointerEvents = 'none'
+          }}
+          ref={divRef}
+        >
+          <div className={isEditing || props.textContent?.length > 0 || props.alwaysShow ? 'd-block' : 'd-none'}
+               style={{width: '100%'}}>{props.field}</div>
           <AlignButtons
             callback={editCallback}
             editable={canEdit}

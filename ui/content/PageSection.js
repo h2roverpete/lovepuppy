@@ -309,8 +309,10 @@ function PageSection({pageSectionData}) {
             && !pageSectionData.SectionText
             && !pageSectionData.SectionTitle
             && sectionExtras.length === 0
-              ? '30px' : 0,
-          margin: canEdit ? undefined : 0
+              ? '40px' : 0,
+          margin: pageSectionData.SectionText
+          || pageSectionData.SectionTitle
+          || sectionExtras.length ? undefined : 0
         }}
         data-testid={`PageSection-${pageSectionData.PageSectionID}`}
         ref={sectionRef}
@@ -408,8 +410,8 @@ function PageSection({pageSectionData}) {
             {sectionText}
           </>)}
         </>)}
-        <Extras/>
       </div>
+      <Extras/>
     </PageSectionContext>
   );
 }
