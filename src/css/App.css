@@ -35,7 +35,7 @@
   background-color: #829960;
   background-image: url('../assets/topimage.jpg');
   background-repeat: no-repeat;
-  height:199px;
+  height: 199px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -59,7 +59,7 @@
   align-items: start;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.5));
   border-bottom: 1px solid white;
-  min-height:46px;
+  min-height: 46px;
 }
 
 /* Navigation bar inner elements, allows for custom alignment/layout */
@@ -70,7 +70,7 @@
 
 /* Navbar branding text */
 .navbar-brand {
-  height:40px;
+  height: 40px;
 }
 
 /* Navbar dropdown button */
@@ -108,9 +108,9 @@
   line-height: 100%;
   display: flex;
   align-items: center;
-  margin-left:10px;
-  padding-bottom:0;
-  margin-bottom:5px;
+  margin-left: 10px;
+  padding-bottom: 0;
+  margin-bottom: 5px;
 }
 
 /* Dropdown navigation links */
@@ -139,19 +139,33 @@ div .PageContent.container-fluid {
   display: flex;
   flex-direction: column;
   max-width: 768px; /** bootstrap lg boundary */
-  margin:0;
-  font-size:14pt;
+  margin: 0;
+  font-size: 14pt;
   line-height: 160%;
 }
 
 .Breadcrumbs,
+.PageNavigation,
 .Copyright {
   color: #a1b583;
-  font-size:12pt;
-  margin-bottom:10px;
+  font-size: 12pt;
   max-width: 768px;
-  width:100%;
-  padding-right:20px;
+  width: 100%;
+  padding: 10px 20px 10px 20px;
+}
+
+div.PageNavigation {
+
+}
+
+.PageNavigation a {
+  color: #a1b583;
+  text-decoration: none;
+}
+
+.PageNavigation a:hover {
+  color: #a1b583;
+  text-decoration: underline;
 }
 
 /* Main title */
@@ -213,15 +227,9 @@ div.SectionImage img {
 
 /* Copyright notice */
 .Copyright {
-  line-height:120%;
-  text-align: right;
   font-size: 10pt;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: end;
-  justify-content: flex-end;
-  flex:1;
+  line-height: 120%;
+  text-align: right;
 }
 
 .BottomBanner {
@@ -241,13 +249,16 @@ div.SectionImage img {
 .btn.EditorToggle {
   color: white;
 }
+
 .btn.EditorToggle:hover {
   color: #f26222;
 }
+
 .btn.EditorToggle.expanded {
   color: black;
 }
-.btn.EditorToggle.expanded:hover{
+
+.btn.EditorToggle.expanded:hover {
   color: black;
 }
 
@@ -258,15 +269,19 @@ div.SectionImage img {
     justify-content: flex-start;
     height: auto;
   }
+
   .NavBar.navbar {
     padding: 20px;
   }
+
   .NavBarBrandIcon {
-    height:60px;
+    height: 60px;
   }
+
   div.navbar-nav {
-    margin-top:20px;
+    margin-top: 20px;
   }
+
   a.nav-link {
     margin: 10px 0;
     padding: 0;

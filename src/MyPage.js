@@ -10,6 +10,7 @@ import logo from "./assets/logo.png";
 import logo_sm from "./assets/logo-sm.png";
 import Logo from "framework/ui/content/Logo";
 import './css/GuestBook.css'
+import PageNavigation from "framework/ui/content/PageNavigation";
 
 /**
  * @typedef MyPageProps
@@ -37,11 +38,12 @@ export default function MyPage(props) {
           brandClassName="d-flex d-md-none"
         />
       </div>
+      <Breadcrumbs/>
       <PageContent>
-        <Breadcrumbs/>
         <PageTitle/>
         <PageSections/>
       </PageContent>
+      <PageNavigation/>
       <Copyright startYear={'2010'}/>
       <div className={'BottomBanner'}/>
     </Page>
