@@ -18,10 +18,10 @@ export default function PageNavigation() {
       for (const page of outlineData) {
         if (page.PageID === pageData.PageID) {
           current = page;
-        } else if (current && !page.HasChildren) {
+        } else if (current && !page.HasChildren && !page.PageHidden) {
           after = page;
           break;
-        } else if (!page.HasChildren) {
+        } else if (!page.HasChildren && !page.PageHidden) {
           before = page;
         }
       }
