@@ -24,7 +24,7 @@ export default function NewPageModal({show, setShow}) {
   const {edits, FormData} = useFormEditor();
   const [routes, setRoutes] = useState([]);
   useEffect(() => {
-    if (outlineData && pageData) {
+    if (canEdit && outlineData && pageData) {
       const routeList = [];
       for (const page of outlineData) {
         if (page.PageID !== pageData.PageID) {
@@ -34,7 +34,7 @@ export default function NewPageModal({show, setShow}) {
       console.debug(`Loaded route list: ${JSON.stringify(routeList)}`);
       setRoutes(routeList);
     }
-  }, [outlineData, pageData]);
+  }, [outlineData, pageData, canEdit]);
 
   if (!canEdit) {
     return <></>;

@@ -348,7 +348,17 @@ export default function NavBar(props) {
           </Nav>
           {canEdit && (<>
             <Button
-              style={{border: 'none', boxShadow: 'none', margin: '0 0 0 10px', padding: '0 3px', zIndex: 200}}
+              style={{
+                border: 'none',
+                boxShadow: 'none',
+                margin: '0 20px 0 0',
+                padding: '0 3px',
+                zIndex: 200,
+                position: 'absolute',
+                right:0,
+                top:'50%',
+                transform: 'translate(-50%, -50%)',
+            }}
               className={`border border-secondary btn-light`}
               type="button"
               variant={'secondary'}
