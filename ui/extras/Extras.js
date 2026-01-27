@@ -11,7 +11,7 @@ import {usePageSectionContext} from "../content/PageSection";
  *
  * @constructor
  */
-export default function Extras({}) {
+export default function Extras() {
 
   // extras to show
   const {extras} = usePageContext();

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import EditButtons, {EditAction} from "./EditButtons";
 import {useEdit} from "./EditProvider";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
@@ -83,12 +83,12 @@ export default function EditableField(props) {
     }
   }
 
-  function startEditing() {
+  const startEditing = useCallback(() => {
     // set editing flag
     setEditing(true);
     // transform text from display HTML to source
     props.fieldRef.current.textContent = props.fieldRef.current.innerHTML
-  }
+  },[props.fieldRef]);
 
   function cancelEditing() {
     // revert title value and alignment

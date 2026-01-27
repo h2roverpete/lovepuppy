@@ -19,7 +19,7 @@ export default function GuestBookConfig({extraId}) {
   const buttonRef = useRef(null);
   const {edits, FormData} = useFormEditor();
   useEffect(() => {
-    FormData?.setData(guestBookConfig);
+    FormData?.update(guestBookConfig);
   },[guestBookConfig]);
   
   if (!canEdit) {

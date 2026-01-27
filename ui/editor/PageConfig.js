@@ -22,7 +22,7 @@ export default function PageConfig() {
 
   const {edits, FormData} = useFormEditor();
   useEffect(() => {
-    FormData.setData(pageData);
+    FormData.update(pageData);
   }, [pageData])
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);

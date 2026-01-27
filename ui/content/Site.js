@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
@@ -55,7 +55,7 @@ export default function Site(props) {
    * Display the site in an error state.
    * @param {ErrorData} errorData
    */
-  function setError(errorData) {
+  const setError = useCallback((errorData)=> {
     // use stringify for deep compare
     if (JSON.stringify(errorData) !== JSON.stringify(error)) {
       __setError__(errorData);
@@ -64,7 +64,7 @@ export default function Site(props) {
         navigate('/error');
       }
     }
-  }
+  },[navigate, error]);
 
   // set error from props if defined
   useEffect(() => {

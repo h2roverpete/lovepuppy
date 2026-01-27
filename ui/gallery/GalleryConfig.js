@@ -15,7 +15,7 @@ export default function GalleryConfig({galleryConfig, setGalleryConfig, extraId}
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const {edits, FormData} = useFormEditor();
   useEffect(() => {
-    FormData.setData(galleryConfig);
+    FormData.update(galleryConfig);
   }, [galleryConfig]);
 
   if (!canEdit) {

@@ -1,5 +1,5 @@
 import EditableField from "../editor/EditableField";
-import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
+import {createContext, useContext, useEffect, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useEdit} from "../editor/EditProvider";
 import {BsPencil} from "react-icons/bs";

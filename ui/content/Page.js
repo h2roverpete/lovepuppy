@@ -70,7 +70,7 @@ export default function Page(props) {
         setExtras(data); // update state
       })
     }
-  }, [Pages, pageData]);
+  }, [Pages, Extras, pageData]);
 
   useEffect(() => {
     if (pageData && outlineData) {

@@ -1,9 +1,8 @@
 import PageSection from './PageSection';
-import React, {useContext, useEffect, useState} from "react";
-import {PageContext, usePageContext} from "./Page";
+import React, {useEffect} from "react";
+import {usePageContext} from "./Page";
 import Login from "../../auth/Login";
 import {useEdit} from "../editor/EditProvider";
-import Extras from "../extras/Extras";
 
 /**
  * @typedef PageSectionProps

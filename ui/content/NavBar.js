@@ -1,8 +1,8 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {useSiteContext} from "./Site";
 import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {Button, Col, Form, Modal, Nav, NavDropdown, Row} from "react-bootstrap";
+import {Button, Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
@@ -33,7 +33,7 @@ import NewPageModal from "../editor/NewPageModal";
 export default function NavBar(props) {
 
   const {siteData, getChildren, Outline} = useSiteContext();
-  const {pageData, outlineData, breadcrumbs} = usePageContext();
+  const {pageData, breadcrumbs} = usePageContext();
   const navigate = useNavigate();
   const togglerRef = useRef(null);
   const {token} = useAuth();

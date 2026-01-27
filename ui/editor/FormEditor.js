@@ -9,12 +9,6 @@ export default function FormEditor({children}) {
   const [edits, setEdits] = useState({});
   const [touched, setTouched] = useState([]);
 
-  function setData(data) {
-    setOriginalData(data);
-    setEdits(data)
-    setTouched([]);
-  }
-
   function onDataChanged({name, value, changes}) {
     if (changes && Array.isArray(changes)) {
       for (const change of changes) {
@@ -41,7 +35,7 @@ export default function FormEditor({children}) {
   }
 
   /**
-   * Update the data, i.e. after a DynamoDB update.
+   * Update the original data and clear edits, i.e. after a DynamoDB update.
    * @param data {Object} data being edited.
    */
   function update(data) {
@@ -69,7 +63,6 @@ export default function FormEditor({children}) {
     <FormEditContext.Provider value={{
       edits: edits,
       FormData: {
-        setData: setData,
         isTouched: isTouched,
         isDataChanged: isDataChanged,
         revert: revert,

@@ -11,7 +11,7 @@ export default function SiteFields(props) {
 
   const {edits, FormData} = useFormEditor();
   useEffect(() => {
-    FormData?.setData(siteData);
+    FormData?.update(siteData);
   },[siteData])
 
   function onSubmit() {
@@ -32,7 +32,7 @@ export default function SiteFields(props) {
   }
 
   function isValidUrl(url) {
-    return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/.test(url);
+    return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(url);
   }
 
   function isValidBucket(bucketName) {

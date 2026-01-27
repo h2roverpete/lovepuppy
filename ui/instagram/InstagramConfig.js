@@ -13,7 +13,7 @@ export default function InstagramConfig({extraData, setExtraData}) {
   const {refreshPage} = usePageContext();
   const {edits, FormData} = useFormEditor();
   useEffect(() => {
-    FormData?.setData(extraData);
+    FormData?.update(extraData);
   }, [extraData]);
 
   if (!canEdit) {
