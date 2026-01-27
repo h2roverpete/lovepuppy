@@ -380,15 +380,15 @@ function PageSection({pageSectionData}) {
             </ModalFooter>
           </Modal>
         </>) : (<>
-          {pageSectionData.SectionTitle && (
+          {pageSectionData.SectionTitle && (<>
             {sectionTitle}
-          )}
+          </>)}
           <PageSectionImage
             pageSectionData={pageSectionData}
           />
-          {pageSectionData.SectionText && (
+          {pageSectionData.SectionText && (<>
             {sectionText}
-          )}
+          </>)}
         </>)}
       </div>
       <Extras/>
