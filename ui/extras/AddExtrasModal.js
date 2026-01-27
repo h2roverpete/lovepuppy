@@ -36,24 +36,28 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
   const [galleryList, setGalleryList] = useState([]);
 
   useEffect(() => {
-    // load list of existing galleries
-    Galleries.getGalleries().then((result) => {
-      console.debug(`List of ${result.length} galleries loaded.`);
-      setGalleryList(result);
-    }).catch((err) => {
-      console.error(`Error getting gallery list.`, err);
-    })
-  }, [Galleries]);
+    if (canEdit) {
+      // load list of existing galleries
+      Galleries.getGalleries().then((result) => {
+        console.debug(`List of ${result.length} galleries loaded.`);
+        setGalleryList(result);
+      }).catch((err) => {
+        console.error(`Error getting gallery list.`, err);
+      })
+    }
+  }, [Galleries, canEdit]);
 
   useEffect(() => {
-    // load list of existing guest books
-    GuestBooks.getGuestBooks().then((result) => {
-      console.debug(`List of ${result.length} guest books loaded.`);
-      setGuestBookList(result);
-    }).catch((err) => {
-      console.error(`Error getting guest book list.`, err);
-    })
-  }, [GuestBooks]);
+    if (canEdit) {
+      // load list of existing guest books
+      GuestBooks.getGuestBooks().then((result) => {
+        console.debug(`List of ${result.length} guest books loaded.`);
+        setGuestBookList(result);
+      }).catch((err) => {
+        console.error(`Error getting guest book list.`, err);
+      })
+    }
+  }, [GuestBooks, canEdit]);
 
   if (!canEdit) {
     return <></>;

@@ -55,7 +55,7 @@ export default function Site(props) {
    * Display the site in an error state.
    * @param {ErrorData} errorData
    */
-  const setError = useCallback((errorData)=> {
+  const setError = useCallback((errorData) => {
     // use stringify for deep compare
     if (JSON.stringify(errorData) !== JSON.stringify(error)) {
       __setError__(errorData);
@@ -64,7 +64,7 @@ export default function Site(props) {
         navigate('/error');
       }
     }
-  },[navigate, error]);
+  }, [navigate, error]);
 
   // set error from props if defined
   useEffect(() => {
@@ -95,36 +95,20 @@ export default function Site(props) {
   }
 
   useEffect(() => {
-    if (!siteData) {
-      // load site data
-      Sites.getSite().then((data) => {
-        console.debug(`Loaded site ${data.SiteID}.`);
-        setSiteData(data);
-      }).catch(error => {
-        setError({
-          title: `${error.status} Server Error`,
-          description: `Site data could not be loaded.<br>Code: ${error.code}`
-        });
-        setSiteData(null);
-      });
-    }
-  }, [Sites, siteData, setError]);
+    // load site data
+    Sites.getSite().then((data) => {
+      console.debug(`Loaded site ${data.SiteID}.`);
+      setSiteData(data);
+    }).catch(err => console.error(`Error loading site.`, err));
+  }, []);
 
   useEffect(() => {
-    if (!outlineData) {
-      // load site outline
-      Sites.getSiteOutline().then((data) => {
-        console.debug(`Loaded site outline.`);
-        setOutlineData(data);
-      }).catch(error => {
-        setError({
-          title: `${error.status} Server Error`,
-          description: `Site data could not be loaded.<br>Code: ${error.code}`
-        });
-        setOutlineData(null);
-      });
-    }
-  }, [Sites, outlineData, setError]);
+    // load site outline
+    Sites.getSiteOutline().then((data) => {
+      console.debug(`Loaded site outline.`);
+      setOutlineData(data);
+    }).catch(err => console.error(`Error loading outline.`, err));
+  }, []);
 
   let redirect;
   if (props.redirects && window.location.pathname === '/') {

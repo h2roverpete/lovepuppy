@@ -55,7 +55,7 @@ export default function Page(props) {
         setPageData(data); // update state
       })
     }
-  }, [Pages, props.pageId]);
+  }, [props.pageId]);
 
   useEffect(() => {
     if (pageData) {
@@ -70,7 +70,7 @@ export default function Page(props) {
         setExtras(data); // update state
       })
     }
-  }, [Pages, Extras, pageData]);
+  }, [pageData]);
 
   useEffect(() => {
     if (pageData && outlineData) {

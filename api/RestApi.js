@@ -7,9 +7,9 @@ export const RestApiContext = React.createContext({});
 
 export default function RestApi(props) {
 
-  const siteId = useMemo(() => parseInt(process.env.REACT_APP_SITE_ID), []);
-  const host = useMemo(() => process.env.REACT_APP_BACKEND_HOST, []);
-  const apiKey = useMemo(() => process.env.REACT_APP_API_KEY, []);
+  const siteId = parseInt(process.env.REACT_APP_SITE_ID);
+  const host = process.env.REACT_APP_BACKEND_HOST;
+  const apiKey = process.env.REACT_APP_API_KEY;
   const [cookies] = useCookies(); // can't use auth context, access directly
 
   axios.defaults.headers.common["x-api-key"] = apiKey;

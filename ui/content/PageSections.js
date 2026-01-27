@@ -1,5 +1,5 @@
 import PageSection from './PageSection';
-import React, {useEffect} from "react";
+import React, {Fragment, useEffect} from "react";
 import {usePageContext} from "./Page";
 import Login from "../../auth/Login";
 import {useEdit} from "../editor/EditProvider";
@@ -41,12 +41,11 @@ export default function PageSections(props) {
         <Login/>
       </>) : (<>
         {pageData && sectionData && (<>
-          {sectionData.map(section => (<>
+          {sectionData.map(section => (<Fragment key={section.PageSectionID}>
             <PageSection
               pageSectionData={section}
-              key={section.PageSectionID}
               data-testid={`PageSection-section.PageSectionID`}/>
-          </>))}
+          </Fragment>))}
           {props.children}
         </>)}
       </>)}
