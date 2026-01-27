@@ -18,11 +18,12 @@ function PageSection({pageSectionData}) {
 
   const {PageSections} = useRestApi();
   const {canEdit} = useEdit();
-  const {sectionData, setSectionData, updatePageSection, refreshPage, addExtraModal} = usePageContext();
+  const {sectionData, setSectionData, updatePageSection, refreshPage, addExtraModal, extras} = usePageContext();
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingText, setEditingText] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [uploadPrompt, setUploadPrompt] = useState(pageSectionData.SectionImage ? DropState.REPLACE : DropState.INSERT);
+  const [sectionExtras, setSectionExtras] = useState([]);
 
   const sectionTitleRef = useRef(null);
   const sectionTitle = (
@@ -205,7 +206,19 @@ function PageSection({pageSectionData}) {
       sectionRef.current.addEventListener('dragover', dragOverHandler);
       sectionRef.current.addEventListener('drop', dropHandler);
     }
-  }, [sectionImageRef, dropFileRef, canEdit, pageSectionData]);
+  }, [sectionImageRef, canEdit]);
+
+  useEffect(() => {
+    if (extras && pageSectionData) {
+      const list = [];
+      for (const extra of extras) {
+        if (extra.PageSectionID === pageSectionData.PageSectionID) {
+          list.push(extra);
+        }
+      }
+      setSectionExtras(list);
+    }
+  }, [extras, pageSectionData]);
 
   function selectImageFile() {
     if (fileInputRef.current && canEdit) {
@@ -291,7 +304,12 @@ function PageSection({pageSectionData}) {
         className={`PageSection`}
         style={{
           position: 'relative',
-          minHeight: canEdit ? '30px' : 0,
+          minHeight:
+            canEdit
+            && !pageSectionData.SectionText
+            && !pageSectionData.SectionTitle
+            && sectionExtras.length === 0
+              ? '30px' : 0,
           margin: canEdit ? undefined : 0
         }}
         data-testid={`PageSection-${pageSectionData.PageSectionID}`}
@@ -390,8 +408,8 @@ function PageSection({pageSectionData}) {
             {sectionText}
           </>)}
         </>)}
+        <Extras/>
       </div>
-      <Extras/>
     </PageSectionContext>
   );
 }
