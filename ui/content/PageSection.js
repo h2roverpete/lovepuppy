@@ -287,33 +287,17 @@ function PageSection({pageSectionData}) {
     <PageSectionContext value={{
       pageSectionData: pageSectionData
     }}>
-      {canEdit ? (<>
-        <Modal
-          show={showDeleteConfirmation}
-          onHide={() => setShowDeleteConfirmation(false)}
-          className={'Editor'}
-        >
-          <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
-          <ModalBody>Are you sure you want to delete this section of the page? This action cannot be undone.</ModalBody>
-          <ModalFooter>
-            <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel
-            </Button>
-            <Button size="sm" variant="danger" onClick={() => {
-              deleteSection();
-              setShowDeleteConfirmation(false)
-            }}>Delete Section
-            </Button>
-          </ModalFooter>
-        </Modal>
-        <div
-          className={`PageSection`}
-          style={{
-            position: 'relative',
-            minHeight: pageSectionData.SectionText ? 0 : '30px'
-          }}
-          data-testid={`PageSection-${pageSectionData.PageSectionID}`}
-          ref={sectionRef}
-        >
+      <div
+        className={`PageSection`}
+        style={{
+          position: 'relative',
+          minHeight: canEdit ? '30px' : 0,
+          margin: canEdit ? undefined : 0
+        }}
+        data-testid={`PageSection-${pageSectionData.PageSectionID}`}
+        ref={sectionRef}
+      >
+        {canEdit ? (<>
           <EditableField
             field={sectionTitle}
             fieldRef={sectionTitleRef}
@@ -357,8 +341,10 @@ function PageSection({pageSectionData}) {
                     onClick={() => setEditingTitle(true)}>{`${pageSectionData?.SectionTitle?.length > 0 ? 'Edit' : 'Add'} Title`}</span>
                 <span className="dropdown-item"
                       onClick={() => setEditingText(true)}>{`${pageSectionData?.SectionText?.length > 0 ? 'Edit' : 'Add'} Text`}</span>
-                <span className="dropdown-item" onClick={selectImageFile}>{`${pageSectionData?.SectionImage?.length > 0 ? 'Update' : 'Add'} Image`}</span>
-                <span className="dropdown-item" onClick={()=>addExtraModal({pageSectionId: pageSectionData.PageSectionID})}>Add Extra</span>
+                <span className="dropdown-item"
+                      onClick={selectImageFile}>{`${pageSectionData?.SectionImage?.length > 0 ? 'Update' : 'Add'} Image`}</span>
+                <span className="dropdown-item"
+                      onClick={() => addExtraModal({pageSectionId: pageSectionData.PageSectionID})}>Add Extra</span>
                 {pageSectionData.PageSectionSeq > 1 && (
                   <span className="dropdown-item" onClick={onMoveUp}>Move Up</span>
                 )}
@@ -375,29 +361,36 @@ function PageSection({pageSectionData}) {
           {!pageSectionData.SectionImage && (
             <FileDropTarget state={uploadPrompt} ref={dropFileRef}/>
           )}
-        </div>
-      </>) : (<>
-        {pageSectionData.SectionTitle && (
-          <h2
-            className={'SectionTitle'}
-            dangerouslySetInnerHTML={{__html: pageSectionData.SectionTitle}}
-            style={{textAlign: pageSectionData.TitleAlign, width: '100%'}}
+          <Modal
+            show={showDeleteConfirmation}
+            onHide={() => setShowDeleteConfirmation(false)}
+            className={'Editor'}
+          >
+            <ModalHeader><h5>Delete Page Section</h5></ModalHeader>
+            <ModalBody>Are you sure you want to delete this section of the page? This action cannot be
+              undone.</ModalBody>
+            <ModalFooter>
+              <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel
+              </Button>
+              <Button size="sm" variant="danger" onClick={() => {
+                deleteSection();
+                setShowDeleteConfirmation(false)
+              }}>Delete Section
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>) : (<>
+          {pageSectionData.SectionTitle && (
+            {sectionTitle}
+          )}
+          <PageSectionImage
+            pageSectionData={pageSectionData}
           />
-        )}
-        <PageSectionImage
-          pageSectionData={pageSectionData}
-          imageRef={sectionImageRef}
-          dropTargetRef={dropFileRef}
-          dropTargetState={uploadPrompt}
-        />
-        {pageSectionData.SectionText && (
-          <div
-            className={'SectionText'}
-            dangerouslySetInnerHTML={{__html: pageSectionData.SectionText}}
-            style={{textAlign: pageSectionData.TextAlign, width: '100%'}}
-          />
-        )}
-      </>)}
+          {pageSectionData.SectionText && (
+            {sectionText}
+          )}
+        </>)}
+      </div>
       <Extras/>
     </PageSectionContext>
   );
