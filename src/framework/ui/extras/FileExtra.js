@@ -19,7 +19,7 @@ export default function FileExtra({extraData}) {
           setContent(<>
             <Container className={'Extra'}>
               <Row className="ExtraAudio">
-                <Col xs={'auto'} className={'ExtraAudioLabel d-flex align-items-center'}>
+                <Col xs={'auto'} className={'ExtraAudioLabel d-flex align-items-center ps-0'}>
                   {extraData.ExtraFilePrompt}
                 </Col>
                 <Col xs='auto' className={'ExtraAudioPlayer d-flex align-items-center'}>

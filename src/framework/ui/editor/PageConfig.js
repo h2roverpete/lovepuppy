@@ -106,7 +106,7 @@ export default function PageConfig() {
       onUpdate={onUpdate}
       onDelete={() => setShowDeleteConfirmation(true)}
       isDataValid={isDataValid}
-      panelStyle={{zIndex: 1032}}
+      panelStyle={{zIndex: 1032, position: 'fixed', top:0, left:0, width:'100vw'}}
       buttonStyle={{position: 'fixed', top: '5px'}}
       bodyStyle={{borderBottom: '1px solid gray'}}
       buttonRef={buttonRef}
@@ -119,15 +119,6 @@ export default function PageConfig() {
         >
           <span className={'d-none d-sm-block'}>Add Section</span>
           <span className={'d-block d-sm-none'}>+Section</span>
-        </Button>
-        <Button
-          className="me-2"
-          size="sm"
-          variant="secondary"
-          onClick={() => addExtraModal()}
-        >
-          <span className={'d-none d-sm-block'}>Add Extra</span>
-          <span className={'d-block d-sm-none'}>+Extra</span>
         </Button>
       </>}
     >
