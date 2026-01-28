@@ -8,6 +8,7 @@ import axios from "axios";
  * @property {String} SiteName
  * @property {String} SiteRootUrl
  * @property {String} SiteRootDir
+ * @property {String} SiteBucketName
  * @property {String} PageDisplayURL
  * @property {Number} ColorSchemeID
  * @property {Number} FrameID
@@ -57,6 +58,7 @@ import axios from "axios";
  * @property {String} PopUpXMLCached
  * @property {Boolean} InheritSecurity
  * @property {String} FacebookPixelID
+ * @property {string} PageRoute
  */
 
 /**
@@ -73,6 +75,7 @@ import axios from "axios";
  * @property {Boolean} HasChildren
  * @property {String} OutlineSort
  * @property {number} OutlineLevel
+ * @property {string} PageRoute
  */
 
 /**
@@ -278,6 +281,26 @@ import axios from "axios";
  */
 
 /**
+ * @typedef ExtraData
+ *
+ * Data for content "extras" added to sites.
+ * Each extra can store its own specific configuration data
+ * in addition to the fields below.
+ *
+ * @property {Number} ExtraID
+ * @property {Number} [PageID]          Page to insert the extra into.
+ * @property {Number} [PageSectionID]   Page section to insert the extra into.
+ * @property {String} ExtraType         Type of extra, i.e. "gallery" or "guestbook" or "instagram" or "html"
+ * @property {String} [InstagramHandle] Handle for Instagram when ExtraType == 'instagram'
+ * @property {String} [ExtraFile]       S3 path to file attached to the Extra
+ * @property {String} [GalleryID]       Gallery ID when ExtraType == 'gallery'
+ * @property {String} [GuestBookID]     Guest book ID when ExtraType == 'guestbook'
+ * @property {String} Created           Creation date in ISO format.
+ * @property {String} Modified          Modification date in ISO format.
+ */
+
+
+/**
  * @class RestAPI
  *
  * Class to access the backend server.
@@ -300,12 +323,8 @@ class RestAPI {
    * @returns {Promise<PageData>}
    */
   async getPage(pageId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching page ${pageId}.`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}`);
+    return response.data;
   }
 
   /**
@@ -315,12 +334,8 @@ class RestAPI {
    * @returns {Promise<[PageSectionData]>}
    */
   async getPageSections(pageId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}/sections`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching page ${pageId} sections.`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/pages/${pageId}/sections`);
+    return response.data;
   }
 
   /**
@@ -329,12 +344,8 @@ class RestAPI {
    * @returns {Promise<SiteData>}
    */
   async getSite() {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching site data. siteId=${this.siteId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}`);
+    return response.data;
   }
 
   /**
@@ -343,12 +354,18 @@ class RestAPI {
    * @returns {Promise<[OutlineData]>}
    */
   async getSiteOutline() {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/outline`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching site outline. siteId=${this.siteId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/outline`);
+    return response.data;
+  }
+
+  /**
+   * Get the sitemap XML.
+   *
+   * @returns {Promise<[OutlineData]>}
+   */
+  async getSitemap() {
+    const response = await axios.get(`${this.host}/api/v1/content/sites/${this.siteId}/sitemap`);
+    return response.data;
   }
 
   /**
@@ -358,12 +375,8 @@ class RestAPI {
    * @returns {Promise<GuestBookConfig>}
    */
   async getGuestBook(guestBookId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/guestbook/${guestBookId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching guestbook. guestBookId=${guestBookId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/guestbook/${guestBookId}`);
+    return response.data;
   }
 
   /**
@@ -373,12 +386,8 @@ class RestAPI {
    * @return {Promise<GuestData>}
    */
   async getGuest(guestId) {
-    try {
-      const response = await axios.get(`${this.host}/api/v1/guestbook/guest/${guestId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching guest data. guestId=${guestId}`, error);
-    }
+    const response = await axios.get(`${this.host}/api/v1/guestbook/guest/${guestId}`);
+    return response.data;
   }
 
   /**
@@ -389,12 +398,8 @@ class RestAPI {
    * @return {Promise<GuestData>}
    */
   async insertOrUpdateGuest(guestBookId, data) {
-    try {
-      const response = await axios.post(`${this.host}/api/v1/guestbook/${guestBookId}/guest`, data);
-      return response.data;
-    } catch (error) {
-      console.error(`Error posting guest data. guestBookId=${guestBookId}, data=${JSON.stringify(data)}`, error);
-    }
+    const response = await axios.post(`${this.host}/api/v1/guestbook/${guestBookId}/guest`, data);
+    return response.data;
   }
 
   /**
@@ -442,6 +447,10 @@ class RestAPI {
     return response.data;
   }
 
+  async getAuthToken(clientId, redirectUrl, authCode) {
+    const response = await axios.post(`${this.host}/oauth/token?client_id=${clientId}&redirect_uri=${redirectUrl}&code=${authCode}&grant_type=authorization_code`);
+    return response.data;
+  }
 }
 
 export default RestAPI;
