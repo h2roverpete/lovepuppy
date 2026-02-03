@@ -1,59 +1,59 @@
 /* Guest book form elements (large form) */
-.col-form-label,
-.form-label,
-label.form-check-label,
-div.form-control,
-input.form-control,
-input.form-control.phone,
-select.form-control,
-textarea.form-control,
-.btn {
+.GuestBook .col-form-label,
+.GuestBook .form-label,
+.GuestBook label.form-check-label,
+.GuestBook div.form-control,
+.GuestBook input.form-control,
+.GuestBook input.form-control.phone,
+.GuestBook select.form-control,
+.GuestBook textarea.form-control,
+.GuestBook .btn {
 
 }
 
 /* Admin form elements (small form) */
-.col-form-label-sm,
-div.form-control-sm,
-div.form-control-sm label,
-input.form-control-sm,
-select.form-control-sm,
-textarea.form-control-sm,
-.btn-sm {
+.GuestBook .col-form-label-sm,
+.GuestBook div.form-control-sm,
+.GuestBook div.form-control-sm label,
+.GuestBook input.form-control-sm,
+.GuestBook select.form-control-sm,
+.GuestBook textarea.form-control-sm,
+.GuestBook .btn-sm {
   line-height:1.2;
 }
 
 /* Extra style for phone and fields */
-input.form-control.phone,
-li.country {
+.GuestBook input.form-control.phone,
+.GuestBook li.country {
 }
 
 /* checkbox height adjustment */
-input.form-check-input {
+.GuestBook input.form-check-input {
 }
 
 /* small checkbox height adjustment */
-div.form-control-sm input.form-check-input {
+.GuestBook div.form-control-sm input.form-check-input {
 }
 
 /* Guest book submit button */
-button.btn.btn-primary,
-input.btn.btn-primary {
+.GuestBook button.btn.btn-primary,
+.GuestBook input.btn.btn-primary {
   background-color: #f26222;
   border-color: #f26222;
   color: white;
 }
 
 /* Guest book submit hover */
-button.btn.btn-primary:hover,
-input.btn.btn-primary:hover {
+.GuestBook button.btn.btn-primary:hover,
+.GuestBook input.btn.btn-primary:hover {
   background-color: #fb7538;
   border-color: #fb7538;
   color: white;
 }
 
 /* Guest book submit pressed */
-button.btn.btn-primary:active,
-input.btn.btn-primary:active {
+.GuestBook button.btn.btn-primary:active,
+.GuestBook input.btn.btn-primary:active {
   background-color: #d5561d;
   border-color: #d5561d;
   color: white;
