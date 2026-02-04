@@ -58,3 +58,32 @@
   border-color: #d5561d;
   color: white;
 }
+
+div.GuestBook {
+  margin-bottom: 10px;
+}
+
+/* bootstrap xs width */
+@media (max-width: 575px) {
+
+}
+
+/* bootstrap sm width */
+@media (min-width: 576px) {
+
+}
+
+/* bootstrap md width */
+@media (min-width: 768px) {
+
+}
+
+/* bootstrap lg width */
+@media (min-width: 960px) {
+
+}
+
+/* bootstrap xl width */
+@media (min-width: 1140px) {
+
+}

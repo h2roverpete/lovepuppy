@@ -246,20 +246,37 @@ div.SectionImage img {
   background-repeat: repeat-x;
 }
 
-.btn.EditorToggle {
-  color: white;
-}
+@media (max-width: 576px) {
 
-.btn.EditorToggle:hover {
-  color: #f26222;
-}
+  div.PageContent {
+    padding: 10px;
+  }
 
-.btn.EditorToggle.expanded {
-  color: black;
-}
+  div.PageContent.container-fluid {
+    font-size: 12pt;
+  }
 
-.btn.EditorToggle.expanded:hover {
-  color: black;
+  div.SectionText {
+    line-height: 150%;
+  }
+
+  h1.PageTitle {
+    font-size: 30pt;
+    margin-bottom: 10px;
+  }
+
+  h2.SectionTitle {
+    font-size: 24pt;
+    margin-bottom: 10px;
+  }
+
+  div.PageNavigation {
+    font-size:12pt;
+  }
+
+  div.Breadcrumbs {
+    font-size:12pt;
+  }
 }
 
 /* bootstrap xs-sm width */
