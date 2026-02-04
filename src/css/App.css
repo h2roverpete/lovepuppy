@@ -254,6 +254,7 @@ div.SectionImage img {
 
   div.PageContent.container-fluid {
     font-size: 12pt;
+    padding:15px;
   }
 
   div.SectionText {
