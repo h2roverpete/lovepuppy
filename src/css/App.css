@@ -33,20 +33,25 @@
 
 .NavBarWrapper {
   background-color: #829960;
-  background-image: url('../assets/topimage.jpg');
+  background-image: url('../assets/ricochet.jpg');
   background-repeat: no-repeat;
-  height: 199px;
+  background-size: 100vw;
+  background-position-y: -20vw;
+  height: 160px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: start;
   width: 100%;
+  position: fixed;
+  z-index: 1100;
 }
 
 .Logo {
   align-self: start;
   justify-self: start;
   margin-left: 10px;
+  height: 110px;
 }
 
 /* Navigation bar outer container */
@@ -75,7 +80,9 @@
 
 /* Navbar dropdown button */
 .navbar .navbar-toggler {
-  background-color: #829960;
+  background-color: #8e9f7344;
+  border-color: #e9f7d8;
+  color: #e9f7d8;
 }
 
 /* Navbar dropdown submenus */
@@ -95,7 +102,7 @@
 /* Navbar dropdown hover */
 .navbar .dropdown-item:hover {
   color: white;
-  background-color: #00000016;
+  background-color: #00000033;
 }
 
 /* Navbar navigation links */
@@ -132,7 +139,7 @@
 
 /* Page content container, uses flex:1 to fill page height */
 div .PageContent.container-fluid {
-  padding: 20px;
+  padding: 170px 20px 20px 20px;
   color: #5A7335;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   flex: 1;
@@ -151,11 +158,10 @@ div .PageContent.container-fluid {
   font-size: 12pt;
   max-width: 768px;
   width: 100%;
-  padding: 10px 20px 10px 20px;
 }
 
 div.PageNavigation {
-
+  margin-bottom:10px;
 }
 
 .PageNavigation a {
@@ -246,15 +252,21 @@ div.SectionImage img {
   background-repeat: repeat-x;
 }
 
+@media (max-width: 400px) {
+
+  .NavBarWrapper {
+    background-position-x: -80px;
+  }
+}
+
 @media (max-width: 576px) {
 
-  div.PageContent {
-    padding: 10px;
+  .NavBarWrapper {
+    background-size: 576px;
   }
 
   div.PageContent.container-fluid {
     font-size: 12pt;
-    padding:15px;
   }
 
   div.SectionText {
@@ -282,10 +294,21 @@ div.SectionImage img {
 
 /* bootstrap xs-sm width */
 @media (max-width: 768px) {
+
+  /* Navbar dropdown submenus */
+  .navbar .dropdown-menu {
+    background-color: #8e9f7344;
+  }
+
   .NavBarWrapper {
-    background-image: none;
     justify-content: flex-start;
     height: auto;
+    background-size: 768px;
+    background-position-y: -5vw;
+  }
+
+  div .PageContent.container-fluid {
+    padding: 95px 15px 15px 15px;
   }
 
   .NavBar.navbar {
@@ -305,6 +328,7 @@ div.SectionImage img {
     padding: 0;
   }
 }
+
 
 /* bootstrap md width */
 @media (min-width: 768px) {

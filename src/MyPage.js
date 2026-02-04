@@ -38,13 +38,13 @@ export default function MyPage(props) {
           brandClassName="d-flex d-md-none"
         />
       </div>
-      <Breadcrumbs/>
       <PageContent>
+        <Breadcrumbs/>
         <PageTitle/>
         <PageSections/>
+        <PageNavigation/>
+        <Copyright startYear={'2010'}/>
       </PageContent>
-      <PageNavigation/>
-      <Copyright startYear={'2010'}/>
       <div className={'BottomBanner'}/>
     </Page>
   )
