@@ -304,7 +304,7 @@ div.SectionImage img {
     justify-content: flex-start;
     height: auto;
     background-size: 768px;
-    background-position-y: -5vw;
+    background-position-y: -10vw;
   }
 
   div .PageContent.container-fluid {
