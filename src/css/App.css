@@ -29,6 +29,7 @@
   flex-direction: column;
   align-items: flex-start;
   flex: 1;
+  min-height: 100vh;
 }
 
 .NavBarWrapper {
@@ -142,7 +143,7 @@ div .PageContent.container-fluid {
   padding: 170px 20px 20px 20px;
   color: #5A7335;
   font-family: Arial, Tahoma, Verdana, sans-serif;
-  flex: 1;
+  flex:1;
   display: flex;
   flex-direction: column;
   max-width: 768px; /** bootstrap lg boundary */
@@ -161,17 +162,22 @@ div .PageContent.container-fluid {
 }
 
 div.PageNavigation {
-  margin-bottom:10px;
+  padding: 0 10px 10px 10px;
 }
 
+div.Copyright {
+  padding: 0 10px 10px 0;
+}
+
+
 .PageNavigation a {
-  color: #a1b583;
+  color: #f26222;
   text-decoration: none;
 }
 
 .PageNavigation a:hover {
-  color: #a1b583;
-  text-decoration: underline;
+  color: #ff4f00;
+  text-decoration: none;
 }
 
 /* Main title */
@@ -236,6 +242,7 @@ div.SectionImage img {
   font-size: 10pt;
   line-height: 120%;
   text-align: right;
+  margin: 0 10px 10px 0;
 }
 
 .BottomBanner {

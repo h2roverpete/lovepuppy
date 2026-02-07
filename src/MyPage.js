@@ -42,9 +42,9 @@ export default function MyPage(props) {
         <Breadcrumbs/>
         <PageTitle/>
         <PageSections/>
-        <PageNavigation/>
-        <Copyright startYear={'2010'}/>
       </PageContent>
+      <PageNavigation/>
+      <Copyright startYear={'2010'}/>
       <div className={'BottomBanner'}/>
     </Page>
   )
