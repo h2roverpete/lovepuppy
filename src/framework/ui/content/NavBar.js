@@ -1,18 +1,16 @@
-import {lazy, Suspense, useRef, useState} from "react";
+import {useRef} from "react";
 import {useSiteContext} from "./Site";
 import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
-import {Button, Nav, NavDropdown} from "react-bootstrap";
+import {Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
-import {BsPlus} from "react-icons/bs";
 import {useRestApi} from "../../api/RestApi";
 import React from 'react';
-import FormEditor from "../editor/FormEditor";
 import {useTouchContext} from "../../util/TouchProvider";
+import AddPageMenu from "../editor/AddPageMenu";
 
-const NewPageModal = lazy(() => import("../editor/NewPageModal"));
 
 /**
  * @typedef NavBarProps
@@ -35,14 +33,13 @@ const NewPageModal = lazy(() => import("../editor/NewPageModal"));
 export default function NavBar(props) {
 
   const {siteData, getChildren, Outline} = useSiteContext();
-  const {pageData, breadcrumbs, addPageSection} = usePageContext();
+  const {pageData, breadcrumbs} = usePageContext();
   const navigate = useNavigate();
   const togglerRef = useRef(null);
   const {token} = useAuth();
   const {canEdit} = useEdit();
-  const {Pages, PageSections} = useRestApi();
+  const {Pages} = useRestApi();
   const editButtonRef = useRef(null);
-  const [showNewPage, setShowNewPage] = useState(false);
   const {supportsHover} = useTouchContext();
 
   function navigateTo(to) {
@@ -250,21 +247,6 @@ export default function NavBar(props) {
     }
   }
 
-  function onAddSection() {
-    if (pageData) {
-      const data = {
-        PageID: pageData.PageID
-      }
-      console.debug(`Adding page section...`);
-      PageSections.insertOrUpdatePageSection(data)
-        .then((section) => {
-          addPageSection(section);
-        }).catch((error) => {
-        console.error(`Error adding page section.`, error);
-      })
-    }
-  }
-
   return (
     <Navbar
       expand={props.expand ? props.expand : 'sm'}
@@ -273,10 +255,10 @@ export default function NavBar(props) {
       fixed={props.fixed ? props.fixed : undefined}
       data-testid="NavBar"
       onMouseOver={() => {
-        if (supportsHover && canEdit && editButtonRef.current) editButtonRef.current.hidden = false
+        if (canEdit && supportsHover) editButtonRef.current.hidden = false
       }}
       onMouseLeave={() => {
-        if (supportsHover && canEdit && editButtonRef.current) editButtonRef.current.hidden = true
+        if (canEdit && supportsHover) editButtonRef.current.hidden = true
       }}
     >
       <div
@@ -375,56 +357,9 @@ export default function NavBar(props) {
                 </Nav.Link>
               )}</>
             )}</>
-
           </Nav>
           {canEdit && (
-            <div
-              className="AddPageButton Editor dropdown"
-              ref={editButtonRef}
-              hidden={supportsHover}
-            >
-              <Button
-                style={{
-                  margin: '0 0 0 5px',
-                  padding: '2px 5px',
-                  fontSize: '10pt'
-                }}
-                className={`border btn-light`}
-                type="button"
-                variant={'secondary'}
-                size={'sm'}
-                aria-expanded="false"
-                data-bs-toggle="dropdown"
-              >
-                <BsPlus/>
-              </Button>
-              <div
-                className="dropdown-menu Editor border-secondary border-opacity-25"
-                style={{
-                  position: 'absolute',
-                  zIndex: 100,
-                }}>
-              <span
-                className="dropdown-item"
-                onClick={() => setShowNewPage(true)}
-              >
-                New Page
-              </span>
-                <span
-                  className="dropdown-item"
-                  onClick={() => onAddSection()}
-                >
-                New Section
-              </span>
-              </div>
-              {showNewPage && (
-                <Suspense fallback={<></>}>
-                  <FormEditor>
-                    <NewPageModal show={showNewPage} setShow={setShowNewPage}/>
-                  </FormEditor>
-                </Suspense>
-              )}
-            </div>
+            <AddPageMenu editButtonRef={editButtonRef}/>
           )}
         </Navbar.Collapse>
       </div>
