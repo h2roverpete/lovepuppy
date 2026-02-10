@@ -15,16 +15,28 @@
 
 /* Outer container and background */
 .Site {
-  width: 100%;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: start;
+  justify-content: start;
   flex: 1;
+}
+
+.swiper {
+  width: 100vw;
+  max-width: 768px;
+  height: 100dvh;
+}
+
+.swiper-slide {
+  width: 100%;
+  min-height: 100dvh;
 }
 
 /* Middle content section, add width constraints here */
 .Page {
-  width: 100vw;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -100,6 +112,12 @@
   background-color: #00000016;
 }
 
+/* Navbar link hover */
+.navbar .nav-link:hover
+{
+  color: white;
+}
+
 /* Navbar dropdown hover */
 .navbar .dropdown-item:hover {
   color: white;
@@ -107,6 +125,7 @@
 }
 
 /* Navbar navigation links */
+.navbar .nav-link:focus,
 .navbar .nav-link,
 .navbar .navbar-brand {
   font-family: "EmmaScript", cursive;
@@ -133,17 +152,13 @@
   color: white;
 }
 
-/* Navbar link hover */
-.navbar a:hover {
-  color: #e9f7d8;
-}
 
 /* Page content container, uses flex:1 to fill page height */
 div .PageContent.container-fluid {
   padding: 170px 20px 20px 20px;
   color: #5A7335;
   font-family: Arial, Tahoma, Verdana, sans-serif;
-  flex:1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   max-width: 768px; /** bootstrap lg boundary */
@@ -291,11 +306,11 @@ div.SectionImage img {
   }
 
   div.PageNavigation {
-    font-size:12pt;
+    font-size: 12pt;
   }
 
   div.Breadcrumbs {
-    font-size:12pt;
+    font-size: 12pt;
   }
 }
 
