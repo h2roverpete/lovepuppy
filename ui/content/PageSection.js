@@ -342,6 +342,7 @@ export default function PageSection({pageSectionData}) {
         }}
         style={{
           position: 'relative',
+          minHeight: '30px',
         }}
         data-testid={`PageSection-${pageSectionData.PageSectionID}`}
         ref={sectionRef}
@@ -353,6 +354,7 @@ export default function PageSection({pageSectionData}) {
             || pageSectionData.SectionImage
             || pageSectionData.SectionTitle
             || pageSectionData.SectionText
+            || sectionExtras?.length > 0
           }
         >
           <div className={'Editor EmptyElement'}>(Empty Section)</div>

@@ -40,6 +40,29 @@ export default function Page(props) {
   const [extraPageSectionId, setExtraPageSectionId] = useState(0);
   const [extras, setExtras] = useState([]);
   const {canEdit} = useEdit();
+  const [nextPage, setNextPage] = useState(null);
+  const [prevPage, setPrevPage] = useState(null);
+
+  useEffect(() => {
+    // build next & prev page for navigation
+    if (pageData && outlineData) {
+      let before;
+      let current;
+      let after;
+      for (const page of outlineData) {
+        if (page.PageID === pageData.PageID) {
+          current = page;
+        } else if (current && !page.HasChildren && !page.PageHidden) {
+          after = page;
+          break;
+        } else if (!page.HasChildren && !page.PageHidden) {
+          before = page;
+        }
+      }
+      setPrevPage(before);
+      setNextPage(after);
+    }
+  }, [outlineData, pageData]);
 
   let errorData;
   if (error) {
@@ -167,6 +190,8 @@ export default function Page(props) {
         addExtraToPage: addExtraToPage,
         removeExtraFromPage: removeExtraFromPage,
         updateExtra: updateExtra,
+        nextPage: nextPage,
+        prevPage: prevPage,
       }}
     >
       {canEdit && showAddExtraModal && (

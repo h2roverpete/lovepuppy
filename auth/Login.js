@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import '../ui/forms/Forms.css'
 import PasswordField from "../ui/forms/PasswordField";
 import {useSearchParams} from 'react-router';
@@ -51,10 +51,11 @@ const Login = (props) => {
   const {token, setToken} = useAuth();
   const navigate = useNavigate();
   const [cookies, setCookie] = useCookies();
-
-  if (!cookies.loginState) {
-    setCookie("loginState", generateState());
-  }
+  const loginState = useMemo(() => {
+    const state = generateState();
+    setCookie("loginState", state);
+    return state;
+  }, [setCookie]);
 
   useEffect(() => {
     if (token) {
@@ -102,14 +103,14 @@ const Login = (props) => {
       <div>Processing login...</div>
     ) : (
       // display login form
-      <div className="container-fluid">
+      <div className="Login container-fluid">
         <title>Log In</title>
         <form method="POST" action={`${process.env.REACT_APP_BACKEND_HOST}/oauth/login`}>
           <input type="hidden" name="response_type" value="code"/>
           <input type="hidden" name="client_id" value={window.location.host}/>
           <input type="hidden" name="redirect_uri"
                  value={`${window.location.protocol}//${window.location.host}/login`}/>
-          <input type="hidden" name="state" value={cookies.loginState}/>
+          <input type="hidden" name="state" value={loginState}/>
           <input type="hidden" name="scope" value={scope}/>
           <Row className="mt-4">
             <Form.Label className={'required'} htmlFor="username" column={true} sm={3}>

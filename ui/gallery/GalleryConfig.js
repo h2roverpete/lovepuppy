@@ -6,16 +6,17 @@ import {usePageContext} from "../content/Page";
 import EditorPanel from "../editor/EditorPanel";
 import {useFormEditor} from "../editor/FormEditor";
 
-export default function GalleryConfig({galleryConfig, setGalleryConfig, extraId, buttonRef, ref}) {
+export default function GalleryConfig({galleryConfig, setGalleryConfig, extraId, buttonRef}) {
 
   const {canEdit} = useEdit();
   const {Galleries, Extras} = useRestApi();
   const {removeExtraFromPage} = usePageContext();
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const {edits, FormData} = useFormEditor();
+
   useEffect(() => {
-    FormData.update(galleryConfig);
-  }, [galleryConfig]);
+    FormData.setData(galleryConfig);
+  }, [galleryConfig, FormData]);
 
   if (!canEdit) {
     return <></>
@@ -91,7 +92,6 @@ export default function GalleryConfig({galleryConfig, setGalleryConfig, extraId,
       isDataValid={isDataValid}
       onDelete={() => setShowDeleteConfirmation(true)}
       buttonRef={buttonRef}
-      ref={ref}
     >
       <h5>Gallery Properties</h5>
       <Row>

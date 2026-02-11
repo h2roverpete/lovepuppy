@@ -1,16 +1,14 @@
 import {useRef} from "react";
 import {useSiteContext} from "./Site";
-import {usePageContext} from "./Page";
 import Navbar from 'react-bootstrap/Navbar';
 import {Nav, NavDropdown} from "react-bootstrap";
-import {useNavigate} from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useEdit} from "../editor/EditProvider";
 import {useRestApi} from "../../api/RestApi";
 import React from 'react';
 import {useTouchContext} from "../../util/TouchProvider";
 import AddPageMenu from "../editor/AddPageMenu";
-
 
 /**
  * @typedef NavBarProps
@@ -32,10 +30,10 @@ import AddPageMenu from "../editor/AddPageMenu";
  */
 export default function NavBar(props) {
 
-  const {siteData, getChildren, Outline} = useSiteContext();
-  const {pageData, breadcrumbs} = usePageContext();
+  const {siteData, getChildren, Outline, currentPage, breadcrumbs, outlineData} = useSiteContext();
   const navigate = useNavigate();
-  const togglerRef = useRef(null);
+  const location = useLocation();
+  const toggleRef = useRef(null);
   const {token} = useAuth();
   const {canEdit} = useEdit();
   const {Pages} = useRestApi();
@@ -43,26 +41,21 @@ export default function NavBar(props) {
   const {supportsHover} = useTouchContext();
 
   function navigateTo(to) {
-    if ((togglerRef.current.style.visible || togglerRef.current.style.display !== 'none') && !togglerRef.current.classList.contains("collapsed")) {
+    if ((toggleRef.current.style.visible || toggleRef.current.style.display !== 'none') && !toggleRef.current.classList.contains("collapsed")) {
       // toggle is active, collapse menu on navigation
-      togglerRef.current.click();
+      toggleRef.current.click();
     }
     // react-router navigation
     navigate(to);
   }
 
-  function isInCurrentPath(pageId) {
-    if (!pageData || !breadcrumbs) {
+  function isInCurrentPath(pageRoute) {
+    if (!outlineData) {
       return false
-    } else if (pageId === pageData.PageID) {
+    } else if (pageRoute === location.pathname) {
       return true;
     } else {
-      for (const page of breadcrumbs) {
-        if (page.PageID === pageId) {
-          return true;
-        }
-      }
-      return false;
+      return breadcrumbs?.find((item) => item.PageRoute === pageRoute);
     }
   }
 
@@ -80,7 +73,7 @@ export default function NavBar(props) {
           onDrop={(e) => dropHandler(e, props.pageData, 'vertical')}
           key={props.pageData.PageID}
           onClick={() => navigateTo(props.pageData.PageRoute)}
-          className={`NavbarDropdownItem text-nowrap${isInCurrentPath(props.pageData.PageID) ? ' active' : ''}`}
+          className={`NavbarDropdownItem text-nowrap${isInCurrentPath(props.pageData.PageRoute) ? ' active' : ''}`}
           data-testid={`NavItem-${props.pageData.PageID}`}
         >
           {props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
@@ -97,7 +90,7 @@ export default function NavBar(props) {
           onDrop={(e) => dropHandler(e, props.pageData, 'horizontal')}
           key={props.pageData.PageID}
           title={props.pageData.NavTitle ? props.pageData.NavTitle : props.pageData.PageTitle}
-          id={`nav-dropdown${isInCurrentPath(props.pageData.PageID) ? '-active' : ''}`}
+          id={`nav-dropdown${isInCurrentPath(props.pageData.PageRoute) ? '-active' : ''}`}
           data-testid={`NavItem-${props.pageData.PageID}`}
         >
           <>{children.map((item) => (
@@ -113,7 +106,7 @@ export default function NavBar(props) {
                 onDragOver={(e) => dragOverHandler(e, item, 'vertical')}
                 onDragLeave={(e) => dragLeaveHandler(e)}
                 onDrop={(e) => dropHandler(e, item, 'vertical')}
-                className={`NavbarDropdownItem text-nowrap${pageData?.PageID === item.PageID ? ' active' : ''}`}
+                className={`NavbarDropdownItem text-nowrap${currentPage?.PageID === item.PageID ? ' active' : ''}`}
                 key={item.PageID}
                 onClick={() => navigateTo(item.PageRoute)}
                 data-testid={`NavItem-${item.PageID}`}
@@ -153,7 +146,7 @@ export default function NavBar(props) {
   }
 
   function dragOverHandler(e, dropData, direction) {
-    if (togglerRef.current?.checkVisibility()) {
+    if (toggleRef.current?.checkVisibility()) {
       // navbar is collapsed, all items are vertical
       direction = 'vertical';
     }
@@ -196,7 +189,7 @@ export default function NavBar(props) {
    */
   function dropHandler(e, dropData, direction) {
     if (canEdit) {
-      if (togglerRef.current?.checkVisibility()) {
+      if (toggleRef.current?.checkVisibility()) {
         // navbar is collapsed, all items are vertical
         direction = 'vertical';
       }
@@ -303,7 +296,7 @@ export default function NavBar(props) {
           aria-controls="basic-navbar-nav"
           id="NavbarToggle"
           className="NavbarToggle"
-          ref={togglerRef}
+          ref={toggleRef}
         />
         <Navbar.Collapse
           className="NavbarCollapse"
@@ -327,7 +320,7 @@ export default function NavBar(props) {
                     onDragLeave={(e) => dragLeaveHandler(e)}
                     onDrop={(e) => dropHandler(e, item, 'horizontal')}
                     onClick={() => navigateTo(item.PageRoute)}
-                    className={`NavLink text-nowrap${isInCurrentPath(item.PageID) ? ' active' : ''}`}
+                    className={`NavLink text-nowrap${isInCurrentPath(item.PageRoute) ? ' active' : ''}`}
                     key={item.PageID}
                     data-testid={`NavItem-${item.PageID}`}
                   >
