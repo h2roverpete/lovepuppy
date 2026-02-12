@@ -91,11 +91,15 @@
   height: 40px;
 }
 
-/* Navbar dropdown button */
+/* Navbar toggle button */
 .navbar .navbar-toggler {
   background-color: #8e9f7344;
   border-color: #e9f7d8;
   color: #e9f7d8;
+}
+
+div.AddPageMenu.Editor.dropdown {
+  right: 10px;
 }
 
 /* Navbar dropdown submenus */
@@ -107,9 +111,15 @@
   font-size: 14pt;
 }
 
-/* Active page in dropdowns */
+/* active dropdowns */
+a#nav-dropdown-active.dropdown-toggle.nav-link{
+  color: white;
+}
+
+/* Active pages displayed in dropdowns */
 .navbar-nav .dropdown-menu a.active.dropdown-item {
-  background-color: #00000016;
+  color: white;
+  background-color: transparent;
 }
 
 /* Navbar link hover */
@@ -191,7 +201,7 @@ div.Copyright {
 }
 
 .PageNavigation a:hover {
-  color: #ff4f00;
+  color: #ff9159;
   text-decoration: none;
 }
 
@@ -243,7 +253,7 @@ div.SectionText a:visited {
 }
 
 div.SectionText a:hover {
-  text-decoration: underline;
+  color: #ff9159;
 }
 
 /* Content images */
