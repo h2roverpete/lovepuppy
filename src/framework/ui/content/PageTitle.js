@@ -26,7 +26,7 @@ import {useSiteContext} from "./Site";
  */
 export default function PageTitle(props) {
 
-  const {pageData, error, login} = useContext(PageContext);
+  const {error, login, pageData} = useContext(PageContext);
   const {Outline} = useSiteContext();
   const {Pages} = useRestApi();
   const {canEdit} = useEdit();
