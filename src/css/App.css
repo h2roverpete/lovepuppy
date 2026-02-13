@@ -42,6 +42,8 @@
   align-items: flex-start;
   flex: 1;
   min-height: 100dvh;
+  height: 100%;
+  overflow: scroll;
 }
 
 .NavBarWrapper {
