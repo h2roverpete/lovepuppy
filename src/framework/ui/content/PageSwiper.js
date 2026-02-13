@@ -1,5 +1,8 @@
 import {Swiper, SwiperSlide} from 'swiper/react'
+import {Virtual} from 'swiper/modules';
 import 'swiper/css'
+import 'swiper/css/virtual'
+
 import {useSiteContext} from "./Site";
 import Page from "./Page";
 import {useEffect, useState} from "react";
@@ -22,12 +25,15 @@ export default function PageSwiper(props) {
   useEffect(() => {
     if (swiperInstance) {
       let currentSlideIndex = -1;
-      swipePages?.map((page, index) => {
-        if (location.pathname === page.PageRoute) {
-          currentSlideIndex = index;
-        }
-        return page;
-      })
+      if (location.pathname === '/') {
+        currentSlideIndex = 0;
+      } else {
+        swipePages?.map((page, index) => {
+          if (location.pathname === page.PageRoute) {
+            currentSlideIndex = index;
+          }
+        })
+      }
       if (currentSlideIndex !== -1 && swiperInstance.realIndex !== currentSlideIndex) {
         swiperInstance.slideTo(
           currentSlideIndex,
@@ -49,15 +55,17 @@ export default function PageSwiper(props) {
     <Page {...props}/>
   ) : (
     <Swiper
+      modules={[Virtual]}
       speed={600}
       onSwiper={setSwiperInstance}
       onSlideChange={onSlideChange}
       style={{
         margin: 0,
       }}
+      virtual
     >
-      {swipePages?.map((page) =>
-        <SwiperSlide key={page.PageID} style={{overflow: 'scroll'}}>
+      {swipePages?.map((page, index) =>
+        <SwiperSlide key={page.PageID} virtualIndex={index}>
           <Page {...props} pageId={page.PageID}/>
         </SwiperSlide>
       )}
